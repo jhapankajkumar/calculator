@@ -1,5 +1,7 @@
+import 'package:calculator/Screens/sip_detail.dart';
 import 'package:calculator/util/components.dart';
 import 'package:calculator/util/constants.dart';
+import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,23 +29,27 @@ class _MyHomePageState extends State<MyHomePage> {
   double? investedAmount;
   TextFieldFocus? currentFocus;
   final amountTextField = TextEditingController();
+  SIPData detail = SIPData();
 
   var textFieldSelected = false;
   _calculateSIP() {
     var helper = UtilityHelper();
+
+    detail.amount = amount;
+    detail.interestRate = rate;
+    detail.duration = period;
     corpusAmount = helper
         .getFutureAmountValue(amount ?? 0, rate ?? 0, period ?? 0,
             inflationrate, false, shouldAdjustInflation)
         .roundToDouble();
     setState(() {
-      print("Corpus Amount: $corpusAmount");
       investedAmount = (amount ?? 0) * (period ?? 0) * 12;
       wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
       currentFocus = null;
     });
   }
 
-  final formatter = new NumberFormat("##,###");
+  final formatter = new NumberFormat("#,###");
   bool isAllInputValid() {
     bool isValid = true;
     if (rate == null) {
@@ -89,7 +95,6 @@ class _MyHomePageState extends State<MyHomePage> {
         if (inputtedValue > 0) {
           rate = inputtedValue;
         } else {
-          print("object null");
           rate = null;
         }
       });
@@ -226,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (corpusAmount != null) {
       container = Container(
         width: deviceWidth,
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(0),
         margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -333,10 +338,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       ElevatedButton(
                         child: Text("Detail >>"),
                         onPressed: () {
-                          // Navigator.push(context, MaterialPageRoute(
-                          //     builder: (BuildContext context) {
-
-                          // }));
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (BuildContext context) {
+                            return InvestmentDetail(detail);
+                          }));
                         },
                       ),
                       SizedBox(height: 10),
@@ -407,12 +412,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _amountSection(BuildContext context) {
     TextFieldContainerData data = TextFieldContainerData(
-        placeHolder: "amount",
+        placeHolder: "Amount",
         onTextChange: _onTextChange,
         onFocusChanged: _onFocusChange,
         textField: TextFieldFocus.amount,
         currentFocus: currentFocus,
-        textLimit: 19);
+        textLimit: 15);
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -433,7 +438,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onFocusChanged: _onFocusChange,
         textField: TextFieldFocus.period,
         currentFocus: currentFocus,
-        textLimit: 4);
+        textLimit: 3);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
         "Investment Period",
@@ -454,7 +459,7 @@ class _MyHomePageState extends State<MyHomePage> {
         textLimit: 3);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        "Annual Returns (%)",
+        "Annual Returns(%)",
         style: lableStyle,
       ),
       SizedBox(height: 5),
