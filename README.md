@@ -15,10 +15,9 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-
-![alt Home Page](https://github.com/jhapankajkumar/calculator/IMG_5676.PNG.png)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/IMG_5677.PNG.png)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/IMG_5678.PNG.png)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/IMG_5679.PNG.png)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/IMG_5680.PNG.png)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/IMG_5681.PNG.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5676.PNG.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5677.PNG.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5678.PNG.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5679.PNG.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5680.PNG.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5681.PNG.png)
