@@ -12,11 +12,11 @@ class UtilityHelper {
     if (interestRate == 0) {
       return amount * period * 12;
     }
-    
+
     double roi = interestRate / 100 / 12;
     num power = pow(1 + roi, 12 * (period));
     double value = (((power - 1) * (amount)) / roi) * (1 + roi);
-    // print('Expected Amount $value');
+    print('Expected Amount $value');
     print('\n');
     return value;
   }

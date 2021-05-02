@@ -36,13 +36,14 @@ class _MyHomePageState extends State<MyHomePage> {
             inflationrate, false, shouldAdjustInflation)
         .roundToDouble();
     setState(() {
+      print("Corpus Amount: $corpusAmount");
       investedAmount = (amount ?? 0) * (period ?? 0) * 12;
       wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
       currentFocus = null;
     });
   }
 
-  final formatter = new NumberFormat("#,###");
+  final formatter = new NumberFormat("##,###");
   bool isAllInputValid() {
     bool isValid = true;
     if (rate == null) {
@@ -276,8 +277,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Expanded(
                             child: ListTile(
-                              title:
-                                  Text('\$${formatter.format(corpusAmount)}'),
+                              title: corpusAmount?.isInfinite == false
+                                  ? Text('\$${formatter.format(corpusAmount)}')
+                                  : Text('\$INFINITE'),
                             ),
                           ),
                         ],
@@ -296,9 +298,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             child: ListTile(
                               tileColor: Colors.grey[300],
-                              title: Text(
-                                "\$${formatter.format(investedAmount)}",
-                              ),
+                              title: investedAmount?.isInfinite == false
+                                  ? Text(
+                                      '\$${formatter.format(investedAmount)}')
+                                  : Text('\$INFINITE'),
                             ),
                           ),
                         ],
@@ -315,11 +318,26 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Expanded(
                             child: ListTile(
-                              title: Text("\$${formatter.format(wealthGain)}",
-                                  style: TextStyle(color: Colors.green)),
+                              title: wealthGain?.isInfinite == false
+                                  ? Text(
+                                      '\$${formatter.format(wealthGain)}',
+                                      style: TextStyle(color: Colors.green),
+                                    )
+                                  : Text('\$INFINITE',
+                                      style: TextStyle(color: Colors.green)),
                             ),
                           ),
                         ],
+                      ),
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        child: Text("Detail >>"),
+                        onPressed: () {
+                          // Navigator.push(context, MaterialPageRoute(
+                          //     builder: (BuildContext context) {
+
+                          // }));
+                        },
                       ),
                       SizedBox(height: 10),
                     ],
@@ -421,7 +439,7 @@ class _MyHomePageState extends State<MyHomePage> {
         "Investment Period",
         style: lableStyle,
       ),
-      SizedBox(height: 5),
+      SizedBox(height: 3),
       TextFieldContainer(containerData: data)
     ]);
   }
@@ -433,7 +451,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onFocusChanged: _onFocusChange,
         textField: TextFieldFocus.interestRate,
         currentFocus: currentFocus,
-        textLimit: 4);
+        textLimit: 3);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
         "Annual Returns (%)",
@@ -449,7 +467,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<PieChartSectionData>? showingSections() {
     List<PieChartSectionData>? sectionData;
 
-    if ((wealthGain ?? 0).compareTo(0) > 0) {
+    if ((wealthGain ?? 0).compareTo(0) > 0 && wealthGain?.isInfinite == false) {
       sectionData = List.generate(2, (i) {
         final isTouched = i == touchedIndex;
         final double radius = isTouched ? 150 : 125;
@@ -482,6 +500,20 @@ class _MyHomePageState extends State<MyHomePage> {
             return PieChartSectionData();
         }
       });
+    } else if (corpusAmount?.isInfinite == true) {
+      sectionData = List.generate(1, (i) {
+        return PieChartSectionData(
+          color: const Color(0xff31944a).withOpacity(1.0),
+          value: _getGainPercentage(),
+          title: '',
+          radius: 150,
+          titleStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xff044d7c)),
+          titlePositionPercentageOffset: 0.55,
+        );
+      });
     } else {
       sectionData = List.generate(1, (i) {
         return PieChartSectionData(
@@ -504,6 +536,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if ((wealthGain ?? 0) < 0) {
       return 0;
     }
+    if (corpusAmount?.isInfinite ?? false) {
+      return 100;
+    }
     return (wealthGain ?? 0) / (corpusAmount ?? 0) * 100;
   }
 
@@ -513,9 +548,4 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return (investedAmount ?? 0) / (corpusAmount ?? 0) * 100;
   }
-
-  // int _generateRandom(int limit) {
-  //   var rng = new Random();
-  //   return rng.nextInt(limit);
-  // }
 }
