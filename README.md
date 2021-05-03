@@ -1,23 +1,22 @@
 # Calculator
 
-A new Flutter project.
+A Simple Calculator project built in flutter.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is flutter application to perform financial calculation.
 
-A few resources to get you started if this is your first Flutter project:
+This application has following feature
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+1.  SIP Calculator
+2.  Step Up SIP Calculator
+3.  EMI Calculator
+4.  Future Value Calculator
+5.  Retirement Calculator
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
 
-![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5676.PNG)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5677.PNG)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5678.PNG)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5679.PNG)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5680.PNG)
-![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5681.PNG)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/image1.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/image2.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/image3.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/image4.png)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/image5.png)
