@@ -1,4 +1,4 @@
-# calculator
+# Calculator
 
 A new Flutter project.
 
@@ -14,3 +14,10 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5676.PNG)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5677.PNG)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5678.PNG)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5679.PNG)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5680.PNG)
+![alt Home Page](https://github.com/jhapankajkumar/calculator/blob/master/IMG_5681.PNG)
