@@ -1,6 +1,8 @@
 import 'package:calculator/Screens/sip_detail.dart';
 import 'package:calculator/util/components.dart';
 import 'package:calculator/util/constants.dart';
+import 'package:calculator/util/indicator.dart';
+import 'package:calculator/util/piechart.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -161,63 +163,53 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget buildGraphContainer(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
     var container = Container();
+    double? gainPercentage = _getGainPercentage();
+    double? investmentPercentage = _getInvestmentPercentage();
+
+    String? wealthGainValue =
+        "Wealth Gain (${gainPercentage.toStringAsFixed(2)}%)";
+    String? investedAmountValue =
+        "Amount Invested (${investmentPercentage.toStringAsFixed(2)}%)";
     if (corpusAmount != null) {
       container = Container(
           width: deviceWidth,
           // padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
           margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            color: Colors.grey[300],
-          ),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
             Container(
-              // color: Colors.blue[200],
-              margin: EdgeInsets.fromLTRB(16, 15, 0, 0),
-              width: deviceWidth,
-              child: Text(
-                "Amount Invested vs Return",
-                style: headerTextStyle,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Indicator(
+                    color: Color(0xff31944a),
+                    text: wealthGainValue,
+                    isSquare: true,
+                  ),
+                  SizedBox(
+                    height: 4,
+                  ),
+                  Indicator(
+                    color: Color(0xfff8b250),
+                    text: investedAmountValue,
+                    isSquare: true,
+                  ),
+                  SizedBox(
+                    height: 18,
+                  ),
+                ],
               ),
             ),
             SizedBox(
               height: 10,
             ),
             corpusAmount != null
-                ? Container(
-                    // width: 300,
-
-                    height: 350,
-                    color: Colors.white,
-                    child: Center(
-                      child: PieChart(
-                        PieChartData(
-                            pieTouchData:
-                                PieTouchData(touchCallback: (pieTouchResponse) {
-                              setState(() {
-                                final desiredTouch = pieTouchResponse.touchInput
-                                        is! PointerExitEvent &&
-                                    pieTouchResponse.touchInput
-                                        is! PointerUpEvent;
-                                if (desiredTouch &&
-                                    pieTouchResponse.touchedSection != null) {
-                                  touchedIndex = pieTouchResponse
-                                      .touchedSection?.touchedSectionIndex;
-                                } else {
-                                  touchedIndex = -1;
-                                }
-                              });
-                            }),
-                            startDegreeOffset: 270,
-                            borderData: FlBorderData(
-                              show: false,
-                            ),
-                            sectionsSpace: 2,
-                            centerSpaceRadius: 0,
-                            sections: showingSections()),
-                      ),
-                    ),
+                ? Chart(
+                    corpusAmount: corpusAmount,
+                    wealthGain: wealthGain,
+                    amountInvested: investedAmount,
                   )
                 : Container(),
           ]));
@@ -236,120 +228,118 @@ class _MyHomePageState extends State<MyHomePage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(8)),
           color: Colors.white,
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Colors.grey,
-          //     spreadRadius: 2,
-          //     blurRadius: 2,
-          //     offset: Offset(1, 1), // changes position of shadow
-          //   )
-          // ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              spreadRadius: 2,
+              blurRadius: 2,
+              offset: Offset(1, 1), // changes position of shadow
+            )
+          ],
         ),
         child: Column(
           children: [
-            Card(
-              borderOnForeground: true,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    color: Colors.blue[200],
-                    padding: EdgeInsets.all(8),
-                    width: deviceWidth,
-                    child: Text(
-                      "Summery",
-                      style: headerTextStyle,
-                    ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  color: Colors.blue[200],
+                  padding: EdgeInsets.all(8),
+                  width: deviceWidth,
+                  child: Text(
+                    "Summary",
+                    style: headerTextStyle,
                   ),
-                  //summery
+                ),
+                //summery
 
-                  Column(
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      // Expected Amount
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ListTile(
-                              title: Text('Expected Amount'),
-                            ),
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    // Expected Amount
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ListTile(
+                            title: Text('Expected Amount'),
                           ),
-                          Expanded(
-                            child: ListTile(
-                              title: corpusAmount?.isInfinite == false
-                                  ? Text('\$${formatter.format(corpusAmount)}')
-                                  : Text('\$INFINITE'),
-                            ),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: corpusAmount?.isInfinite == false
+                                ? Text('\$${formatter.format(corpusAmount)}')
+                                : Text('\$INFINITE'),
                           ),
-                        ],
-                      ),
-                      // Invested Amount
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ListTile(
-                              tileColor: Colors.grey[300],
-                              title: Text('Invested Amount'),
-                            ),
+                        ),
+                      ],
+                    ),
+                    // Invested Amount
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ListTile(
+                            tileColor: Colors.grey[300],
+                            title: Text('Invested Amount'),
                           ),
-                          Expanded(
-                            child: ListTile(
-                              tileColor: Colors.grey[300],
-                              title: investedAmount?.isInfinite == false
-                                  ? Text(
-                                      '\$${formatter.format(investedAmount)}')
-                                  : Text('\$INFINITE'),
-                            ),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            tileColor: Colors.grey[300],
+                            title: investedAmount?.isInfinite == false
+                                ? Text('\$${formatter.format(investedAmount)}')
+                                : Text('\$INFINITE'),
                           ),
-                        ],
-                      ),
-                      // Wealth Gain/Lost
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ListTile(
-                              title: Text('Wealth Gain'),
-                            ),
+                        ),
+                      ],
+                    ),
+                    // Wealth Gain/Lost
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ListTile(
+                            title: Text('Wealth Gain'),
                           ),
-                          Expanded(
-                            child: ListTile(
-                              title: wealthGain?.isInfinite == false
-                                  ? Text(
-                                      '\$${formatter.format(wealthGain)}',
-                                      style: TextStyle(color: Colors.green),
-                                    )
-                                  : Text('\$INFINITE',
-                                      style: TextStyle(color: Colors.green)),
-                            ),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: wealthGain?.isInfinite == false
+                                ? Text(
+                                    '\$${formatter.format(wealthGain)}',
+                                    style: TextStyle(color: Colors.green),
+                                  )
+                                : Text('\$INFINITE',
+                                    style: TextStyle(color: Colors.green)),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        child: Text("Detail >>"),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (BuildContext context) {
-                            return InvestmentDetail(detail);
-                          }));
-                        },
-                      ),
-                      SizedBox(height: 10),
-                    ],
-                  ),
-                ],
-              ),
-              shadowColor: Colors.blueGrey,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    CupertinoButton(
+                      child: Text("Detail"),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      color: Colors.blue,
+                      disabledColor: Colors.grey,
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (BuildContext context) {
+                          return InvestmentDetail(detail);
+                        }));
+                      },
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -394,6 +384,7 @@ class _MyHomePageState extends State<MyHomePage> {
           SizedBox(height: 30),
           CupertinoButton(
             child: Text("Calculate"),
+            // padding: EdgeInsets.all(16),
             borderRadius: BorderRadius.all(Radius.circular(8)),
             color: Colors.blue,
             disabledColor: Colors.grey,
@@ -467,74 +458,6 @@ class _MyHomePageState extends State<MyHomePage> {
         containerData: data,
       )
     ]);
-  }
-
-  List<PieChartSectionData>? showingSections() {
-    List<PieChartSectionData>? sectionData;
-
-    if ((wealthGain ?? 0).compareTo(0) > 0 && wealthGain?.isInfinite == false) {
-      sectionData = List.generate(2, (i) {
-        final isTouched = i == touchedIndex;
-        final double radius = isTouched ? 150 : 125;
-        switch (i) {
-          case 0:
-            return PieChartSectionData(
-              color: const Color(0xff31944a).withOpacity(1.0),
-              value: _getGainPercentage(),
-              title: isTouched ? 'Wealth Gain' : "",
-              radius: radius,
-              titleStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xff044d7c)),
-              titlePositionPercentageOffset: 0.55,
-            );
-          case 1:
-            return PieChartSectionData(
-              color: const Color(0xfff8b250).withOpacity(1.0),
-              value: _getInvestmentPercentage(),
-              title: isTouched ? 'Amount Invested' : "",
-              radius: radius,
-              titleStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xff044d7c)),
-              titlePositionPercentageOffset: 0.55,
-            );
-          default:
-            return PieChartSectionData();
-        }
-      });
-    } else if (corpusAmount?.isInfinite == true) {
-      sectionData = List.generate(1, (i) {
-        return PieChartSectionData(
-          color: const Color(0xff31944a).withOpacity(1.0),
-          value: _getGainPercentage(),
-          title: '',
-          radius: 150,
-          titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xff044d7c)),
-          titlePositionPercentageOffset: 0.55,
-        );
-      });
-    } else {
-      sectionData = List.generate(1, (i) {
-        return PieChartSectionData(
-          color: const Color(0xfff8b250).withOpacity(1.0),
-          value: _getInvestmentPercentage(),
-          title: '',
-          radius: 150,
-          titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xff90672d)),
-          titlePositionPercentageOffset: 0.55,
-        );
-      });
-    }
-    return sectionData;
   }
 
   double _getGainPercentage() {

@@ -77,7 +77,7 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
                                           ? Colors.grey[300]
                                           : Colors.white)),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
                                     width: 100,
