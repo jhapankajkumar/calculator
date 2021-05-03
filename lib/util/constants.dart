@@ -21,6 +21,6 @@ TextStyle titleStyle =
 TextStyle lableStyle = TextStyle(
     fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54);
 TextStyle textFieldTextStyle = TextStyle(
-    fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black45);
+    fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black54);
 TextStyle headerTextStyle = TextStyle(
     fontSize: 20.0, fontWeight: FontWeight.normal, color: Colors.black45);

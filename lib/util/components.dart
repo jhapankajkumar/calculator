@@ -74,6 +74,9 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
             child: TextField(
               decoration: InputDecoration(
                 border: InputBorder.none,
+                hintText: widget.containerData.placeHolder,
+                hintStyle: TextStyle(color: Colors.grey[350]),
+                alignLabelWithHint: true,
                 suffixIcon: shouldShowClearButton ? _getClearButton() : null,
               ),
               keyboardType: TextInputType.numberWithOptions(decimal: true),
