@@ -1,21 +1,26 @@
+import 'dart:math';
+
+import 'package:calculator/util/constants.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class InvestmentDetail extends StatefulWidget {
+class SIPProjetionList extends StatefulWidget {
   final SIPData data;
-  InvestmentDetail(this.data);
+  SIPProjetionList(this.data);
   @override
-  _InvestmentDetailState createState() => _InvestmentDetailState();
+  _SIPProjetionListState createState() => _SIPProjetionListState();
 }
 
-class _InvestmentDetailState extends State<InvestmentDetail> {
+class _SIPProjetionListState extends State<SIPProjetionList> {
   final formatter = new NumberFormat("##,###");
   List<SIPData>? list;
   @override
   void initState() {
-    list = getInvestmentValues();
+    list = widget.data.increase == null
+        ? getInvestmentValues()
+        : getStepUpInvestmentValues();
     super.initState();
   }
 
@@ -23,7 +28,33 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Investment Detail"),
+          leading: Container(
+            margin: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.transparent,
+                  spreadRadius: 8,
+                  blurRadius: 2,
+                  offset: Offset(1, 1), // changes position of shadow
+                )
+              ],
+            ),
+            child: Center(
+              child: IconButton(
+                icon: Icon(Icons.arrow_back, color: appTheme.accentColor),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+          title: new Text(
+            "Invetment Detail",
+            style: appTheme.textTheme.bodyText2,
+          ),
+          backgroundColor: appTheme.primaryColor,
+          elevation: 0.0,
         ),
         body: GestureDetector(
             onTap: () {
@@ -72,9 +103,9 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
                               height: 60,
                               decoration: BoxDecoration(
                                   color: index == 0
-                                      ? Colors.blue[300]
+                                      ? appTheme.secondaryHeaderColor
                                       : (index % 2 == 0
-                                          ? Colors.grey[300]
+                                          ? appTheme.primaryColor
                                           : Colors.white)),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -85,7 +116,9 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
                                       padding:
                                           const EdgeInsets.fromLTRB(8, 0, 0, 0),
                                       child: Text(
-                                          "${(data.duration?.toInt())} Years"),
+                                        "${(data.duration?.toInt())} Years",
+                                        style: subTitle1,
+                                      ),
                                     ),
                                   ),
                                   Flexible(
@@ -94,7 +127,9 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                            "\$${data.amount?.toInt() ?? 0}"),
+                                          "\$${data.amount?.toInt() ?? 0}",
+                                          style: subTitle2,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -104,6 +139,7 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
                                       child: Text(
                                         '\$${k_m_b_generator(data.futureValue ?? 0)}',
                                         overflow: TextOverflow.fade,
+                                        style: subTitle2,
                                       ),
                                     ),
                                   ),
@@ -124,7 +160,7 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
   List<SIPData> getInvestmentValues() {
     var helper = UtilityHelper();
     var limit = 35;
-    double amount = helper.getFutureAmountValue(
+    double amount = helper.getCorpusAmount(
         widget.data.amount ?? 0,
         widget.data.interestRate ?? 0,
         (widget.data.duration ?? 0),
@@ -138,7 +174,7 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
         futureValue: amount);
     var list = List.generate(limit - 1, (index) {
       double amount = helper
-          .getFutureAmountValue(widget.data.amount ?? 0,
+          .getCorpusAmount(widget.data.amount ?? 0,
               widget.data.interestRate ?? 0, index + 1, null, false, false)
           .roundToDouble();
       // investedAmount = (amount ?? 0) * (period ?? 0) * 12;
@@ -156,15 +192,73 @@ class _InvestmentDetailState extends State<InvestmentDetail> {
     return list;
   }
 
+  List<SIPData> getStepUpInvestmentValues() {
+    var amount = widget.data.amount;
+    var limit = 35;
+    double? stepupFinalAmount = getSipAmount(widget.data.duration);
+    SIPData data = SIPData(
+        amount: amount,
+        duration: (widget.data.duration ?? 0),
+        increase: 2,
+        futureValue: stepupFinalAmount);
+    var list = List.generate(limit - 1, (index) {
+      double? stepupFinalAmount = getSipAmount((index + 1).toDouble());
+      if (index != 0) {
+        amount =
+            (amount ?? 0) + ((amount ?? 0) * (widget.data.increase ?? 0) / 100);
+      }
+      return SIPData(
+          amount: amount,
+          duration: index + 1,
+          increase: 2,
+          futureValue: stepupFinalAmount);
+    });
+
+    // list.insert(0, list[widget.data.duration?.toInt() ?? 0 - 1]);
+    // list.remove(list[widget.data.duration?.toInt() ?? 0 - 1]);
+    list.insert(0, data);
+    return list;
+  }
+
   // ignore: non_constant_identifier_names
   String k_m_b_generator(double num) {
     if (num.isInfinite == true) {
       return "INFINITE";
     }
-    if (num < 999999999999999999) {
+    if (num < 9999999999) {
       return "${formatter.format(num)}";
     } else {
       return num.roundToDouble().toString();
     }
+  }
+
+  double? getSipAmount(double? duration) {
+    var stepupFinalAmount = 0.0;
+    var sipAmount = widget.data.amount;
+    var totalInvestAmount = sipAmount;
+    var s = (widget.data.increase ?? 0) / 100;
+    var n = (duration ?? 0) * 12;
+    var roi = (widget.data.interestRate ?? 0) / 100 / 12;
+    var value3 = 1 + roi;
+    var value4 = pow(value3, n);
+    var finalValue = (sipAmount ?? 0) * value4;
+    n = n - 1;
+    while (n > 0) {
+      if (n % 12 > 0) {
+        sipAmount = sipAmount;
+        totalInvestAmount = (totalInvestAmount ?? 0) + (sipAmount ?? 0);
+        var value4 = pow(value3, n);
+        finalValue = finalValue + (sipAmount ?? 0) * value4;
+        n = n - 1;
+      } else {
+        sipAmount = (sipAmount ?? 0) + ((sipAmount ?? 0) * s);
+        totalInvestAmount = (totalInvestAmount ?? 0) + sipAmount;
+        var value4 = pow(value3, n);
+        finalValue = finalValue + sipAmount * value4;
+        n = n - 1;
+      }
+    }
+    stepupFinalAmount = finalValue.roundToDouble();
+    return stepupFinalAmount;
   }
 }

@@ -1,107 +1,64 @@
-import 'dart:math';
-import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/components.dart';
 import 'package:calculator/util/constants.dart';
 import 'package:calculator/util/indicator.dart';
 import 'package:calculator/util/piechart.dart';
-import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/string_constants.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class SIPCalculator extends StatefulWidget {
-  SIPCalculator({Key? key, required this.title, required this.isSteupUp})
-      : super(key: key);
+class FixedDepositeCalculator extends StatefulWidget {
   final String title;
-  final bool isSteupUp;
-
+  final bool isFixedDeposit;
+  FixedDepositeCalculator({
+    Key? key,
+    required this.title,
+    required this.isFixedDeposit,
+  });
   @override
-  _SIPCalculatorState createState() => _SIPCalculatorState();
+  _FixedDepositeCalculatorState createState() =>
+      _FixedDepositeCalculatorState();
 }
 
-class _SIPCalculatorState extends State<SIPCalculator> {
+enum Compounding { monthly, quaterly, annually }
+
+class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
   bool shouldAdjustInflation = false;
   double? corpusAmount;
   double? amount;
   double? rate;
-  double? inflationrate;
   double? period;
   int? touchedIndex;
   double? wealthGain;
   double? investedAmount;
   TextFieldFocus? currentFocus;
-  double? stepUpPercentage;
   final amountTextField = TextEditingController();
-  SIPData detail = SIPData();
-  String? errorText;
-
+  Compounding? _compounding = Compounding.quaterly;
   var textFieldSelected = false;
-  _calculateSIP() {
+  _calculateAmount() {
+    removeFocust(context);
     var helper = UtilityHelper();
-    detail.amount = amount;
-    detail.interestRate = rate;
-    detail.duration = period;
-    detail.increase = stepUpPercentage;
-    if (widget.isSteupUp && stepUpPercentage != null) {
-      var stepupFinalAmount = 0.0;
-      var stepupInvestAmount = 0.0;
-      var stepupInterestAmount = 0.0;
-      var sipAmount = amount;
-      var totalInvestAmount = sipAmount;
-      var s = (stepUpPercentage ?? 0) / 100;
-      var n = (period ?? 0) * 12;
-      var roi = (rate ?? 0) / 100 / 12;
-      var value3 = 1 + roi;
-      var value4 = pow(value3, n);
-      var finalValue = (sipAmount ?? 0) * value4;
-      n = n - 1;
-      while (n > 0) {
-        if (n % 12 > 0) {
-          sipAmount = sipAmount;
-          totalInvestAmount = (totalInvestAmount ?? 0) + (sipAmount ?? 0);
-          var value4 = pow(value3, n);
-          finalValue = finalValue + (sipAmount ?? 0) * value4;
-          n = n - 1;
-        } else {
-          sipAmount = (sipAmount ?? 0) + ((sipAmount ?? 0) * s);
-          totalInvestAmount = (totalInvestAmount ?? 0) + sipAmount;
-          var value4 = pow(value3, n);
-          finalValue = finalValue + sipAmount * value4;
-          n = n - 1;
-        }
-      }
-      stepupFinalAmount = finalValue.roundToDouble();
-      stepupInvestAmount = (totalInvestAmount ?? 0).roundToDouble();
-      stepupInterestAmount = stepupFinalAmount - stepupInvestAmount;
-      stepupInterestAmount = stepupInterestAmount.roundToDouble();
-
-      setState(() {
-        investedAmount = stepupInvestAmount;
-        corpusAmount = stepupFinalAmount;
-        wealthGain = stepupInterestAmount;
-        currentFocus = null;
-      });
-    } else {
-      corpusAmount = helper
-          .getCorpusAmount(amount ?? 0, rate ?? 0, period ?? 0, inflationrate,
-              false, shouldAdjustInflation)
-          .roundToDouble();
-      setState(() {
-        investedAmount = (amount ?? 0) * (period ?? 0) * 12;
-        wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
-        currentFocus = null;
-      });
+    var compoundedValue = 4;
+    if (_compounding == Compounding.annually) {
+      compoundedValue = 1;
+    } else if (_compounding == Compounding.monthly) {
+      compoundedValue = 12;
     }
+    corpusAmount = helper
+        .getFutureValueAmount(
+            amount ?? 0, rate ?? 0, period ?? 0, compoundedValue)
+        .roundToDouble();
+    setState(() {
+      investedAmount = amount;
+      wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
+      currentFocus = null;
+    });
   }
 
   final formatter = new NumberFormat("#,###");
   bool isAllInputValid() {
     bool isValid = true;
-    if (errorText != null) {
-      isValid = false;
-    }
     if (rate == null) {
       isValid = false;
     }
@@ -149,22 +106,24 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         }
       });
     }
-
-    if (textField == TextFieldFocus.stepUp) {
-      setState(() {
-        if (inputtedValue > 0) {
-          stepUpPercentage = inputtedValue;
-        } else {
-          stepUpPercentage = null;
-        }
-      });
-    }
   }
 
   _onFocusChange(TextFieldFocus? textField, bool value) {
     if (value == true) {
       setState(() {
         currentFocus = textField;
+      });
+    }
+  }
+
+  void removeFocust(BuildContext context) {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    if (this.currentFocus != null) {
+      setState(() {
+        this.currentFocus = null;
       });
     }
   }
@@ -205,15 +164,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         ),
         body: GestureDetector(
             onTap: () {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus) {
-                currentFocus.unfocus();
-              }
-              if (this.currentFocus != null) {
-                setState(() {
-                  this.currentFocus = null;
-                });
-              }
+              removeFocust(context);
             },
             child: Container(
               margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -247,7 +198,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                       ),
                       buildGraphContainer(context),
                       SizedBox(
-                        height: 20,
+                        height: 50,
                       ),
                     ],
                   )),
@@ -427,24 +378,6 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                         ),
                       ],
                     ),
-                    Container(
-                      height: 1,
-                      color: appTheme.accentColor,
-                    ),
-                    SizedBox(height: 30),
-                    CupertinoButton(
-                      child: Text("Detail"),
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      color: appTheme.accentColor,
-                      disabledColor: Colors.grey,
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (BuildContext context) {
-                          return SIPProjetionList(detail);
-                        }));
-                      },
-                    ),
-                    SizedBox(height: 10),
                   ],
                 ),
               ],
@@ -461,7 +394,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
     return Container(
         width: deviceWidth,
         padding: EdgeInsets.all(16),
-        margin: EdgeInsets.fromLTRB(8, 10, 8, 0),
+        margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           _amountSection(context),
           SizedBox(height: 20),
@@ -469,8 +402,13 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           SizedBox(height: 20),
           _rateSection(context),
           SizedBox(height: 20),
-          widget.isSteupUp ? _stepUpSection(context) : Container(),
-          widget.isSteupUp ? SizedBox(height: 20) : Container(),
+          widget.isFixedDeposit
+              ? _buildRadioList(context)
+              : Text(
+                  '* Compounding quaterly.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 10, color: Color(0xffFF4611)),
+                ),
           SizedBox(height: 20),
           CupertinoButton(
             child: Text(StringConstants.calculate),
@@ -479,7 +417,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
             disabledColor: Colors.grey,
             onPressed: isAllInputValid()
                 ? () {
-                    _calculateSIP();
+                    _calculateAmount();
                     FocusScopeNode currentFocus = FocusScope.of(context);
                     if (!currentFocus.hasPrimaryFocus) {
                       currentFocus.unfocus();
@@ -488,6 +426,66 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                 : null,
           )
         ]));
+  }
+
+  Widget _buildRadioList(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(8)),
+        color: appTheme.primaryColor,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Compounding',
+            textAlign: TextAlign.center,
+            style: appTheme.textTheme.caption,
+          ),
+          ListTile(
+            title: Text('Monthly', style: appTheme.textTheme.caption),
+            horizontalTitleGap: 0,
+            leading: Radio<Compounding>(
+              value: Compounding.monthly,
+              groupValue: _compounding,
+              onChanged: (Compounding? value) {
+                setState(() {
+                  _compounding = value;
+                });
+              },
+            ),
+          ),
+          ListTile(
+            title: Text('Quaterly', style: appTheme.textTheme.caption),
+            horizontalTitleGap: 0,
+            leading: Radio<Compounding>(
+              value: Compounding.quaterly,
+              groupValue: _compounding,
+              onChanged: (Compounding? value) {
+                setState(() {
+                  _compounding = value;
+                });
+              },
+            ),
+          ),
+          ListTile(
+            title: Text('Annually', style: appTheme.textTheme.caption),
+            horizontalTitleGap: 0,
+            leading: Radio<Compounding>(
+              value: Compounding.annually,
+              groupValue: _compounding,
+              onChanged: (Compounding? value) {
+                setState(() {
+                  _compounding = value;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+    return Container();
   }
 
   Widget _amountSection(BuildContext context) {
@@ -503,7 +501,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            StringConstants.monthlyInvestmentAmount,
+            widget.isFixedDeposit
+                ? StringConstants.fixedDepositAmount
+                : StringConstants.investmentAmount,
             style: appTheme.textTheme.caption,
           ),
           SizedBox(height: 10),
@@ -521,7 +521,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         textLimit: 3);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        StringConstants.investmentPeriod,
+        widget.isFixedDeposit
+            ? StringConstants.depositPriod
+            : StringConstants.investmentPeriod,
         style: appTheme.textTheme.caption,
       ),
       SizedBox(height: 10),
@@ -531,7 +533,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
 
   Widget _rateSection(BuildContext context) {
     TextFieldContainerData data = TextFieldContainerData(
-        placeHolder: "12",
+        placeHolder: "10",
         onTextChange: _onTextChange,
         onFocusChanged: _onFocusChange,
         textField: TextFieldFocus.interestRate,
@@ -539,30 +541,12 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         textLimit: 5);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        StringConstants.expectedReturn,
+        widget.isFixedDeposit
+            ? StringConstants.depositIntrestRate
+            : StringConstants.expectedReturn,
         style: appTheme.textTheme.caption,
       ),
       SizedBox(height: 10),
-      TextFieldContainer(
-        containerData: data,
-      )
-    ]);
-  }
-
-  Widget _stepUpSection(BuildContext context) {
-    TextFieldContainerData data = TextFieldContainerData(
-        placeHolder: "10",
-        onTextChange: _onTextChange,
-        onFocusChanged: _onFocusChange,
-        textField: TextFieldFocus.stepUp,
-        currentFocus: currentFocus,
-        textLimit: 3);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        StringConstants.annualPercentageIncreamntOnSip,
-        style: appTheme.textTheme.caption,
-      ),
-      SizedBox(height: 5),
       TextFieldContainer(
         containerData: data,
       )

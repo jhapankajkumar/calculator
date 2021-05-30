@@ -1,3 +1,4 @@
+import 'package:calculator/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'Screens/landing_page.dart';
@@ -12,10 +13,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Calculator',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: appTheme,
       home: LandingPage(title: 'Calculator'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

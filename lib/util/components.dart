@@ -11,6 +11,7 @@ class TextFieldContainerData {
   final TextFieldFocus? textField;
   final TextFieldFocus? currentFocus;
   final int? textLimit;
+  final String? errorText;
 
   TextFieldContainerData(
       {required this.placeHolder,
@@ -18,7 +19,8 @@ class TextFieldContainerData {
       required this.onFocusChanged,
       required this.textField,
       required this.currentFocus,
-      required this.textLimit});
+      required this.textLimit,
+      this.errorText});
 }
 
 class TextFieldContainer extends StatefulWidget {
@@ -51,16 +53,16 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
     var container = Container(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          color: Color(0xffEFEFEF),
           boxShadow: [
             BoxShadow(
               color: widget.containerData.currentFocus == focusField
                   ? Colors.blue
                   : Colors.grey,
-              spreadRadius: 2,
-              blurRadius: 2,
-              offset: Offset(1, 1), // changes position of shadow
+              spreadRadius: 0,
+              blurRadius: 0,
+              offset: Offset(0, 0), // changes position of shadow
             ),
           ],
         ),
@@ -76,11 +78,12 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
                 border: InputBorder.none,
                 hintText: widget.containerData.placeHolder,
                 hintStyle: TextStyle(color: Colors.grey[350]),
+                errorText: widget.containerData.errorText,
                 alignLabelWithHint: true,
                 suffixIcon: shouldShowClearButton ? _getClearButton() : null,
               ),
               keyboardType: TextInputType.numberWithOptions(decimal: true),
-              style: textFieldTextStyle,
+              style: appTheme.textTheme.subtitle2,
               inputFormatters: [
                 LengthLimitingTextInputFormatter(
                     widget.containerData.textLimit),

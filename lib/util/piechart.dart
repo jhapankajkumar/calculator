@@ -31,9 +31,7 @@ class Chart extends StatelessWidget {
   List<PieChartSectionData>? showingSections() {
     List<PieChartSectionData>? sectionData;
     double? gainPercentage = _getGainPercentage();
-    print("wealth Gain ${gainPercentage}");
     double? investmentPercentage = _getInvestmentPercentage();
-    print("Amount Invested ${investmentPercentage}");
     final double radius = 75;
     if ((wealthGain ?? 0).compareTo(0) > 0 && wealthGain?.isInfinite == false) {
       if (gainPercentage > 99.99) {
@@ -67,14 +65,14 @@ class Chart extends StatelessWidget {
               );
             case 1:
               return PieChartSectionData(
-                color: const Color(0xfff8b250).withOpacity(1.0),
+                color: const Color(0xffFF4611).withOpacity(1.0),
                 value: investmentPercentage,
                 title: "",
                 radius: radius,
                 titleStyle: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xff044d7c)),
+                    color: const Color(0xffFF4611)),
                 titlePositionPercentageOffset: 0.55,
               );
             default:
@@ -106,7 +104,7 @@ class Chart extends StatelessWidget {
           titleStyle: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: const Color(0xff90672d)),
+              color: const Color(0xffFF4611)),
           titlePositionPercentageOffset: 0.55,
         );
       });
