@@ -91,7 +91,7 @@ Widget buildSummeryContainer(
                         buildSummaryRow(
                             targetAmount, StringConstants.futureTargetAmout),
                         devider(),
-                        buildSummaryRow(period,
+                        buildPeriodRow(period,
                             StringConstants.futureAmountInvestmentPeriod),
                         devider(),
                         buildSummaryRow(
@@ -148,24 +148,24 @@ Widget buildSummaryRow(double? amount, String title) {
   );
 }
 
-Widget buildDescriptionRow(double? amount, String title) {
+Widget buildPeriodRow(double? amount, String title) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceAround,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Expanded(
         child: ListTile(
-          title: RichText(
-            text: TextSpan(
-              text: 'You require monthly SIP of amount ',
-              style: subTitle1,
-              children: <TextSpan>[
-                TextSpan(
-                    text: '\$${formatter.format(amount)}', style: subTitle2),
-                TextSpan(text: ' to achieve your target amount.'),
-              ],
-            ),
-          ),
+          title: Text(title),
+        ),
+      ),
+      Expanded(
+        child: ListTile(
+          title: amount?.isInfinite == false
+              ? Text(
+                  amount != null ? '${amount.toInt()}' : "",
+                  style: subTitle2,
+                )
+              : Text('\$INFINITE', style: subTitle2),
         ),
       ),
     ],
