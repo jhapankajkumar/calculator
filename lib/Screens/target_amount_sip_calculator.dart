@@ -1,12 +1,13 @@
 import 'dart:math';
 
-import 'package:calculator/Screens/sip_projection_list.dart';
-import 'package:calculator/util/components.dart';
-import 'package:calculator/util/constants.dart';
-import 'package:calculator/util/indicator.dart';
-import 'package:calculator/util/piechart.dart';
+import 'package:calculator/util/Components/appbar.dart';
+import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/text_field_container.dart';
+import 'package:calculator/util/Constants/constants.dart';
+import 'package:calculator/util/Components/indicator.dart';
+import 'package:calculator/util/Components/piechart.dart';
 import 'package:calculator/util/sip_data.dart';
-import 'package:calculator/util/string_constants.dart';
+import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,30 +23,28 @@ class TargetAmountSIPCalculator extends StatefulWidget {
 }
 
 class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
-  bool shouldAdjustInflation = false;
   double? sipAmount;
   double? amount;
   double? rate;
   double? inflationrate;
   double? period;
-  int? touchedIndex;
+
   double? wealthGain;
   double? investedAmount;
   TextFieldFocus? currentFocus;
   double? stepUpPercentage;
-  final amountTextField = TextEditingController();
+
   SIPData detail = SIPData();
 
-  var textFieldSelected = false;
-  _calculateSIP() {
+  _calculateTargetAmount() {
     var helper = UtilityHelper();
     detail.amount = amount;
     detail.interestRate = rate;
     detail.duration = period;
     detail.increase = stepUpPercentage;
     double montlyAmount = helper
-        .getSIPAmount(amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false,
-            shouldAdjustInflation)
+        .getSIPAmount(
+            amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
         .roundToDouble();
     setState(() {
       sipAmount = montlyAmount;
@@ -68,6 +67,16 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
       isValid = false;
     }
     return isValid;
+  }
+
+  void _calculateButtonTapped() {
+    {
+      _calculateTargetAmount();
+      FocusScopeNode currentFocus = FocusScope.of(context);
+      if (!currentFocus.hasPrimaryFocus) {
+        currentFocus.unfocus();
+      }
+    }
   }
 
   _onTextChange(TextFieldFocus? textField, String value) {
@@ -130,35 +139,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
     double deviceWidth = MediaQuery.of(context).size.width;
     double deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-        appBar: AppBar(
-          leading: Container(
-            margin: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.transparent,
-                  spreadRadius: 8,
-                  blurRadius: 2,
-                  offset: Offset(1, 1), // changes position of shadow
-                )
-              ],
-            ),
-            child: Center(
-              child: IconButton(
-                icon: Icon(Icons.arrow_back, color: appTheme.accentColor),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ),
-          title: new Text(
-            widget.title,
-            style: appTheme.textTheme.bodyText2,
-          ),
-          backgroundColor: appTheme.primaryColor,
-          elevation: 0.0,
-        ),
+        appBar: appBar(title: widget.title, context: context),
         body: GestureDetector(
             onTap: () {
               FocusScopeNode currentFocus = FocusScope.of(context);
@@ -450,22 +431,13 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
           SizedBox(height: 20),
           _rateSection(context),
           SizedBox(height: 30),
-          CupertinoButton(
-            child: Text(StringConstants.calculate),
-            // padding: EdgeInsets.all(16),
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            color: Colors.blue,
-            disabledColor: Colors.grey,
-            onPressed: isAllInputValid()
-                ? () {
-                    _calculateSIP();
-                    FocusScopeNode currentFocus = FocusScope.of(context);
-                    if (!currentFocus.hasPrimaryFocus) {
-                      currentFocus.unfocus();
-                    }
-                  }
-                : null,
-          )
+          Row(children: [
+            Expanded(
+                child: calculateButton(
+                    title: StringConstants.calculate,
+                    onPress:
+                        isAllInputValid() ? _calculateButtonTapped : null)),
+          ])
         ]));
   }
 

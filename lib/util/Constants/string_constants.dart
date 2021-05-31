@@ -64,4 +64,9 @@ class StringConstants {
   static String loanEMI = 'Loan EMI';
   static String totalInterestPayable = 'Total interest payable';
   static String totalPayment = "Total payment (Principal + Interest)";
+
+  static String totalInterest = 'Total Interest';
+  static String principalLoanAmount = "Principal Loan Amount";
+
+  static String amountInvested = "Amount Invested";
 }

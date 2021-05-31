@@ -1,6 +1,7 @@
 import 'dart:math';
 
-import 'package:calculator/util/constants.dart';
+import 'package:calculator/util/Components/appbar.dart';
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
@@ -27,35 +28,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: Container(
-            margin: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.transparent,
-                  spreadRadius: 8,
-                  blurRadius: 2,
-                  offset: Offset(1, 1), // changes position of shadow
-                )
-              ],
-            ),
-            child: Center(
-              child: IconButton(
-                icon: Icon(Icons.arrow_back, color: appTheme.accentColor),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ),
-          title: new Text(
-            "Invetment Detail",
-            style: appTheme.textTheme.bodyText2,
-          ),
-          backgroundColor: appTheme.primaryColor,
-          elevation: 0.0,
-        ),
+        appBar: appBar(title: "Investment Detail", context: context),
         body: GestureDetector(
             onTap: () {
               FocusScopeNode currentFocus = FocusScope.of(context);

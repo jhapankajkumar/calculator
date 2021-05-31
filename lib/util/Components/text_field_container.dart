@@ -1,4 +1,4 @@
-import 'package:calculator/util/constants.dart';
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -115,48 +115,31 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
   }
 }
 
-// class TextFieldContainer {
-//   TextFieldFocus? focusField;
-//   Widget buildContainer(
-//       String label,
-//       Function onTextChange,
-//       Function onFocusChanged,
-//       TextFieldFocus textField,
-//       TextFieldFocus? currentFocus) {
-//     focusField = textField;
-//     var container = Container(
-//         padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
-//         decoration: BoxDecoration(
-//           borderRadius: BorderRadius.circular(5),
-//           color: Colors.white,
-//           boxShadow: [
-//             BoxShadow(
-//               color: currentFocus == focusField ? Colors.blue : Colors.grey,
-//               spreadRadius: 2,
-//               blurRadius: 2,
-//               offset: Offset(1, 1), // changes position of shadow
-//             ),
-//           ],
-//         ),
-//         child: FocusScope(
-//           child: Focus(
-//             onFocusChange: (value) {
-//               onFocusChanged(focusField, value);
-//             },
-//             child: TextField(
-//               decoration: InputDecoration(
-//                   border: InputBorder.none,
-//                   labelText: label,
-//                   suffixIcon: _getClearButton()),
-//               keyboardType: TextInputType.numberWithOptions(decimal: true),
-//               style: textFieldTextStyle,
-//               controller: ,
-//               onChanged: (value) {
-//                 onTextChange(focusField, value);
-//               },
-//             ),
-//           ),
-//         ));
-//     return container;
-//   }
-//}
+Widget buildTextFieldContainerSection({
+  required String placeHolder,
+  required TextFieldFocus textFieldType,
+  TextFieldFocus? focus,
+  required int textLimit,
+  required String containerTitle,
+  Function? onTextChange,
+  Function? onFocusChange,
+}) {
+  TextFieldContainerData data = TextFieldContainerData(
+      placeHolder: placeHolder,
+      onTextChange: onTextChange,
+      onFocusChanged: onFocusChange,
+      textField: textFieldType,
+      currentFocus: focus,
+      textLimit: textLimit);
+  return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          containerTitle,
+          style: appTheme.textTheme.caption,
+        ),
+        SizedBox(height: 10),
+        TextFieldContainer(containerData: data)
+      ]);
+}

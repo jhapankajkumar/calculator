@@ -1,7 +1,8 @@
 import 'dart:math';
 
-import 'package:calculator/util/components.dart';
-import 'package:calculator/util/constants.dart';
+import 'package:calculator/util/Components/appbar.dart';
+import 'package:calculator/util/Components/text_field_container.dart';
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,21 +20,19 @@ class RetirementCalculator extends StatefulWidget {
 }
 
 class _RetirementCalculatorState extends State<RetirementCalculator> {
-  bool shouldAdjustInflation = false;
   double? corpusAmount;
   double? amount;
   double? rate;
   double? inflationrate;
   double? period;
-  int? touchedIndex;
+
   double? wealthGain;
   double? investedAmount;
   TextFieldFocus? currentFocus;
   double? stepUpPercentage;
-  final amountTextField = TextEditingController();
+
   SIPData detail = SIPData();
 
-  var textFieldSelected = false;
   _calculateSIP() {
     var helper = UtilityHelper();
     detail.amount = amount;
@@ -81,8 +80,8 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       });
     } else {
       corpusAmount = helper
-          .getCorpusAmount(amount ?? 0, rate ?? 0, period ?? 0, inflationrate,
-              false, shouldAdjustInflation)
+          .getCorpusAmount(
+              amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
           .roundToDouble();
       setState(() {
         investedAmount = (amount ?? 0) * (period ?? 0) * 12;
@@ -166,9 +165,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
   Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
+        appBar: appBar(title: widget.title, context: context),
         body: GestureDetector(
             onTap: () {
               FocusScopeNode currentFocus = FocusScope.of(context);

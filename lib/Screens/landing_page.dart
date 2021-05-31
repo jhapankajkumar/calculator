@@ -1,9 +1,11 @@
 import 'package:calculator/Screens/emi_calculator.dart';
 import 'package:calculator/Screens/sip_calculator.dart';
 import 'package:calculator/Screens/target_amount_sip_calculator.dart';
-import 'package:calculator/util/constants.dart';
-import 'package:calculator/util/image_constants.dart';
-import 'package:calculator/util/string_constants.dart';
+import 'package:calculator/util/Components/appbar.dart';
+import 'package:calculator/util/Components/base_container.dart';
+import 'package:calculator/util/Constants/constants.dart';
+import 'package:calculator/util/Constants/image_constants.dart';
+import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'fixed_deposite_calculator.dart';
@@ -83,34 +85,10 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
-    double deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-        appBar: new AppBar(
-          title: new Text(
-            StringConstants.calculator,
-            style: appTheme.textTheme.bodyText2,
-          ),
-          backgroundColor: appTheme.primaryColor,
-          elevation: 0.0,
-        ),
-        body: Container(
-          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-          width: deviceWidth,
-          height: deviceHeight,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.transparent,
-                spreadRadius: 8,
-                blurRadius: 2,
-                offset: Offset(1, 1), // changes position of shadow
-              )
-            ],
-          ),
+        appBar: appBar(title: StringConstants.calculator, context: context),
+        body: baseContainer(
+          context: context,
           child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(
@@ -122,13 +100,6 @@ class _LandingPageState extends State<LandingPage> {
                       SizedBox(
                         height: 10,
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.fromLTRB(36, 0, 0, 0),
-                      //   child: Text(
-                      //     "Systmatic Investmnt Planning",
-                      //     style: appTheme.textTheme.subtitle1,
-                      //   ),
-                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -142,19 +113,12 @@ class _LandingPageState extends State<LandingPage> {
                       SizedBox(
                         height: 10,
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.fromLTRB(36, 0, 0, 0),
-                      //   child: Text(
-                      //     "Value of Your Money",
-                      //     style: appTheme.textTheme.subtitle1,
-                      //   ),
-                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          buildSIPView(context, StringConstants.futureValue,
-                              ImageConstants.futureValue, _futureValueClicked),
+                          buildSIPView(context, StringConstants.fixedDeposit,
+                              ImageConstants.fd, _fdClicked),
                           buildSIPView(context, StringConstants.emi,
                               ImageConstants.emi, _emiClicked),
                         ],
@@ -166,8 +130,8 @@ class _LandingPageState extends State<LandingPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          buildSIPView(context, StringConstants.fixedDeposit,
-                              ImageConstants.fd, _fdClicked),
+                          buildSIPView(context, StringConstants.futureValue,
+                              ImageConstants.futureValue, _futureValueClicked),
                           buildSIPView(
                               context,
                               StringConstants.targetAmount,
