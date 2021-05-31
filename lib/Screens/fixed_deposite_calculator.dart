@@ -158,8 +158,12 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                     ),
                     buildSummeryContainer(
                       context: context,
-                      expectedAmountTitle: StringConstants.expectedAmount,
-                      investedAmountTitle: StringConstants.investedAmount,
+                      expectedAmountTitle: widget.isFixedDeposit
+                          ? StringConstants.expectedAmount
+                          : StringConstants.futureValueOfAmount,
+                      investedAmountTitle: widget.isFixedDeposit
+                          ? StringConstants.investedAmount
+                          : StringConstants.stringAmount,
                       wealthGainTitle: StringConstants.wealthGain,
                       totalExpectedAmount: corpusAmount,
                       totalGainAmount: wealthGain,
@@ -196,7 +200,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
               textLimit: 15,
               containerTitle: widget.isFixedDeposit
                   ? StringConstants.fixedDepositAmount
-                  : StringConstants.investmentAmount,
+                  : StringConstants.stringAmount,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
               onTextChange: _onTextChange),
@@ -207,7 +211,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
               textLimit: 3,
               containerTitle: widget.isFixedDeposit
                   ? StringConstants.depositPriod
-                  : StringConstants.investmentPeriod,
+                  : StringConstants.numberOfYears,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
               onTextChange: _onTextChange),
@@ -218,7 +222,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
               textLimit: 5,
               containerTitle: widget.isFixedDeposit
                   ? StringConstants.depositIntrestRate
-                  : StringConstants.expectedReturn,
+                  : StringConstants.interestRate,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
               onTextChange: _onTextChange),

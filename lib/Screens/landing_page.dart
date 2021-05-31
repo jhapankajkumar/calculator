@@ -86,7 +86,10 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: StringConstants.calculator, context: context),
+        appBar: appBar(
+            title: StringConstants.calculator,
+            context: context,
+            isBackButton: false),
         body: baseContainer(
           context: context,
           child: Padding(

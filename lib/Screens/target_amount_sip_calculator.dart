@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/piechartsection.dart';
+import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Components/indicator.dart';
@@ -178,11 +180,27 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
                       SizedBox(
                         height: 20,
                       ),
-                      buildSummeryContainer(context),
+                      buildSummeryContainer(
+                          context: context,
+                          expectedAmountTitle: StringConstants.expectedAmount,
+                          investedAmountTitle: StringConstants.investedAmount,
+                          wealthGainTitle: StringConstants.wealthGain,
+                          targetAmount: amount,
+                          period: period,
+                          sipAmount: sipAmount,
+                          totalGainAmount: wealthGain,
+                          totalInvestedAmount: investedAmount,
+                          isTargetAmount: true),
                       SizedBox(
                         height: 20,
                       ),
-                      buildGraphContainer(context),
+                      buildGraphContainer(
+                          context: context,
+                          totalExpectedAmount: amount,
+                          totalGainAmount: wealthGain,
+                          totalInvestedAmount: investedAmount,
+                          gainTitle: StringConstants.wealthGain,
+                          investedTitle: StringConstants.amountInvested),
                       SizedBox(
                         height: 20,
                       ),
@@ -191,70 +209,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
             )));
   }
 
-  Widget buildGraphContainer(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
-    var container = Container();
-    double? gainPercentage = _getGainPercentage();
-    double? investmentPercentage = _getInvestmentPercentage();
-
-    String? wealthGainValue =
-        "Wealth Gain (${gainPercentage.toStringAsFixed(2)}%)";
-    String? investedAmountValue =
-        "Amount Invested (${investmentPercentage.toStringAsFixed(2)}%)";
-    if (sipAmount != null) {
-      container = Container(
-          width: deviceWidth,
-          padding: EdgeInsets.all(16),
-          margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            color: appTheme.primaryColor,
-          ),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Indicator(
-                    color: Color(0xff31944a),
-                    text: wealthGainValue,
-                    isSquare: false,
-                    textColor: appTheme.accentColor,
-                  ),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Indicator(
-                    color: Color(0xffFF4611),
-                    text: investedAmountValue,
-                    isSquare: false,
-                    textColor: appTheme.accentColor,
-                  ),
-                  SizedBox(
-                    height: 18,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            sipAmount != null
-                ? Chart(
-                    corpusAmount: amount,
-                    wealthGain: wealthGain,
-                    amountInvested: investedAmount,
-                  )
-                : Container(),
-          ]));
-    }
-    return container;
-  }
-
-  Widget buildSummeryContainer(BuildContext context) {
+  /*Widget buildSummeryContainer(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
     var container = Container();
     if (sipAmount != null) {
@@ -264,15 +219,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
         margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(8)),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey,
-              spreadRadius: 2,
-              blurRadius: 2,
-              offset: Offset(1, 1), // changes position of shadow
-            )
-          ],
+          color: appTheme.primaryColor,
         ),
         child: Column(
           children: [
@@ -282,12 +229,12 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Container(
-                  color: Colors.blue[200],
+                  color: appTheme.accentColor,
                   padding: EdgeInsets.all(8),
                   width: deviceWidth,
                   child: Text(
                     "Summary",
-                    style: appTheme.textTheme.subtitle1,
+                    style: appTheme.textTheme.bodyText1,
                   ),
                 ),
                 //summery
@@ -298,114 +245,18 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
                       height: 10,
                     ),
                     // Expected Amount
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Your target amount'),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListTile(
-                            title: amount?.isInfinite == false
-                                ? Text('\$${formatter.format(amount)}')
-                                : Text('\$0'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: ListTile(
-                            tileColor: Colors.grey[300],
-                            title: Text('Number of years to save'),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListTile(
-                            tileColor: Colors.grey[300],
-                            title: investedAmount?.isInfinite == false
-                                ? Text('${(period?.toInt())}')
-                                : Text('\$0'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Invested Amount
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: ListTile(
-                            tileColor: Colors.grey[300],
-                            title: Text('Monthly SIP required'),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListTile(
-                            tileColor: Colors.grey[300],
-                            title: investedAmount?.isInfinite == false
-                                ? Text('\$${formatter.format(sipAmount)}',
-                                    style: TextStyle(color: Colors.red))
-                                : Text('\$INFINITE'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Total amount invested in SIP'),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListTile(
-                            title: wealthGain?.isInfinite == false
-                                ? Text(
-                                    '\$${formatter.format(investedAmount)}',
-                                  )
-                                : Text(
-                                    '\$INFINITE',
-                                  ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    // Wealth Gain/Lost
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Wealth Gain'),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListTile(
-                            title: wealthGain?.isInfinite == false
-                                ? Text(
-                                    '\$${formatter.format(wealthGain)}',
-                                    style: TextStyle(color: Colors.green),
-                                  )
-                                : Text('\$INFINITE',
-                                    style: TextStyle(color: Colors.green)),
-                          ),
-                        ),
-                      ],
-                    ),
-
+                    buildSummaryRow(amount, StringConstants.futureTargetAmout),
+                    devider(),
+                    buildSummaryRow(
+                        period, StringConstants.futureAmountInvestmentPeriod),
+                    devider(),
+                    buildSummaryRow(
+                        sipAmount, StringConstants.monthlySIPRequired),
+                    devider(),
+                    buildSummaryRow(investedAmount,
+                        StringConstants.totalAmountInvestedInSIP),
+                    devider(),
+                    buildSummaryRow(wealthGain, StringConstants.wealthGain),
                     SizedBox(height: 10),
                   ],
                 ),
@@ -416,7 +267,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
       );
     }
     return container;
-  }
+  }*/
 
   Widget buildInputContainer(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
@@ -425,12 +276,33 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
         padding: EdgeInsets.all(16),
         margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          _amountSection(context),
+          buildTextFieldContainerSection(
+              textFieldType: TextFieldFocus.amount,
+              placeHolder: "100000000",
+              textLimit: 15,
+              containerTitle: StringConstants.futureTargetAmout,
+              focus: currentFocus,
+              onFocusChange: _onFocusChange,
+              onTextChange: _onTextChange),
           SizedBox(height: 20),
-          _periodSection(context),
+          buildTextFieldContainerSection(
+              textFieldType: TextFieldFocus.period,
+              placeHolder: "12 Years",
+              textLimit: 3,
+              containerTitle: StringConstants.futureAmountInvestmentPeriod,
+              focus: currentFocus,
+              onFocusChange: _onFocusChange,
+              onTextChange: _onTextChange),
           SizedBox(height: 20),
-          _rateSection(context),
-          SizedBox(height: 30),
+          buildTextFieldContainerSection(
+              textFieldType: TextFieldFocus.interestRate,
+              placeHolder: "10",
+              textLimit: 5,
+              containerTitle: StringConstants.expectedReturn,
+              focus: currentFocus,
+              onFocusChange: _onFocusChange,
+              onTextChange: _onTextChange),
+          SizedBox(height: 40),
           Row(children: [
             Expanded(
                 child: calculateButton(
@@ -439,81 +311,5 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
                         isAllInputValid() ? _calculateButtonTapped : null)),
           ])
         ]));
-  }
-
-  Widget _amountSection(BuildContext context) {
-    TextFieldContainerData data = TextFieldContainerData(
-        placeHolder: "10000000",
-        onTextChange: _onTextChange,
-        onFocusChanged: _onFocusChange,
-        textField: TextFieldFocus.amount,
-        currentFocus: currentFocus,
-        textLimit: 15);
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            StringConstants.futureTargetAmout,
-            style: appTheme.textTheme.caption,
-          ),
-          SizedBox(height: 10),
-          TextFieldContainer(containerData: data)
-        ]);
-  }
-
-  Widget _periodSection(BuildContext context) {
-    TextFieldContainerData data = TextFieldContainerData(
-        placeHolder: "12 Years",
-        onTextChange: _onTextChange,
-        onFocusChanged: _onFocusChange,
-        textField: TextFieldFocus.period,
-        currentFocus: currentFocus,
-        textLimit: 3);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        StringConstants.investmentPeriod,
-        style: appTheme.textTheme.caption,
-      ),
-      SizedBox(height: 10),
-      TextFieldContainer(containerData: data)
-    ]);
-  }
-
-  Widget _rateSection(BuildContext context) {
-    TextFieldContainerData data = TextFieldContainerData(
-        placeHolder: "10",
-        onTextChange: _onTextChange,
-        onFocusChanged: _onFocusChange,
-        textField: TextFieldFocus.interestRate,
-        currentFocus: currentFocus,
-        textLimit: 3);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        StringConstants.expectedReturn,
-        style: appTheme.textTheme.caption,
-      ),
-      SizedBox(height: 10),
-      TextFieldContainer(
-        containerData: data,
-      )
-    ]);
-  }
-
-  double _getGainPercentage() {
-    if ((wealthGain ?? 0) < 0) {
-      return 0;
-    }
-    if (amount?.isInfinite ?? false) {
-      return 100;
-    }
-    return (wealthGain ?? 0) / (amount ?? 0) * 100;
-  }
-
-  double _getInvestmentPercentage() {
-    if ((investedAmount ?? 0) < 0) {
-      return 0;
-    }
-    return (investedAmount ?? 0) / (amount ?? 0) * 100;
   }
 }

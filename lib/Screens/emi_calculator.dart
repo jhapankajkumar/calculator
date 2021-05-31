@@ -144,9 +144,9 @@ class _EMICalculatorState extends State<EMICalculator> {
                       expectedAmountTitle: StringConstants.loanEMI,
                       investedAmountTitle: StringConstants.totalInterestPayable,
                       wealthGainTitle: StringConstants.totalPayment,
-                      totalExpectedAmount: totalPayment,
-                      totalGainAmount: totalIntrestPayble,
-                      totalInvestedAmount: loanAmount,
+                      totalExpectedAmount: loanEMIAmount,
+                      totalGainAmount: totalPayment,
+                      totalInvestedAmount: totalIntrestPayble,
                     ),
                     SizedBox(
                       height: 20,
@@ -184,7 +184,7 @@ class _EMICalculatorState extends State<EMICalculator> {
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
-              placeHolder: "120 Months",
+              placeHolder: "120",
               textLimit: 3,
               containerTitle: StringConstants.loanPeriod,
               focus: currentFocus,

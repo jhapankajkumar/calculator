@@ -6,7 +6,7 @@ AppBar appBar(
     required BuildContext context,
     bool? isBackButton}) {
   return AppBar(
-    leading: leading(context),
+    leading: isBackButton == false ? null : leading(context),
     title: new Text(
       title,
       style: appTheme.textTheme.bodyText2,

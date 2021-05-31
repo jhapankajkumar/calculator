@@ -56,10 +56,10 @@ class StringConstants {
 
   static String loanAmount = 'Loan amount';
 
-  static String loanPeriod = 'Loan period';
+  static String loanPeriod = 'Number of installments (Years * 12)';
   static String loanIntrestRate = 'Loan interest rate (%)';
 
-  static String futureTargetAmout = 'Your target amount';
+  static String futureTargetAmout = 'Target amount';
 
   static String loanEMI = 'Loan EMI';
   static String totalInterestPayable = 'Total interest payable';
@@ -69,4 +69,16 @@ class StringConstants {
   static String principalLoanAmount = "Principal Loan Amount";
 
   static String amountInvested = "Amount Invested";
+
+  static String futureAmountInvestmentPeriod = "Number of years";
+
+  static String monthlySIPRequired = 'Monthly SIP required';
+
+  static String totalAmountInvestedInSIP = 'Total amount invested';
+
+//Future Value
+  static String stringAmount = 'Starting amount';
+  static String interestRate = 'Interest rate (%)';
+  static String numberOfYears = 'Number of years';
+  static String futureValueOfAmount = "Future value";
 }
