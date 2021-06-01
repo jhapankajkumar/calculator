@@ -24,9 +24,9 @@ class StringConstants {
   static String annualPercentageIncreamntOnSip =
       'Annual percentage increment on SIP';
 
-  static String expectedAmount = 'Expected amount';
-  static String investedAmount = 'Invested amount';
-  static String wealthGain = 'Wealth gain';
+  static String expectedAmount = 'Expected Amount';
+  static String investedAmount = 'Invested Amount';
+  static String wealthGain = 'Wealth Gain';
 
   //Retirement
   static String personalInformation = 'Personal information';
@@ -59,26 +59,26 @@ class StringConstants {
   static String loanPeriod = 'Number of installments (Years * 12)';
   static String loanIntrestRate = 'Loan interest rate (%)';
 
-  static String futureTargetAmout = 'Target amount';
+  static String futureTargetAmout = 'Target Amount';
 
   static String loanEMI = 'Loan EMI';
-  static String totalInterestPayable = 'Total interest payable';
-  static String totalPayment = "Total payment (Principal + Interest)";
+  static String totalInterestPayable = 'Total Interest Payable';
+  static String totalPayment = "Total Payment (Principal + Interest)";
 
   static String totalInterest = 'Total Interest';
   static String principalLoanAmount = "Principal Loan Amount";
 
   static String amountInvested = "Amount Invested";
 
-  static String futureAmountInvestmentPeriod = "Number of years";
+  static String futureAmountInvestmentPeriod = "Number Of Years";
 
-  static String monthlySIPRequired = 'Monthly SIP required';
+  static String monthlySIPRequired = 'Monthly SIP Required';
 
-  static String totalAmountInvestedInSIP = 'Total amount invested';
+  static String totalAmountInvestedInSIP = 'Total Amount Invested';
 
 //Future Value
-  static String stringAmount = 'Starting amount';
-  static String interestRate = 'Interest rate (%)';
+  static String stringAmount = 'Starting Amount';
+  static String interestRate = 'Interest Rate (%)';
   static String numberOfYears = 'Number of years';
-  static String futureValueOfAmount = "Future value";
+  static String futureValueOfAmount = "Future Value";
 }

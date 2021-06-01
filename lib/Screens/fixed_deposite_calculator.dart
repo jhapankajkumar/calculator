@@ -5,6 +5,7 @@ import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
@@ -197,7 +198,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.amount,
               placeHolder: "5000",
-              textLimit: 15,
+              textLimit: amountTextLimit,
               containerTitle: widget.isFixedDeposit
                   ? StringConstants.fixedDepositAmount
                   : StringConstants.stringAmount,
@@ -208,7 +209,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
               placeHolder: "12 Years",
-              textLimit: 3,
+              textLimit: periodTextLimit,
               containerTitle: widget.isFixedDeposit
                   ? StringConstants.depositPriod
                   : StringConstants.numberOfYears,
@@ -219,7 +220,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,
               placeHolder: "10",
-              textLimit: 5,
+              textLimit: interestRateTextLimit,
               containerTitle: widget.isFixedDeposit
                   ? StringConstants.depositIntrestRate
                   : StringConstants.interestRate,

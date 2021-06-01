@@ -334,7 +334,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         onFocusChanged: _onFocusChange,
         textField: TextFieldFocus.amount,
         currentFocus: currentFocus,
-        textLimit: 3);
+        textLimit: periodTextLimit);
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -355,7 +355,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         onFocusChanged: _onFocusChange,
         textField: TextFieldFocus.amount,
         currentFocus: currentFocus,
-        textLimit: 3);
+        textLimit: periodTextLimit);
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -414,7 +414,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         onFocusChanged: _onFocusChange,
         textField: TextFieldFocus.stepUp,
         currentFocus: currentFocus,
-        textLimit: 3);
+        textLimit: periodTextLimit);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
         "Life expectancy",

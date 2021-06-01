@@ -27,3 +27,7 @@ TextStyle subTitle1 = TextStyle(
     fontSize: 16.0, fontWeight: FontWeight.bold, color: Color(0xff212E51));
 TextStyle subTitle2 = TextStyle(
     fontSize: 16.0, fontWeight: FontWeight.bold, color: Color(0xffFF4611));
+
+int amountTextLimit = 16;
+int periodTextLimit = 3;
+int interestRateTextLimit = 5;

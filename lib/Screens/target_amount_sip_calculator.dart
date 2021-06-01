@@ -209,66 +209,6 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
             )));
   }
 
-  /*Widget buildSummeryContainer(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
-    var container = Container();
-    if (sipAmount != null) {
-      container = Container(
-        width: deviceWidth,
-        padding: EdgeInsets.all(0),
-        margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-          color: appTheme.primaryColor,
-        ),
-        child: Column(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Container(
-                  color: appTheme.accentColor,
-                  padding: EdgeInsets.all(8),
-                  width: deviceWidth,
-                  child: Text(
-                    "Summary",
-                    style: appTheme.textTheme.bodyText1,
-                  ),
-                ),
-                //summery
-
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    // Expected Amount
-                    buildSummaryRow(amount, StringConstants.futureTargetAmout),
-                    devider(),
-                    buildSummaryRow(
-                        period, StringConstants.futureAmountInvestmentPeriod),
-                    devider(),
-                    buildSummaryRow(
-                        sipAmount, StringConstants.monthlySIPRequired),
-                    devider(),
-                    buildSummaryRow(investedAmount,
-                        StringConstants.totalAmountInvestedInSIP),
-                    devider(),
-                    buildSummaryRow(wealthGain, StringConstants.wealthGain),
-                    SizedBox(height: 10),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    }
-    return container;
-  }*/
-
   Widget buildInputContainer(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
     return Container(
@@ -279,7 +219,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.amount,
               placeHolder: "100000000",
-              textLimit: 15,
+              textLimit: amountTextLimit,
               containerTitle: StringConstants.futureTargetAmout,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
@@ -288,7 +228,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
               placeHolder: "12 Years",
-              textLimit: 3,
+              textLimit: periodTextLimit,
               containerTitle: StringConstants.futureAmountInvestmentPeriod,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
@@ -297,7 +237,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,
               placeHolder: "10",
-              textLimit: 5,
+              textLimit: interestRateTextLimit,
               containerTitle: StringConstants.expectedReturn,
               focus: currentFocus,
               onFocusChange: _onFocusChange,

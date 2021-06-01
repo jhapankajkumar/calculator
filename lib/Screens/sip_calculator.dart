@@ -6,6 +6,7 @@ import 'package:calculator/util/Components/button.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/utility.dart';
@@ -247,7 +248,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.amount,
               placeHolder: "5000",
-              textLimit: 15,
+              textLimit: amountTextLimit,
               containerTitle: StringConstants.monthlyInvestmentAmount,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
@@ -256,7 +257,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
               placeHolder: "12 Years",
-              textLimit: 3,
+              textLimit: periodTextLimit,
               containerTitle: StringConstants.investmentPeriod,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
@@ -265,7 +266,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,
               placeHolder: "10",
-              textLimit: 5,
+              textLimit: interestRateTextLimit,
               containerTitle: StringConstants.expectedReturn,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
@@ -275,7 +276,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
               ? buildTextFieldContainerSection(
                   textFieldType: TextFieldFocus.stepUp,
                   placeHolder: "10",
-                  textLimit: 5,
+                  textLimit: interestRateTextLimit,
                   containerTitle:
                       StringConstants.annualPercentageIncreamntOnSip,
                   focus: currentFocus,

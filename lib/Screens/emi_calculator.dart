@@ -4,6 +4,7 @@ import 'package:calculator/util/Components/button.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
@@ -176,7 +177,7 @@ class _EMICalculatorState extends State<EMICalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.amount,
               placeHolder: "50000000",
-              textLimit: 15,
+              textLimit: amountTextLimit,
               containerTitle: StringConstants.loanAmount,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
@@ -185,7 +186,7 @@ class _EMICalculatorState extends State<EMICalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
               placeHolder: "120",
-              textLimit: 3,
+              textLimit: periodTextLimit,
               containerTitle: StringConstants.loanPeriod,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
@@ -194,7 +195,7 @@ class _EMICalculatorState extends State<EMICalculator> {
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,
               placeHolder: "10",
-              textLimit: 5,
+              textLimit: interestRateTextLimit,
               containerTitle: StringConstants.loanIntrestRate,
               focus: currentFocus,
               onFocusChange: _onFocusChange,

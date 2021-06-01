@@ -1,4 +1,5 @@
 import 'package:calculator/util/Constants/constants.dart';
+import 'package:calculator/util/InputValidator.dart/input_validator.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -82,11 +83,17 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
                 alignLabelWithHint: true,
                 suffixIcon: shouldShowClearButton ? _getClearButton() : null,
               ),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType: (widget.containerData.textField ==
+                          TextFieldFocus.amount ||
+                      widget.containerData.textField == TextFieldFocus.period)
+                  ? TextInputType.numberWithOptions(decimal: false)
+                  : TextInputType.numberWithOptions(decimal: true),
               style: appTheme.textTheme.subtitle2,
               inputFormatters: [
                 LengthLimitingTextInputFormatter(
                     widget.containerData.textLimit),
+                InputFormatterValidator(
+                    validator: RegexValidator(source: regexSource))
               ],
               controller: controller,
               onChanged: (value) {

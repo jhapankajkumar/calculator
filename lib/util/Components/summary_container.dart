@@ -4,7 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-final formatter = new NumberFormat("#,###");
+final formatter = new NumberFormat("##,###");
+
 Widget buildSummeryContainer(
     {required BuildContext context,
     required String expectedAmountTitle,
@@ -43,7 +44,7 @@ Widget buildSummeryContainer(
                 padding: EdgeInsets.all(8),
                 width: deviceWidth,
                 child: Text(
-                  "Summary",
+                  StringConstants.summary,
                   style: appTheme.textTheme.bodyText1,
                 ),
               ),
@@ -89,7 +90,7 @@ Widget buildSummeryContainer(
                         ),
                         // Expected Amount
                         buildSummaryRow(
-                            targetAmount, StringConstants.futureTargetAmout),
+                            targetAmount, StringConstants.targetAmount),
                         devider(),
                         buildPeriodRow(period,
                             StringConstants.futureAmountInvestmentPeriod),
