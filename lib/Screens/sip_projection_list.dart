@@ -46,19 +46,24 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Center(
-                          child: Text(
-                            "Duration",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+                            child: Text(
+                              "Duration",
+                              style: subTitle1,
+                            ),
                           ),
                         ),
                         Center(
-                          child: Text("SIP Amount",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text("SIP Amount", style: subTitle1),
                         ),
                         Center(
-                          child: Text(
-                            "Future Value",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
+                            child: Text(
+                              "Future Value",
+                              style: subTitle1,
+                            ),
                           ),
                         ),
                       ],
@@ -81,13 +86,13 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                                           ? appTheme.primaryColor
                                           : Colors.white)),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   Container(
-                                    width: 100,
                                     child: Padding(
                                       padding:
-                                          const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                          const EdgeInsets.fromLTRB(8, 0, 8, 0),
                                       child: Text(
                                         "${(data.duration?.toInt())} Years",
                                         style: subTitle1,
@@ -96,9 +101,9 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                                   ),
                                   Flexible(
                                     child: Container(
-                                      width: 100,
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding:
+                                            EdgeInsets.fromLTRB(8, 0, 8, 0),
                                         child: Text(
                                           "\$${data.amount?.toInt() ?? 0}",
                                           style: subTitle2,
@@ -108,7 +113,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                                   ),
                                   Flexible(
                                     child: Container(
-                                      width: 300,
+                                      padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                                       child: Text(
                                         '\$${k_m_b_generator(data.futureValue ?? 0)}',
                                         overflow: TextOverflow.fade,
