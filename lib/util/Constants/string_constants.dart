@@ -13,10 +13,11 @@ class StringConstants {
   static String sip = 'SIP';
   static String increamentalSIP = 'Step Up SIP';
   static String futureValue = 'Future Value';
-  static String fixedDeposit = 'Fixed Deposit';
+  static String fixedDeposit = 'FD';
   static String targetAmount = 'Target Amount';
   static String retirement = 'Retirement';
   static String emi = 'EMI';
+  static String recurringDeposit = 'RD';
 
   static String expectedReturn = 'Expected annual return(%)';
   static String investmentPeriod = 'Investment period';

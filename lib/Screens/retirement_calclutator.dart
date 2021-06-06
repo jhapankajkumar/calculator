@@ -36,9 +36,6 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
   _calculateSIP() {
     var helper = UtilityHelper();
     detail.amount = amount;
-    detail.interestRate = rate;
-    detail.duration = period;
-    detail.increase = stepUpPercentage;
     if (widget.isSteupUp && stepUpPercentage != null) {
       var stepupFinalAmount = 0.0;
       var stepupInvestAmount = 0.0;
@@ -78,17 +75,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         wealthGain = stepupInterestAmount;
         currentFocus = null;
       });
-    } else {
-      corpusAmount = helper
-          .getCorpusAmount(
-              amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
-          .roundToDouble();
-      setState(() {
-        investedAmount = (amount ?? 0) * (period ?? 0) * 12;
-        wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
-        currentFocus = null;
-      });
-    }
+    } else {}
   }
 
   final formatter = new NumberFormat("#,###");

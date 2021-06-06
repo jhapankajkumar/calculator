@@ -122,8 +122,24 @@ class _LandingPageState extends State<LandingPage> {
                         children: [
                           buildSIPView(context, StringConstants.fixedDeposit,
                               ImageConstants.fd, _fdClicked),
+                          buildSIPView(
+                              context,
+                              StringConstants.recurringDeposit,
+                              ImageConstants.recurring,
+                              _fdClicked),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
                           buildSIPView(context, StringConstants.emi,
                               ImageConstants.emi, _emiClicked),
+                          buildSIPView(context, StringConstants.futureValue,
+                              ImageConstants.futureValue, _futureValueClicked),
                         ],
                       ),
                       SizedBox(

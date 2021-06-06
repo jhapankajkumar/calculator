@@ -36,6 +36,7 @@ class TextFieldContainer extends StatefulWidget {
 class _TextFieldContainerState extends State<TextFieldContainer> {
   TextEditingController? controller;
   TextFieldFocus? focusField;
+
   @override
   void initState() {
     super.initState();
@@ -50,7 +51,11 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
         (controller?.text.length ?? 0) > 0) {
       shouldShowClearButton = true;
     }
-
+    var source = decimalRegex;
+    if (widget.containerData.textField == TextFieldFocus.amount ||
+        widget.containerData.textField == TextFieldFocus.period) {
+      source = regexSource;
+    }
     var container = Container(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         decoration: BoxDecoration(
@@ -93,7 +98,7 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
                 LengthLimitingTextInputFormatter(
                     widget.containerData.textLimit),
                 InputFormatterValidator(
-                    validator: RegexValidator(source: regexSource))
+                    validator: RegexValidator(source: source))
               ],
               controller: controller,
               onChanged: (value) {

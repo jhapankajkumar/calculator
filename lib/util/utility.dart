@@ -1,25 +1,104 @@
 import 'dart:math';
 
+import 'package:calculator/util/sip_data.dart';
 import 'package:flutter/services.dart';
 
 class UtilityHelper {
-  double getCorpusAmount(double amount, double interestRate, double period,
-      double? inflationRate, bool isMonthlyInvestment, bool adjustInflation) {
-    if (adjustInflation && inflationRate != null) {
-      interestRate = interestRate - inflationRate;
-    }
-    if (isMonthlyInvestment) {
-      period = period / 12;
-    }
+  SIPResultData getCorpusAmount(
+      double amount, double interestRate, double period, double? stepUpRate) {
+    SIPResultData resultData = SIPResultData();
     if (interestRate == 0) {
-      return amount * period * 12;
+      resultData.totalInvestment = amount * period * 12;
+      resultData.corpus = amount * period * 12;
+      resultData.wealthGain = 0;
+      return resultData;
     }
+    var finalAmount = 0.0;
+    var investAmount = 0.0;
+    var interestAmount = 0.0;
+    var sipAmount = amount;
+    var totalInvestAmount = sipAmount;
+    var s = (stepUpRate ?? 0) / 100;
+    var n = period * 12;
+    var roi = (interestRate) / 100 / 12;
+    var value3 = 1 + roi;
+    var value4 = pow(value3, n);
+    var finalValue = ((sipAmount) * value4);
+    int tenor = 1;
+    int year = 1;
+    //list by year
+    List<SIPData> yearList = [];
 
-    double roi = interestRate / 100 / 12;
-    num power = pow(1 + roi, 12 * (period));
-    double value = (((power - 1) * (amount)) / roi) * (1 + roi);
+    //create first year data
+    List<SIPData> monthList = [];
+    //create 1st month wise data;
+    SIPData monthData = SIPData();
+    monthData.amount = amount.roundToDouble();
+    monthData.totalBalance = finalValue.roundToDouble();
+    monthData.interest = (finalValue - (amount)).roundToDouble();
+    monthData.tenor = tenor;
 
-    return value;
+    monthList.add(monthData);
+    n = n - 1;
+    tenor = 2;
+
+    while (n > 0) {
+      if (n % 12 > 0) {
+        sipAmount = sipAmount;
+        totalInvestAmount = (totalInvestAmount) + (sipAmount);
+        var value4 = pow(value3, n);
+        finalValue = (finalValue + (sipAmount) * value4);
+
+        SIPData monthData = SIPData();
+        monthData.amount = (amount * tenor).roundToDouble();
+        monthData.totalBalance = finalValue.roundToDouble();
+        monthData.interest =
+            (monthData.totalBalance ?? 0) - (monthData.amount ?? 0);
+        monthData.tenor = tenor;
+        monthList.add(monthData);
+        n = n - 1;
+
+        //if year complete
+        if (n % 12 == 0) {
+          SIPData yearData = SIPData();
+          yearData.tenor = tenor ~/ 12;
+          yearData.amount = monthData.amount;
+          yearData.totalBalance = monthData.totalBalance;
+          yearData.interest = monthData.interest;
+          yearData.list = monthList;
+
+          yearList.add(yearData);
+
+          monthList = [];
+        }
+        tenor = tenor + 1;
+      } else {
+        sipAmount = (sipAmount) + ((sipAmount) * s);
+        totalInvestAmount = (totalInvestAmount) + sipAmount;
+        var value4 = pow(value3, n);
+        finalValue = (finalValue + sipAmount * value4);
+
+        SIPData monthData = SIPData();
+        monthData.amount = (amount * tenor).roundToDouble();
+        monthData.totalBalance = finalValue.roundToDouble();
+        monthData.interest =
+            (monthData.totalBalance ?? 0) - (monthData.amount ?? 0);
+        monthData.tenor = tenor;
+        monthList.add(monthData);
+        n = n - 1;
+        tenor = tenor + 1;
+      }
+    }
+    finalAmount = finalValue.roundToDouble();
+    investAmount = (totalInvestAmount).roundToDouble();
+    interestAmount = finalAmount - investAmount;
+    interestAmount = interestAmount.roundToDouble();
+
+    resultData.totalInvestment = investAmount;
+    resultData.corpus = finalAmount;
+    resultData.wealthGain = interestAmount;
+    resultData.list = yearList;
+    return resultData;
   }
 
   double getSIPAmount(double amount, double interestRate, double period,

@@ -1,15 +1,15 @@
-class SIPData {
-  double? duration;
-  double? amount;
-  double? futureValue;
-  double? interestRate;
-  double? increase;
+class SIPResultData {
+  double corpus = 0;
+  double totalInvestment = 0;
+  double wealthGain = 0;
+  List<SIPData>? list;
+}
 
-  SIPData({
-    this.duration,
-    this.amount,
-    this.futureValue,
-    this.increase,
-    this.interestRate,
-  });
+class SIPData {
+  int? tenor;
+  double? amount;
+  double? interest;
+  double? totalBalance;
+  bool isExpanded = false;
+  List<SIPData>? list;
 }

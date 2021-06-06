@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 
 String regexSource = "^\$|^(0|([1-9][0-9]{0,15}))(\\.[0-9]{0,2})?\$";
+String decimalRegex = "^\$|^(0|([1-9][0-9]{0,2}))(\\.[0-9]{0,2})?\$";
 
 class InputFormatterValidator implements TextInputFormatter {
   final RegexValidator validator;
@@ -9,6 +10,7 @@ class InputFormatterValidator implements TextInputFormatter {
       TextEditingValue oldValue, TextEditingValue newValue) {
     var isOldValueValid = validator.isValid(oldValue.text);
     var isNewValueValid = validator.isValid(newValue.text);
+
     if (isOldValueValid && !isNewValueValid) {
       return oldValue;
     }

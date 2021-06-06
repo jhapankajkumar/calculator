@@ -6,4 +6,5 @@ class ImageConstants {
   static String targetAmount = 'target_amount';
   static String retirement = 'retirement';
   static String emi = 'emi';
+  static String recurring = 'recurring';
 }

@@ -1,14 +1,18 @@
 import 'dart:math';
 
 import 'package:calculator/util/Components/appbar.dart';
+import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:material_segmented_control/material_segmented_control.dart';
+import 'package:sticky_headers/sticky_headers.dart';
+import 'package:table_sticky_headers/table_sticky_headers.dart';
 
 class SIPProjetionList extends StatefulWidget {
-  final SIPData data;
+  final SIPResultData data;
   SIPProjetionList(this.data);
   @override
   _SIPProjetionListState createState() => _SIPProjetionListState();
@@ -16,12 +20,11 @@ class SIPProjetionList extends StatefulWidget {
 
 class _SIPProjetionListState extends State<SIPProjetionList> {
   final formatter = new NumberFormat("##,###");
-  List<SIPData>? list;
+  int _currentSelection = 0;
+  int _currentSelectedYear = 0;
+  bool isExpanded = false;
   @override
   void initState() {
-    list = widget.data.increase == null
-        ? getInvestmentValues()
-        : getStepUpInvestmentValues();
     super.initState();
   }
 
@@ -29,40 +32,145 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: appBar(title: "Investment Detail", context: context),
-        body: GestureDetector(
-            onTap: () {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus) {
-                currentFocus.unfocus();
-              }
-            },
-            child: Column(
-              children: <Widget>[
-                Card(
+        body: baseContainer(
+            context: context,
+            child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  MaterialSegmentedControl(
+                    children: {
+                      0: Text(
+                        '          Chart          ',
+                        style: TextStyle(
+                            color: (this._currentSelection == 0
+                                ? Colors.white
+                                : appTheme.accentColor)),
+                      ),
+                      1: Text(
+                        '          Table          ',
+                        style: TextStyle(
+                            color: (this._currentSelection == 1
+                                ? Colors.white
+                                : appTheme.accentColor)),
+                      ),
+                    },
+                    selectionIndex: _currentSelection,
+                    borderColor: appTheme.primaryColor,
+                    selectedColor: appTheme.accentColor,
+                    unselectedColor: appTheme.primaryColor,
+                    horizontalPadding: EdgeInsets.all(16),
+                    verticalOffset: 16,
+                    borderRadius: 32.0,
+                    disabledColor: appTheme.primaryColor,
+                    onSegmentChosen: (int index) {
+                      setState(() {
+                        _currentSelection = index;
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 0,
+                  ),
+                  _currentSelection == 0
+                      ? Container()
+                      : Expanded(child: buildT(context)),
+                ],
+              ),
+            )));
+  }
+
+  Widget buildT(BuildContext context) {
+    return Container(
+      child: ListView.builder(
+        itemCount: 1,
+        itemBuilder: (context, index) {
+          return StickyHeader(
+              header: buildTableHeader(), content: buildTableContent(context));
+        },
+      ),
+    );
+  }
+
+  Widget buildTableContent(BuildContext context) {
+    List<Widget> children = [];
+    int? limit = (widget.data.list?.length ?? 0) > 100
+        ? 100
+        : (widget.data.list?.length ?? 0);
+    for (int i = 0; i < (limit); i++) {
+      var data = widget.data.list?[i];
+      if (data != null) {
+        children.add(buildContent(context, data, i));
+      }
+    }
+
+    return Column(
+      children: <Widget>[
+        Card(
+          child: Container(
+              child: Column(
+            children: children,
+          )),
+        ),
+      ],
+    );
+  }
+
+  Widget buildContent(BuildContext context, SIPData data, int index) {
+    double width = MediaQuery.of(context).size.width;
+    double rowHeight = 80;
+    List<Widget> children = [];
+    for (int i = 0; i < (data.list?.length ?? 0); i++) {
+      var detailData = data.list?[i];
+      if (detailData != null) {
+        children.add(buildDetailContent(context, detailData, i));
+        children.add(Container(
+          height: 1,
+          color: Colors.grey,
+        ));
+      }
+    }
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (data.isExpanded == false) {
+            data.isExpanded = true;
+          } else {
+            data.isExpanded = false;
+          }
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: index == 0
+                ? appTheme.secondaryHeaderColor
+                : (index % 2 == 0 ? appTheme.primaryColor : Colors.white)),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Flexible(
                   child: Container(
-                    color: Colors.white,
-                    height: 50,
+                    width: width / 4 + 20,
+                    height: rowHeight,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                            child: Text(
-                              "Duration",
-                              style: subTitle1,
-                            ),
-                          ),
+                        Image(
+                          image: AssetImage('assets/images/expand.png'),
+                          width: 16,
+                          height: 16,
                         ),
-                        Center(
-                          child: Text("SIP Amount", style: subTitle1),
-                        ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(4, 0, 0, 0),
+                          child: Center(
                             child: Text(
-                              "Future Value",
-                              style: subTitle1,
+                              "${(data.tenor?.toInt())} Years",
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.clip,
+                              style: caption2,
                             ),
                           ),
                         ),
@@ -70,132 +178,183 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                     ),
                   ),
                 ),
-                Expanded(
-                  child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        if (list != null) {
-                          SIPData data = list![index];
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                  color: index == 0
-                                      ? appTheme.secondaryHeaderColor
-                                      : (index % 2 == 0
-                                          ? appTheme.primaryColor
-                                          : Colors.white)),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Container(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                      child: Text(
-                                        "${(data.duration?.toInt())} Years",
-                                        style: subTitle1,
-                                      ),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    child: Container(
-                                      child: Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                        child: Text(
-                                          "\$${data.amount?.toInt() ?? 0}",
-                                          style: subTitle2,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    child: Container(
-                                      padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                      child: Text(
-                                        '\$${k_m_b_generator(data.futureValue ?? 0)}',
-                                        overflow: TextOverflow.fade,
-                                        style: subTitle2,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                      itemCount: 35),
+                Container(
+                  height: rowHeight,
+                  width: width / 4,
+                  child: Center(
+                    child: Flexible(
+                      child: Text(
+                        "\$${data.amount?.toInt() ?? 0}",
+                        textAlign: TextAlign.center,
+                        style: caption2,
+                      ),
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: Container(
+                    height: rowHeight,
+                    width: width / 4,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                      child: Center(
+                        child: Text(
+                          "\$${data.interest?.toInt() ?? 0}",
+                          textAlign: TextAlign.center,
+                          style: caption2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: Container(
+                    height: rowHeight,
+                    width: width / 4,
+                    padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                    child: Center(
+                      child: Text(
+                        '\$${k_m_b_generator(data.totalBalance ?? 0)}',
+                        textAlign: TextAlign.justify,
+                        overflow: TextOverflow.fade,
+                        style: caption2,
+                      ),
+                    ),
+                  ),
                 ),
               ],
-            )));
+            ),
+            data.isExpanded == false
+                ? Container()
+                : Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: appTheme.accentColor, width: 1),
+                    ),
+                    child: Column(
+                      children: children,
+                    )),
+          ],
+        ),
+      ),
+    );
   }
 
-  List<SIPData> getInvestmentValues() {
-    var helper = UtilityHelper();
-    var limit = 35;
-    double amount = helper.getCorpusAmount(
-        widget.data.amount ?? 0,
-        widget.data.interestRate ?? 0,
-        (widget.data.duration ?? 0),
-        null,
-        false,
-        false);
-    SIPData data = SIPData(
-        amount: widget.data.amount,
-        duration: (widget.data.duration ?? 0),
-        increase: 2,
-        futureValue: amount);
-    var list = List.generate(limit - 1, (index) {
-      double amount = helper
-          .getCorpusAmount(widget.data.amount ?? 0,
-              widget.data.interestRate ?? 0, index + 1, null, false, false)
-          .roundToDouble();
-      // investedAmount = (amount ?? 0) * (period ?? 0) * 12;
-      // wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
-      return SIPData(
-          amount: widget.data.amount,
-          duration: index + 1,
-          increase: 2,
-          futureValue: amount.roundToDouble());
-    });
-
-    // list.insert(0, list[widget.data.duration?.toInt() ?? 0 - 1]);
-    // list.remove(list[widget.data.duration?.toInt() ?? 0 - 1]);
-    list.insert(0, data);
-    return list;
+  Widget buildDetailContent(BuildContext context, SIPData data, int index) {
+    double width = MediaQuery.of(context).size.width;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(color: appTheme.primaryColor),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              width: width / 4,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                child: Text(
+                  "Month ${(data.tenor?.toInt())} ",
+                  textAlign: TextAlign.center,
+                  style: caption2,
+                ),
+              ),
+            ),
+            Container(
+              width: 1,
+              color: Colors.grey,
+            ),
+            Flexible(
+              child: Container(
+                width: width / 4,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                  child: Text(
+                    "\$${data.amount?.toInt() ?? 0}",
+                    textAlign: TextAlign.center,
+                    style: caption3,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              width: 1,
+              color: Colors.grey,
+            ),
+            Flexible(
+              child: Container(
+                width: width / 4,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  child: Text(
+                    "\$${data.amount?.toInt() ?? 0}",
+                    textAlign: TextAlign.center,
+                    style: caption3,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              width: 1,
+              color: Colors.grey,
+            ),
+            Flexible(
+              child: Container(
+                width: width / 4,
+                padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                child: Text(
+                  '\$${k_m_b_generator(data.totalBalance ?? 0)}',
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.fade,
+                  style: caption3,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  List<SIPData> getStepUpInvestmentValues() {
-    var amount = widget.data.amount;
-    var limit = 35;
-    double? stepupFinalAmount = getSipAmount(widget.data.duration);
-    SIPData data = SIPData(
-        amount: amount,
-        duration: (widget.data.duration ?? 0),
-        increase: 2,
-        futureValue: stepupFinalAmount);
-    var list = List.generate(limit - 1, (index) {
-      double? stepupFinalAmount = getSipAmount((index + 1).toDouble());
-      if (index != 0) {
-        amount =
-            (amount ?? 0) + ((amount ?? 0) * (widget.data.increase ?? 0) / 100);
-      }
-      return SIPData(
-          amount: amount,
-          duration: index + 1,
-          increase: 2,
-          futureValue: stepupFinalAmount);
-    });
-
-    // list.insert(0, list[widget.data.duration?.toInt() ?? 0 - 1]);
-    // list.remove(list[widget.data.duration?.toInt() ?? 0 - 1]);
-    list.insert(0, data);
-    return list;
+  Container buildTableHeader() {
+    return Container(
+      color: appTheme.primaryColor,
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+              child: Text(
+                "Duration",
+                style: appTheme.textTheme.caption,
+              ),
+            ),
+          ),
+          Center(
+            child: Text("Amount", style: appTheme.textTheme.caption),
+          ),
+          Center(
+              child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Text(
+              "Interest",
+              style: appTheme.textTheme.caption,
+            ),
+          )),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
+              child: Text(
+                "Balance",
+                style: appTheme.textTheme.caption,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ignore: non_constant_identifier_names
@@ -203,40 +362,10 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     if (num.isInfinite == true) {
       return "INFINITE";
     }
-    if (num < 9999999999) {
+    if (num < 999999999999999) {
       return "${formatter.format(num)}";
     } else {
       return num.roundToDouble().toString();
     }
-  }
-
-  double? getSipAmount(double? duration) {
-    var stepupFinalAmount = 0.0;
-    var sipAmount = widget.data.amount;
-    var totalInvestAmount = sipAmount;
-    var s = (widget.data.increase ?? 0) / 100;
-    var n = (duration ?? 0) * 12;
-    var roi = (widget.data.interestRate ?? 0) / 100 / 12;
-    var value3 = 1 + roi;
-    var value4 = pow(value3, n);
-    var finalValue = (sipAmount ?? 0) * value4;
-    n = n - 1;
-    while (n > 0) {
-      if (n % 12 > 0) {
-        sipAmount = sipAmount;
-        totalInvestAmount = (totalInvestAmount ?? 0) + (sipAmount ?? 0);
-        var value4 = pow(value3, n);
-        finalValue = finalValue + (sipAmount ?? 0) * value4;
-        n = n - 1;
-      } else {
-        sipAmount = (sipAmount ?? 0) + ((sipAmount ?? 0) * s);
-        totalInvestAmount = (totalInvestAmount ?? 0) + sipAmount;
-        var value4 = pow(value3, n);
-        finalValue = finalValue + sipAmount * value4;
-        n = n - 1;
-      }
-    }
-    stepupFinalAmount = finalValue.roundToDouble();
-    return stepupFinalAmount;
   }
 }

@@ -41,9 +41,6 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
   _calculateTargetAmount() {
     var helper = UtilityHelper();
     detail.amount = amount;
-    detail.interestRate = rate;
-    detail.duration = period;
-    detail.increase = stepUpPercentage;
     double montlyAmount = helper
         .getSIPAmount(
             amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)

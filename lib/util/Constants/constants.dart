@@ -24,10 +24,21 @@ ThemeData appTheme = ThemeData(
 );
 
 TextStyle subTitle1 = TextStyle(
-    fontSize: 16.0, fontWeight: FontWeight.bold, color: Color(0xff212E51));
-TextStyle subTitle2 = TextStyle(
     fontSize: 16.0, fontWeight: FontWeight.bold, color: Color(0xffFF4611));
+TextStyle subTitle2 = TextStyle(
+    fontSize: 16.0, fontWeight: FontWeight.bold, color: Color(0xff212E51));
+TextStyle caption3 = TextStyle(
+  fontSize: 12.0,
+  fontWeight: FontWeight.normal,
+  color: Color(0xffFF4611),
+);
+
+TextStyle caption2 = TextStyle(
+  fontSize: 12.0,
+  fontWeight: FontWeight.normal,
+  color: Color(0xff212E51),
+);
 
 int amountTextLimit = 16;
-int periodTextLimit = 3;
+int periodTextLimit = 2;
 int interestRateTextLimit = 5;

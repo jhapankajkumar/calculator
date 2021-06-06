@@ -31,6 +31,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   fl_chart: ^0.35.0
   intl: ^0.17.0
+  material_segmented_control: ^3.1.2
+  sticky_headers: ^0.2.0
+  table_sticky_headers: ^2.0.0
 
 dev_dependencies:
   flutter_test:

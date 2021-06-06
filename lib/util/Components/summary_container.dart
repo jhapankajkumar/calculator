@@ -132,7 +132,10 @@ Widget buildSummaryRow(double? amount, String title) {
     children: [
       Expanded(
         child: ListTile(
-          title: Text(title),
+          title: Text(
+            title,
+            style: subTitle2,
+          ),
         ),
       ),
       Expanded(
@@ -140,9 +143,9 @@ Widget buildSummaryRow(double? amount, String title) {
           title: amount?.isInfinite == false
               ? Text(
                   '\$${formatter.format(amount)}',
-                  style: subTitle2,
+                  style: subTitle1,
                 )
-              : Text('\$INFINITE', style: subTitle2),
+              : Text('\$INFINITE', style: caption3),
         ),
       ),
     ],
@@ -156,7 +159,10 @@ Widget buildPeriodRow(double? amount, String title) {
     children: [
       Expanded(
         child: ListTile(
-          title: Text(title),
+          title: Text(
+            title,
+            style: subTitle2,
+          ),
         ),
       ),
       Expanded(
@@ -164,9 +170,9 @@ Widget buildPeriodRow(double? amount, String title) {
           title: amount?.isInfinite == false
               ? Text(
                   amount != null ? '${amount.toInt()}' : "",
-                  style: subTitle2,
+                  style: subTitle1,
                 )
-              : Text('\$INFINITE', style: subTitle2),
+              : Text('\$INFINITE', style: subTitle1),
         ),
       ),
     ],

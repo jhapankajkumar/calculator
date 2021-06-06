@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
@@ -37,63 +38,25 @@ class _SIPCalculatorState extends State<SIPCalculator> {
 
   SIPData detail = SIPData();
   String? errorText;
+  SIPResultData? data;
 
   _calculateSIP() {
     var helper = UtilityHelper();
-    detail.amount = amount;
-    detail.interestRate = rate;
-    detail.duration = period;
-    detail.increase = stepUpPercentage;
-    if (widget.isSteupUp && stepUpPercentage != null) {
-      var stepupFinalAmount = 0.0;
-      var stepupInvestAmount = 0.0;
-      var stepupInterestAmount = 0.0;
-      var sipAmount = amount;
-      var totalInvestAmount = sipAmount;
-      var s = (stepUpPercentage ?? 0) / 100;
-      var n = (period ?? 0) * 12;
-      var roi = (rate ?? 0) / 100 / 12;
-      var value3 = 1 + roi;
-      var value4 = pow(value3, n);
-      var finalValue = (sipAmount ?? 0) * value4;
-      n = n - 1;
-      while (n > 0) {
-        if (n % 12 > 0) {
-          sipAmount = sipAmount;
-          totalInvestAmount = (totalInvestAmount ?? 0) + (sipAmount ?? 0);
-          var value4 = pow(value3, n);
-          finalValue = finalValue + (sipAmount ?? 0) * value4;
-          n = n - 1;
-        } else {
-          sipAmount = (sipAmount ?? 0) + ((sipAmount ?? 0) * s);
-          totalInvestAmount = (totalInvestAmount ?? 0) + sipAmount;
-          var value4 = pow(value3, n);
-          finalValue = finalValue + sipAmount * value4;
-          n = n - 1;
-        }
-      }
-      stepupFinalAmount = finalValue.roundToDouble();
-      stepupInvestAmount = (totalInvestAmount ?? 0).roundToDouble();
-      stepupInterestAmount = stepupFinalAmount - stepupInvestAmount;
-      stepupInterestAmount = stepupInterestAmount.roundToDouble();
-
-      setState(() {
-        investedAmount = stepupInvestAmount;
-        corpusAmount = stepupFinalAmount;
-        wealthGain = stepupInterestAmount;
-        currentFocus = null;
-      });
-    } else {
-      corpusAmount = helper
-          .getCorpusAmount(
-              amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
-          .roundToDouble();
-      setState(() {
-        investedAmount = (amount ?? 0) * (period ?? 0) * 12;
-        wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
-        currentFocus = null;
-      });
-    }
+    data = helper.getCorpusAmount(
+        amount ?? 0, rate ?? 0, period ?? 0, stepUpPercentage);
+    print('\n\n');
+    // data?.list?.forEach((element) {
+    //   element.list?.forEach((element) {
+    //     print(
+    //         'A ${element.amount} I ${element.interest} B ${element.totalBalance}\n');
+    //   });
+    // });
+    setState(() {
+      investedAmount = data?.totalInvestment;
+      corpusAmount = data?.corpus;
+      wealthGain = data?.wealthGain;
+      currentFocus = null;
+    });
   }
 
   bool isAllInputValid() {
@@ -191,9 +154,12 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   }
 
   void _onDetailButtonTap() {
-    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-      return SIPProjetionList(detail);
-    }));
+    if (data != null) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (BuildContext context) {
+        return SIPProjetionList(data!);
+      }));
+    }
   }
 
   @override
