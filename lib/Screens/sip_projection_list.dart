@@ -62,14 +62,14 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                   MaterialSegmentedControl(
                     children: {
                       0: Text(
-                        '          Chart          ',
+                        '          Table          ',
                         style: TextStyle(
                             color: (this._currentSelection == 0
                                 ? Colors.white
                                 : appTheme.accentColor)),
                       ),
                       1: Text(
-                        '          Table          ',
+                        '          Chart          ',
                         style: TextStyle(
                             color: (this._currentSelection == 1
                                 ? Colors.white
@@ -94,8 +94,8 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                     height: 0,
                   ),
                   _currentSelection == 0
-                      ? buildChart(context)
-                      : Expanded(child: buildT(context)),
+                      ? Expanded(child: buildT(context))
+                      : buildChart(context),
                 ],
               ),
             )));
@@ -199,11 +199,11 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                     ),
                   ),
                 ),
-                Container(
-                  height: rowHeight,
-                  width: width / 4,
-                  child: Center(
-                    child: Flexible(
+                Flexible(
+                  child: Container(
+                    height: rowHeight,
+                    width: width / 4,
+                    child: Center(
                       child: Text(
                         "\$${k_m_b_generator(data.amount ?? 0)}",
                         textAlign: TextAlign.center,
