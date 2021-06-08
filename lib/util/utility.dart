@@ -97,6 +97,10 @@ class UtilityHelper {
     resultData.totalInvestment = investAmount;
     resultData.corpus = finalAmount;
     resultData.wealthGain = interestAmount;
+    resultData.tenor = period;
+    resultData.initialAmount = amount;
+    resultData.initialInterestRate = interestRate;
+    resultData.initialSteupRate = stepUpRate ?? 0;
     resultData.list = yearList;
     return resultData;
   }

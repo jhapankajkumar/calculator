@@ -45,12 +45,6 @@ class _SIPCalculatorState extends State<SIPCalculator> {
     data = helper.getCorpusAmount(
         amount ?? 0, rate ?? 0, period ?? 0, stepUpPercentage);
     print('\n\n');
-    // data?.list?.forEach((element) {
-    //   element.list?.forEach((element) {
-    //     print(
-    //         'A ${element.amount} I ${element.interest} B ${element.totalBalance}\n');
-    //   });
-    // });
     setState(() {
       investedAmount = data?.totalInvestment;
       corpusAmount = data?.corpus;
