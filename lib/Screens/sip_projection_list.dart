@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
+import 'package:calculator/util/Components/indicator.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -390,19 +391,19 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   }
 
   Widget buildChart(BuildContext context) {
-    if (widget.data.corpus.isInfinite) {
+    if (widget.data.corpus.toString().length > 16) {
       return Text('Data is too larget to fit in chart');
     }
     return Container(
-      margin: EdgeInsets.all(16),
+      margin: EdgeInsets.all(8),
       width: MediaQuery.of(context).size.width - 32,
-      height: MediaQuery.of(context).size.width - 32,
-      decoration: const BoxDecoration(
+      height: MediaQuery.of(context).size.width + 32,
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(18)),
         gradient: LinearGradient(
           colors: [
             Color(0xff2c274c),
-            Color(0xff46426c),
+            appTheme.accentColor,
           ],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
@@ -415,15 +416,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
             children: <Widget>[
               const SizedBox(
                 height: 10,
-              ),
-              const Text(
-                'SIP Chart',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2),
-                textAlign: TextAlign.center,
               ),
               const Text(
                 'Total Amount',
@@ -443,8 +435,44 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                     letterSpacing: 2),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(
-                height: 37,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Indicator(
+                        color: Colors.green,
+                        text: "Total Amount",
+                        isSquare: false,
+                        textColor: Colors.white,
+                      ),
+                      SizedBox(
+                        height: 4,
+                      ),
+                      Indicator(
+                        color: Colors.red,
+                        text: "Invested amount",
+                        isSquare: false,
+                        textColor: Colors.white,
+                      ),
+                      SizedBox(
+                        height: 4,
+                      ),
+                      Indicator(
+                        color: Colors.yellow,
+                        text: "Wealth gain",
+                        isSquare: false,
+                        textColor: Colors.white,
+                      ),
+                      SizedBox(
+                        height: 18,
+                      ),
+                    ],
+                  ),
+                ),
               ),
               Expanded(
                 child: Padding(
