@@ -5,13 +5,12 @@ import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/sip_data.dart';
-import 'package:calculator/util/utility.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:material_segmented_control/material_segmented_control.dart';
 import 'package:sticky_headers/sticky_headers.dart';
-import 'package:table_sticky_headers/table_sticky_headers.dart';
 
 class SIPProjetionList extends StatefulWidget {
   final SIPResultData data;
@@ -391,7 +390,9 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   }
 
   Widget buildChart(BuildContext context) {
-    getYAxisData();
+    if (widget.data.corpus.isInfinite) {
+      return Text('Data is too larget to fit in chart');
+    }
     return Container(
       margin: EdgeInsets.all(16),
       width: MediaQuery.of(context).size.width - 32,
@@ -502,9 +503,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   double interval = 0;
   double amountInterval = 0;
   LineChartData sampleData1() {
-    double yValue = widget.data.corpus;
     double xValue = widget.data.tenor;
-
     if (xValue > 90) {
       interval = 20;
     } else if (xValue > 75) {
@@ -529,11 +528,42 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       interval = 1;
     }
     print('Year Interval, $interval');
-
+    getYAxisData();
     return LineChartData(
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
           tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+          tooltipPadding: EdgeInsets.all(16),
+          getTooltipItems: (barSpots) {
+            var bar = barSpots.first;
+            double corpusAmount = 0;
+            double investedAmount = 0;
+            double wealthGain = 0;
+
+            int index = bar.spotIndex * interval.toInt();
+            corpusAmount = getSipAmount(index.toDouble()) ?? 0;
+            investedAmount = getSumAmount(index.toDouble());
+            wealthGain = corpusAmount - investedAmount;
+            LineTooltipItem item1 = LineTooltipItem(
+                "\$ ${bar.spotIndex > 0 ? k_m_b_generator(corpusAmount) : 0}",
+                TextStyle(
+                    color: Color(0xff4af699),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold));
+            LineTooltipItem item2 = LineTooltipItem(
+                "\$ ${bar.spotIndex > 0 ? k_m_b_generator(investedAmount) : 0}",
+                TextStyle(
+                    color: Colors.red,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold));
+            LineTooltipItem item3 = LineTooltipItem(
+                "\$ ${bar.spotIndex > 0 ? k_m_b_generator(wealthGain) : 0}",
+                TextStyle(
+                    color: Colors.yellow,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold));
+            return [item1, item2, item3];
+          },
         ),
         touchCallback: (LineTouchResponse touchResponse) {},
         handleBuiltInTouches: true,
@@ -612,13 +642,13 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       maxX: maxX,
       maxY: maxY,
       minY: 0,
-      lineBarsData: linesBarData1(),
+      lineBarsData: linesBarDetails(),
     );
   }
 
-  List<FlSpot>? getSpotData() {
-    double x = 0;
+  List<FlSpot>? getCorpusSpots() {
     List<FlSpot> list = [];
+    double x = 0;
     list.add(FlSpot(0, 0));
     x = 20;
     int i = interval.toInt();
@@ -626,8 +656,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     for (; i <= (widget.data.list?.length ?? 0); i = i + interval.toInt()) {
       var amount = getSipAmount(i.toDouble());
       print('$i SIP Amount $amount');
-      String sPoint =
-          ((amount ?? 0) / (widget.data.corpus) * 5).toStringAsFixed(2);
+      String sPoint = ((amount ?? 0) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
       x = x + 20;
@@ -636,19 +665,18 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     if (tenor % interval != 0) {
       var amount = getSipAmount(tenor.toDouble());
       print('$tenor SIP Amount $amount');
-      x = x - (20 / interval);
-      String sPoint =
-          ((amount ?? 0) / (widget.data.corpus) * 5).toStringAsFixed(2);
+      x = x - 20 + ((20 / interval) * (tenor % interval));
+      String sPoint = ((amount ?? 0) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
     }
     list.forEach((element) {
-      print("SIP SPOTS $element");
+      print(element);
     });
     return list;
   }
 
-  List<FlSpot>? getSpotDataWithAmount() {
+  List<FlSpot>? getInvestmentSpots() {
     double x = 0;
     List<FlSpot> list = [];
     list.add(FlSpot(0, 0));
@@ -659,8 +687,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         i = i + interval.toInt()) {
       var amount = getSumAmount(i.toDouble());
       print('$i Sum Amount $amount');
-      String sPoint =
-          ((amount) / ((widget.data.corpus)) * 5).toStringAsFixed(2);
+      String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
       x = x + 20;
@@ -668,22 +695,53 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     if (tenor % interval != 0) {
       var amount = getSumAmount(tenor.toDouble());
       print('$tenor Sum Amount $amount');
-      x = x - (20 / interval);
-      String sPoint = ((amount) / (widget.data.corpus) * 5).toStringAsFixed(2);
+      x = x - 20 + ((20 / interval) * (tenor % interval));
+      String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
     }
     return list;
   }
 
-  List<LineChartBarData> linesBarData1() {
-    final lineChartBarData1 = LineChartBarData(
-      spots: getSpotData(),
+  List<FlSpot>? getInterestAmountSpots() {
+    double x = 0;
+    List<FlSpot> list = [];
+    list.add(FlSpot(0, 0));
+    x = 20;
+    int tenor = widget.data.tenor.toInt();
+    for (int i = interval.toInt();
+        i <= (widget.data.list?.length ?? 0);
+        i = i + interval.toInt()) {
+      var sipAmount = getSipAmount(i.toDouble());
+      var investmentAmount = getSumAmount(i.toDouble());
+      var wealthAmount = (sipAmount ?? 0) - (investmentAmount);
+      print('$i Wealth Amount $wealthAmount');
+      String sPoint = ((wealthAmount) / amountInterval).toStringAsFixed(2);
+      var spots = FlSpot(x, double.parse(sPoint));
+      list.add(spots);
+      x = x + 20;
+    }
+    if (tenor % interval != 0) {
+      var sipAmount = getSipAmount(tenor.toDouble());
+      var investmentAmount = getSumAmount(tenor.toDouble());
+      var wealthAmount = (sipAmount ?? 0) - (investmentAmount);
+      print('$tenor Wealth Amount $wealthAmount');
+      x = x - 20 + ((20 / interval) * (tenor % interval));
+      String sPoint = ((wealthAmount) / amountInterval).toStringAsFixed(2);
+      var spots = FlSpot(x, double.parse(sPoint));
+      list.add(spots);
+    }
+    return list;
+  }
+
+  LineChartBarData getSipBarData() {
+    return LineChartBarData(
+      spots: getCorpusSpots(),
       isCurved: true,
       colors: [
-        const Color(0xff4af699),
+        Colors.green,
       ],
-      barWidth: 2,
+      barWidth: 3,
       isStrokeCapRound: true,
       dotData: FlDotData(
         show: true,
@@ -692,8 +750,11 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         show: false,
       ),
     );
-    final lineChartBarData2 = LineChartBarData(
-      spots: getSpotDataWithAmount(),
+  }
+
+  LineChartBarData getInvestmentBarData() {
+    return LineChartBarData(
+      spots: getInvestmentSpots(),
       isCurved: true,
       colors: [
         Colors.red,
@@ -707,10 +768,31 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         show: false,
       ),
     );
+  }
+
+  LineChartBarData getWealthGainBarData() {
+    return LineChartBarData(
+      spots: getInterestAmountSpots(),
+      isCurved: true,
+      colors: [
+        Colors.yellow,
+      ],
+      barWidth: 3,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: true,
+      ),
+      belowBarData: BarAreaData(
+        show: false,
+      ),
+    );
+  }
+
+  List<LineChartBarData> linesBarDetails() {
     return [
-      lineChartBarData1,
-      lineChartBarData2,
-      // lineChartBarData3,
+      getSipBarData(),
+      getInvestmentBarData(),
+      getWealthGainBarData(),
     ];
   }
 
@@ -752,11 +834,9 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   }
 
   List<Double> getYAxisData() {
-    print("Y DATA");
-    print("${widget.data.corpus}");
     double leading =
         double.parse(widget.data.corpus.toString().substring(0, 2));
-    print(leading);
+    leading = leading + 1;
     if (leading > 75) {
       amountInterval = 20;
     } else if (leading > 60) {
@@ -784,7 +864,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     } else {
       digitToPad = widget.data.corpus.toString().length - 2;
     }
-    print('Amount Interval, $amountInterval');
     String amount = amountInterval.toInt().toString().padRight(digitToPad, '0');
     amountInterval = double.parse(amount);
     print('Amount Interval, $amountInterval');

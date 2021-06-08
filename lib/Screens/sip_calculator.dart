@@ -148,7 +148,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   }
 
   void _onDetailButtonTap() {
-    if (data != null) {
+    if (data != null && data!.corpus.isFinite) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
         return SIPProjetionList(data!);
