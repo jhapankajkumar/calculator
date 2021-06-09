@@ -242,7 +242,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
           SizedBox(height: 40),
           Row(children: [
             Expanded(
-                child: calculateButton(
+                child: genericButton(
                     title: StringConstants.calculate,
                     onPress:
                         isAllInputValid() ? _calculateButtonTapped : null)),

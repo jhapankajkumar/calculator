@@ -1,3 +1,4 @@
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,7 @@ class Chart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: chartSectionSize,
       child: Center(
         child: PieChart(
           PieChartData(
@@ -32,17 +33,17 @@ class Chart extends StatelessWidget {
     List<PieChartSectionData>? sectionData;
     double? gainPercentage = _getGainPercentage();
     double? investmentPercentage = _getInvestmentPercentage();
-    final double radius = 75;
+    final double radius = chartRadisuSize;
     if ((wealthGain ?? 0).compareTo(0) > 0 && wealthGain?.isInfinite == false) {
       if (gainPercentage > 99.99) {
         sectionData = List.generate(1, (i) {
           return PieChartSectionData(
-            color: const Color(0xff31944a).withOpacity(1.0),
+            color: wealthColor.withOpacity(1.0),
             value: _getGainPercentage(),
             title: '',
             radius: radius,
             titleStyle: TextStyle(
-                fontSize: 18,
+                fontSize: bodyText2FontSize,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff044d7c)),
             titlePositionPercentageOffset: 0.55,
@@ -53,26 +54,26 @@ class Chart extends StatelessWidget {
           switch (i) {
             case 0:
               return PieChartSectionData(
-                color: const Color(0xff31944a).withOpacity(1.0),
+                color: wealthColor.withOpacity(1.0),
                 value: gainPercentage,
                 title: "",
                 radius: radius,
                 titleStyle: TextStyle(
-                    fontSize: 18,
+                    fontSize: bodyText2FontSize,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xff044d7c)),
                 titlePositionPercentageOffset: 0.55,
               );
             case 1:
               return PieChartSectionData(
-                color: const Color(0xffFF4611).withOpacity(1.0),
+                color: ternaryColor.withOpacity(1.0),
                 value: investmentPercentage,
                 title: "",
                 radius: radius,
                 titleStyle: TextStyle(
-                    fontSize: 18,
+                    fontSize: bodyText2FontSize,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xffFF4611)),
+                    color: ternaryColor),
                 titlePositionPercentageOffset: 0.55,
               );
             default:
@@ -83,12 +84,12 @@ class Chart extends StatelessWidget {
     } else if (corpusAmount?.isInfinite == true) {
       sectionData = List.generate(1, (i) {
         return PieChartSectionData(
-          color: const Color(0xff31944a).withOpacity(1.0),
+          color: wealthColor.withOpacity(1.0),
           value: _getGainPercentage(),
           title: '',
           radius: radius,
           titleStyle: TextStyle(
-              fontSize: 18,
+              fontSize: bodyText2FontSize,
               fontWeight: FontWeight.bold,
               color: const Color(0xff044d7c)),
           titlePositionPercentageOffset: 0.55,
@@ -102,9 +103,9 @@ class Chart extends StatelessWidget {
           title: '',
           radius: radius,
           titleStyle: TextStyle(
-              fontSize: 18,
+              fontSize: bodyText2FontSize,
               fontWeight: FontWeight.bold,
-              color: const Color(0xffFF4611)),
+              color: ternaryColor),
           titlePositionPercentageOffset: 0.55,
         );
       });

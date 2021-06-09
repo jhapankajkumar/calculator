@@ -1,3 +1,4 @@
+import 'package:calculator/util/Components/button.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,20 +66,10 @@ Widget buildSummeryContainer(
                         buildSummaryRow(totalGainAmount, wealthGainTitle),
                         // Wealth Gain/Lost
 
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         isDetail != null
-                            ? CupertinoButton(
-                                child: Text("Detail"),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
-                                color: appTheme.accentColor,
-                                disabledColor: Colors.grey,
-                                onPressed: () {
-                                  if (onTapDetail != null) {
-                                    onTapDetail();
-                                  }
-                                },
-                              )
+                            ? genericButton(
+                                title: "Detail", onPress: onTapDetail)
                             : Container(),
                         SizedBox(height: 10),
                       ],
@@ -127,7 +118,7 @@ Widget devider() {
 
 Widget buildSummaryRow(double? amount, String title) {
   return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    mainAxisAlignment: MainAxisAlignment.end,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Expanded(
@@ -143,9 +134,10 @@ Widget buildSummaryRow(double? amount, String title) {
           title: amount?.isInfinite == false
               ? Text(
                   '\$${formatter.format(amount)}',
+                  textAlign: TextAlign.end,
                   style: subTitle1,
                 )
-              : Text('\$INFINITE', style: caption3),
+              : Text('\$INFINITE', style: subTitle1),
         ),
       ),
     ],

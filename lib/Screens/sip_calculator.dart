@@ -5,6 +5,7 @@ import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
+import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
@@ -44,7 +45,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
     var helper = UtilityHelper();
     data = helper.getCorpusAmount(
         amount ?? 0, rate ?? 0, period ?? 0, stepUpPercentage);
-    print('\n\n');
+
     setState(() {
       investedAmount = data?.totalInvestment;
       corpusAmount = data?.corpus;
@@ -90,6 +91,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           amount = inputtedValue;
+          // if (isAllInputValid()) {
+          //   _calculateSIP();
+          // }
         } else {
           amount = null;
         }
@@ -100,6 +104,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           period = inputtedValue;
+          // if (isAllInputValid()) {
+          //   _calculateSIP();
+          // }
         } else {
           period = null;
         }
@@ -110,6 +117,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           rate = inputtedValue;
+          // if (isAllInputValid()) {
+          //   _calculateSIP();
+          // }
         } else {
           rate = null;
         }
@@ -120,6 +130,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           stepUpPercentage = inputtedValue;
+          // if (isAllInputValid()) {
+          //   _calculateSIP();
+          // }
         } else {
           stepUpPercentage = null;
         }
@@ -148,12 +161,19 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   }
 
   void _onDetailButtonTap() {
+    _removeFocus();
     if (data != null && data!.corpus.isFinite) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
         return SIPProjetionList(data!);
       }));
     }
+  }
+
+  _onOptionChange(Compounding? value) {
+    setState(() {
+      //_compounding = value;
+    });
   }
 
   @override
@@ -247,7 +267,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           SizedBox(height: 20),
           Row(children: [
             Expanded(
-                child: calculateButton(
+                child: genericButton(
                     title: StringConstants.calculate,
                     onPress:
                         isAllInputValid() ? _calculateButtonTapped : null)),

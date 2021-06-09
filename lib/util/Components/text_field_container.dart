@@ -51,12 +51,13 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
         (controller?.text.length ?? 0) > 0) {
       shouldShowClearButton = true;
     }
-    var source = decimalRegex;
+    AmountValidator validator = DecimalRegexValidator(source: decimalRegex);
     if (widget.containerData.textField == TextFieldFocus.amount ||
         widget.containerData.textField == TextFieldFocus.period) {
-      source = regexSource;
+      validator = AmountRegexValidator(source: regexSource);
     }
     var container = Container(
+        height: textFieldContainerSize,
         padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
@@ -72,45 +73,45 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
             ),
           ],
         ),
-        child: FocusScope(
-          child: Focus(
-            onFocusChange: (value) {
-              if (widget.containerData.onFocusChanged != null) {
-                widget.containerData.onFocusChanged!(focusField, value);
-              }
-            },
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: widget.containerData.placeHolder,
-                hintStyle: TextStyle(color: Colors.grey[350]),
-                errorText: widget.containerData.errorText,
-                alignLabelWithHint: true,
-                suffixIcon: shouldShowClearButton ? _getClearButton() : null,
-              ),
-              keyboardType: (widget.containerData.textField ==
-                          TextFieldFocus.amount ||
-                      widget.containerData.textField == TextFieldFocus.period)
-                  ? TextInputType.numberWithOptions(decimal: false)
-                  : TextInputType.numberWithOptions(decimal: true),
-              style: appTheme.textTheme.subtitle2,
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(
-                    widget.containerData.textLimit),
-                InputFormatterValidator(
-                    validator: RegexValidator(source: source))
-              ],
-              controller: controller,
-              onChanged: (value) {
-                if (widget.containerData.onTextChange != null) {
-                  widget.containerData.onTextChange!(focusField, value);
+        child: Center(
+          child: FocusScope(
+            child: Focus(
+              onFocusChange: (value) {
+                if (widget.containerData.onFocusChanged != null) {
+                  widget.containerData.onFocusChanged!(focusField, value);
                 }
               },
+              child: TextField(
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: widget.containerData.placeHolder,
+                  hintStyle: TextStyle(color: Colors.grey[350]),
+                  errorText: widget.containerData.errorText,
+                  alignLabelWithHint: true,
+                  suffixIcon: shouldShowClearButton ? _getClearButton() : null,
+                ),
+                keyboardType: (widget.containerData.textField ==
+                            TextFieldFocus.amount ||
+                        widget.containerData.textField == TextFieldFocus.period)
+                    ? TextInputType.numberWithOptions(decimal: false)
+                    : TextInputType.numberWithOptions(decimal: true),
+                style: appTheme.textTheme.subtitle2,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(
+                      widget.containerData.textLimit),
+                  InputFormatterValidator(validator: validator)
+                ],
+                controller: controller,
+                onChanged: (value) {
+                  if (widget.containerData.onTextChange != null) {
+                    widget.containerData.onTextChange!(focusField, value);
+                  }
+                },
+              ),
             ),
           ),
         ));
     return container;
-    // return Container();
   }
 
   Widget _getClearButton() {

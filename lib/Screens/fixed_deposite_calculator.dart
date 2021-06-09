@@ -234,12 +234,12 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
               : Text(
                   '* Compounding quaterly.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 10, color: Color(0xffFF4611)),
+                  style: TextStyle(fontSize: 10, color: ternaryColor),
                 ),
           SizedBox(height: 20),
           Row(children: [
             Expanded(
-                child: calculateButton(
+                child: genericButton(
                     title: StringConstants.calculate,
                     onPress:
                         isAllInputValid() ? _calculateButtonTapped : null)),

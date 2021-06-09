@@ -1,3 +1,4 @@
+import 'package:calculator/util/Constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class Indicator extends StatelessWidget {
@@ -11,7 +12,7 @@ class Indicator extends StatelessWidget {
     required this.color,
     this.text,
     required this.isSquare,
-    this.size = 16,
+    this.size,
     this.textColor = const Color(0xff505050),
   });
 
@@ -35,7 +36,9 @@ class Indicator extends StatelessWidget {
             text ?? "",
             maxLines: 2,
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
+                fontSize: indicatorFontSize,
+                fontWeight: FontWeight.bold,
+                color: textColor),
           ),
         )
       ],

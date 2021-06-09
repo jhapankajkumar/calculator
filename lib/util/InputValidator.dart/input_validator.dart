@@ -4,7 +4,7 @@ String regexSource = "^\$|^(0|([1-9][0-9]{0,15}))(\\.[0-9]{0,2})?\$";
 String decimalRegex = "^\$|^(0|([1-9][0-9]{0,2}))(\\.[0-9]{0,2})?\$";
 
 class InputFormatterValidator implements TextInputFormatter {
-  final RegexValidator validator;
+  final AmountValidator validator;
   InputFormatterValidator({required this.validator});
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
@@ -18,13 +18,39 @@ class InputFormatterValidator implements TextInputFormatter {
   }
 }
 
-class RegexValidator {
+abstract class AmountValidator {
+  bool isValid(String value);
+}
+
+class AmountRegexValidator extends AmountValidator {
   final String source;
-  RegexValidator({required this.source});
+  AmountRegexValidator({required this.source});
   bool isValid(String value) {
     try {
       var regex = RegExp(source);
       var matches = regex.allMatches(value);
+      for (Match match in matches) {
+        if (match.start == 0 && match.end == value.length) {
+          return true;
+        }
+      }
+    } catch (error) {}
+
+    return false;
+  }
+}
+
+class DecimalRegexValidator extends AmountValidator {
+  final String source;
+  DecimalRegexValidator({required this.source});
+  bool isValid(String value) {
+    try {
+      var regex = RegExp(source);
+      var matches = regex.allMatches(value);
+      double amount = double.parse(value);
+      if (amount > 100) {
+        return false;
+      }
       for (Match match in matches) {
         if (match.start == 0 && match.end == value.length) {
           return true;

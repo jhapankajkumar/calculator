@@ -174,8 +174,8 @@ class _LandingPageState extends State<LandingPage> {
       },
       child: Container(
         padding: EdgeInsets.all(10),
-        width: 120,
-        height: 120,
+        width: menuContainerSize,
+        height: menuContainerSize,
         margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(24)),
@@ -197,8 +197,8 @@ class _LandingPageState extends State<LandingPage> {
             ),
             Image(
               image: AssetImage('assets/images/$image.png'),
-              width: 60,
-              height: 60,
+              width: menuImageSize,
+              height: menuImageSize,
             ),
             SizedBox(
               height: 10,

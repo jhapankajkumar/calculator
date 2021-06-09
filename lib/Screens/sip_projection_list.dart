@@ -95,7 +95,10 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                   ),
                   _currentSelection == 0
                       ? Expanded(child: buildT(context))
-                      : buildChart(context),
+                      : Expanded(child: buildChart(context)),
+                  SizedBox(
+                    height: 20,
+                  ),
                 ],
               ),
             )));
@@ -414,29 +417,35 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              const SizedBox(
+              SizedBox(
                 height: 10,
               ),
-              const Text(
-                'Total Amount',
+              Text(
+                'Total Expected Amount',
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: subTtitleFontSize,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2),
                 textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 2,
               ),
               Text(
-                '${formatter.format(widget.data.corpus)}',
+                '\$ ${formatter.format(widget.data.corpus)}',
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+                    color: ternaryColor,
+                    fontSize: subTtitleFontSize,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2),
                 textAlign: TextAlign.center,
               ),
+              SizedBox(
+                height: 10,
+              ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
                 child: Container(
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
@@ -445,34 +454,40 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                     children: [
                       Indicator(
                         color: Colors.green,
+                        size: indicatorSize,
                         text: "Total Amount",
                         isSquare: false,
                         textColor: Colors.white,
                       ),
                       SizedBox(
-                        height: 4,
+                        height: 10,
                       ),
                       Indicator(
                         color: Colors.red,
+                        size: indicatorSize,
                         text: "Invested amount",
                         isSquare: false,
                         textColor: Colors.white,
                       ),
                       SizedBox(
-                        height: 4,
+                        height: 10,
                       ),
                       Indicator(
                         color: Colors.yellow,
+                        size: indicatorSize,
                         text: "Wealth gain",
                         isSquare: false,
                         textColor: Colors.white,
                       ),
                       SizedBox(
-                        height: 18,
+                        height: 10,
                       ),
                     ],
                   ),
                 ),
+              ),
+              SizedBox(
+                height: 18,
               ),
               Expanded(
                 child: Padding(
@@ -487,7 +502,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                 height: 10,
               ),
               const Text(
-                'Years',
+                'Duration ->>> ',
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -496,7 +511,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(
-                height: 10,
+                height: 20,
               ),
             ],
           ),
@@ -555,7 +570,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     } else {
       interval = 1;
     }
-    print('Year Interval, $interval');
+    // print('Year Interval, $interval');
     getYAxisData();
     return LineChartData(
       lineTouchData: LineTouchData(
@@ -639,14 +654,14 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
             return k_m_b_generators(amountInterval * value);
           },
           margin: 8,
-          reservedSize: 65,
+          reservedSize: 55,
         ),
         rightTitles: SideTitles(
             showTitles: true,
             getTitles: (value) {
               return '';
             },
-            reservedSize: 10),
+            reservedSize: 5),
       ),
       borderData: FlBorderData(
         show: true,
@@ -683,7 +698,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     int tenor = widget.data.tenor.toInt();
     for (; i <= (widget.data.list?.length ?? 0); i = i + interval.toInt()) {
       var amount = getSipAmount(i.toDouble());
-      print('$i SIP Amount $amount');
+      // print('$i SIP Amount $amount');
       String sPoint = ((amount ?? 0) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
@@ -692,15 +707,12 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
     if (tenor % interval != 0) {
       var amount = getSipAmount(tenor.toDouble());
-      print('$tenor SIP Amount $amount');
+      // print('$tenor SIP Amount $amount');
       x = x - 20 + ((20 / interval) * (tenor % interval));
       String sPoint = ((amount ?? 0) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
     }
-    list.forEach((element) {
-      print(element);
-    });
     return list;
   }
 
@@ -714,7 +726,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         i <= (widget.data.list?.length ?? 0);
         i = i + interval.toInt()) {
       var amount = getSumAmount(i.toDouble());
-      print('$i Sum Amount $amount');
+      // print('$i Sum Amount $amount');
       String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
@@ -722,7 +734,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     }
     if (tenor % interval != 0) {
       var amount = getSumAmount(tenor.toDouble());
-      print('$tenor Sum Amount $amount');
+      // print('$tenor Sum Amount $amount');
       x = x - 20 + ((20 / interval) * (tenor % interval));
       String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
@@ -743,7 +755,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       var sipAmount = getSipAmount(i.toDouble());
       var investmentAmount = getSumAmount(i.toDouble());
       var wealthAmount = (sipAmount ?? 0) - (investmentAmount);
-      print('$i Wealth Amount $wealthAmount');
+      // print('$i Wealth Amount $wealthAmount');
       String sPoint = ((wealthAmount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
@@ -753,7 +765,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       var sipAmount = getSipAmount(tenor.toDouble());
       var investmentAmount = getSumAmount(tenor.toDouble());
       var wealthAmount = (sipAmount ?? 0) - (investmentAmount);
-      print('$tenor Wealth Amount $wealthAmount');
+      // print('$tenor Wealth Amount $wealthAmount');
       x = x - 20 + ((20 / interval) * (tenor % interval));
       String sPoint = ((wealthAmount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
@@ -894,7 +906,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     }
     String amount = amountInterval.toInt().toString().padRight(digitToPad, '0');
     amountInterval = double.parse(amount);
-    print('Amount Interval, $amountInterval');
+    // print('Amount Interval, $amountInterval');
     return [];
   }
 }

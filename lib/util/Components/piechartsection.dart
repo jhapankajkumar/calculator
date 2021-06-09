@@ -40,7 +40,8 @@ Widget buildGraphContainer({
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Indicator(
-                  color: Color(0xff31944a),
+                  color: wealthColor,
+                  size: indicatorSize,
                   text: wealthGainValue,
                   isSquare: false,
                   textColor: appTheme.accentColor,
@@ -49,7 +50,8 @@ Widget buildGraphContainer({
                   height: 4,
                 ),
                 Indicator(
-                  color: Color(0xffFF4611),
+                  color: ternaryColor,
+                  size: indicatorSize,
                   text: investedAmountValue,
                   isSquare: false,
                   textColor: appTheme.accentColor,
