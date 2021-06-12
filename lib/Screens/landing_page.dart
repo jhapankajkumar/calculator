@@ -49,6 +49,39 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
+  void _lumpsumClicked() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (BuildContext context) {
+        return FixedDepositeCalculator(
+          category: Screen.lumpsum,
+        );
+      }),
+    );
+  }
+
+  void _swpClicked() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (BuildContext context) {
+        return FixedDepositeCalculator(
+          category: Screen.swp,
+        );
+      }),
+    );
+  }
+
+  void _rdClicked() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (BuildContext context) {
+        return SIPCalculator(
+          category: Screen.rd,
+        );
+      }),
+    );
+  }
+
   void _fdClicked() {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return FixedDepositeCalculator(
@@ -118,9 +151,9 @@ class _LandingPageState extends State<LandingPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           buildSIPView(context, StringConstants.lumpsum,
-                              ImageConstants.lumpsum, _futureValueClicked),
+                              ImageConstants.lumpsum, _lumpsumClicked),
                           buildSIPView(context, StringConstants.swp,
-                              ImageConstants.swp, _futureValueClicked),
+                              ImageConstants.swp, _swpClicked),
                         ],
                       ),
                       SizedBox(
@@ -136,7 +169,7 @@ class _LandingPageState extends State<LandingPage> {
                               context,
                               StringConstants.recurringDeposit,
                               ImageConstants.recurring,
-                              _fdClicked),
+                              _rdClicked),
                         ],
                       ),
                       SizedBox(

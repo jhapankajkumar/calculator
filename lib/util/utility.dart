@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/sip_data.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 final formatter = new NumberFormat("##,###");
@@ -173,8 +172,11 @@ String amountTitle(Screen category) {
     case Screen.fd:
       containerTitle = StringConstants.fixedDepositAmount;
       break;
+    case Screen.rd:
+      containerTitle = StringConstants.recurringDepositAmount;
+      break;
     case Screen.lumpsum:
-      containerTitle = StringConstants.startingAmount;
+      containerTitle = StringConstants.investmentAmount;
       break;
     case Screen.fv:
       containerTitle = StringConstants.startingAmount;
@@ -195,15 +197,18 @@ String periodTitle(Screen category) {
   String periodTitle = "";
   switch (category) {
     case Screen.sip:
-    case Screen.stepup:
     case Screen.swp:
       periodTitle = StringConstants.investmentPeriod;
       break;
+    case Screen.stepup:
+      periodTitle = StringConstants.investmentPeriodYears;
+      break;
     case Screen.fd:
+    case Screen.rd:
       periodTitle = StringConstants.depositPriod;
       break;
     case Screen.lumpsum:
-      periodTitle = StringConstants.numberOfYears;
+      periodTitle = StringConstants.investmentPeriod;
       break;
     case Screen.fv:
       periodTitle = StringConstants.numberOfYears;
@@ -229,10 +234,11 @@ String interestRateTitle(Screen category) {
       interestRateTitle = StringConstants.expectedReturn;
       break;
     case Screen.fd:
-      interestRateTitle = StringConstants.depositIntrestRate;
+    case Screen.rd:
+      interestRateTitle = StringConstants.rateOfInterest;
       break;
     case Screen.lumpsum:
-      interestRateTitle = StringConstants.interestRate;
+      interestRateTitle = StringConstants.expectedReturn;
       break;
     case Screen.fv:
       interestRateTitle = StringConstants.interestRate;
@@ -241,7 +247,7 @@ String interestRateTitle(Screen category) {
       interestRateTitle = StringConstants.loanIntrestRate;
       break;
     case Screen.target:
-      interestRateTitle = StringConstants.expectedReturn;
+      interestRateTitle = StringConstants.expectedReturnFuture;
       break;
     default:
       print('default');
@@ -261,6 +267,9 @@ String summaryExpectedAmountTitle(Screen category) {
       break;
     case Screen.fv:
       summaryAmountTitle = StringConstants.futureValueOfAmount;
+      break;
+    case Screen.rd:
+      summaryAmountTitle = StringConstants.expectedAmount;
       break;
     case Screen.emi:
       summaryAmountTitle = StringConstants.loanEMI;
@@ -282,6 +291,9 @@ String summaryInvestedAmountTitle(Screen category) {
     case Screen.swp:
     case Screen.lumpsum:
     case Screen.fd:
+      summaryAmountTitle = StringConstants.investedAmount;
+      break;
+    case Screen.rd:
       summaryAmountTitle = StringConstants.investedAmount;
       break;
     case Screen.fv:

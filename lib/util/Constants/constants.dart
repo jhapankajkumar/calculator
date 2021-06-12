@@ -84,6 +84,12 @@ TextStyle caption2 = TextStyle(
   color: Color(0xff212E51),
 );
 
+TextStyle captionHeader = TextStyle(
+  fontSize: captionFontSize,
+  fontWeight: FontWeight.bold,
+  color: Color(0xffffffff),
+);
+
 TextStyle buttonStyle = TextStyle(
   fontSize: calculateButtonFont,
   fontWeight: FontWeight.normal,

@@ -279,12 +279,12 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                 onDoneButtonTapped: _onDoneButtonTapped,
               ),
             ),
-            widget.category == Screen.sip
+            (widget.category == Screen.sip || widget.category == Screen.rd)
                 ? SizedBox(
                     width: 10,
                   )
                 : Container(),
-            widget.category == Screen.sip
+            (widget.category == Screen.sip || widget.category == Screen.rd)
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

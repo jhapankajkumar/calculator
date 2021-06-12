@@ -116,6 +116,9 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
   _onOptionChange(Compounding? value) {
     setState(() {
       _compounding = value;
+      if (isAllInputValid()) {
+        _calculateButtonTapped();
+      }
     });
   }
 
@@ -218,24 +221,65 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
               onTextChange: _onTextChange,
               onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
-          buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.interestRate,
-              placeHolder: "10",
-              textLimit: interestRateTextLimit,
-              containerTitle: interestRateTitle(widget.category),
-              focus: currentFocus,
-              onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange,
-              onDoneButtonTapped: _onDoneButtonTapped),
+          Row(
+            children: [
+              Expanded(
+                child: buildTextFieldContainerSection(
+                    textFieldType: TextFieldFocus.interestRate,
+                    placeHolder: "10",
+                    textLimit: interestRateTextLimit,
+                    containerTitle: interestRateTitle(widget.category),
+                    focus: currentFocus,
+                    onFocusChange: _onFocusChange,
+                    onTextChange: _onTextChange,
+                    onDoneButtonTapped: _onDoneButtonTapped),
+              ),
+              widget.category == Screen.fd
+                  ? SizedBox(
+                      width: 10,
+                    )
+                  : Container(),
+              widget.category == Screen.fd
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                          Text(
+                            "Compounding",
+                            style: appTheme.textTheme.caption,
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            height: textFieldContainerSize,
+                            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Color(0xffEFEFEF),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  spreadRadius: 0,
+                                  blurRadius: 0,
+                                  offset: Offset(
+                                      0, 0), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: buildCompoundungDropDown(
+                                _compounding, _onOptionChange),
+                          ),
+                        ])
+                  : Container()
+            ],
+          ),
           SizedBox(height: 20),
-          widget.category == Screen.fd
-              ? buildRadioList(
-                  compounding: _compounding, onOptionChange: _onOptionChange)
-              : Text(
+          widget.category == Screen.fv
+              ? Text(
                   '* Compounding quaterly.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 10, color: ternaryColor),
-                ),
+                )
+              : Container(),
           SizedBox(height: 20),
           Row(children: [
             Expanded(

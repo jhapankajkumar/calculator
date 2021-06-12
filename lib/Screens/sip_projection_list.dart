@@ -101,7 +101,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         createPDF(context, widget.data);
       });
     }).catchError((onError) {
-      print(onError);
       if (chartImage != null) {
         var file = File('${directory.path}/chart.png');
         file.writeAsBytes(chartImage!);
@@ -328,7 +327,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
   Container buildTableHeader() {
     return Container(
-      color: appTheme.primaryColor,
+      color: appTheme.accentColor,
       height: 50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -338,19 +337,19 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
               padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
               child: Text(
                 "Duration",
-                style: appTheme.textTheme.caption,
+                style: captionHeader,
               ),
             ),
           ),
           Center(
-            child: Text("Amount", style: appTheme.textTheme.caption),
+            child: Text("Amount", style: captionHeader),
           ),
           Center(
               child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Text(
               "Interest",
-              style: appTheme.textTheme.caption,
+              style: captionHeader,
             ),
           )),
           Center(
@@ -358,7 +357,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
               padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
               child: Text(
                 "Balance",
-                style: appTheme.textTheme.caption,
+                style: captionHeader,
               ),
             ),
           ),
@@ -837,7 +836,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   // }
 
   double? getSipAmount(double? duration) {
-    print(duration);
     var stepupFinalAmount = 0.0;
     var sipAmount = widget.data.initialAmount;
     var totalInvestAmount = sipAmount;
@@ -857,7 +855,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         n = n - 1;
       } else {
         sipAmount = (sipAmount) + ((sipAmount) * s);
-        print(sipAmount);
         totalInvestAmount = (totalInvestAmount) + sipAmount;
         var value4 = pow(value3, n);
         finalValue = finalValue + sipAmount * value4;

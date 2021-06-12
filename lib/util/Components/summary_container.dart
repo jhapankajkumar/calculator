@@ -83,8 +83,8 @@ Widget buildSummeryContainer(
                         buildSummaryRow(
                             targetAmount, StringConstants.targetAmount),
                         devider(),
-                        buildPeriodRow(period,
-                            StringConstants.futureAmountInvestmentPeriod),
+                        buildPeriodRow(
+                            period, StringConstants.futureInvestmentPeriod),
                         devider(),
                         buildSummaryRow(
                             sipAmount, StringConstants.monthlySIPRequired),
@@ -163,6 +163,7 @@ Widget buildPeriodRow(double? amount, String title) {
               ? Text(
                   amount != null ? '${amount.toInt()}' : "",
                   style: subTitle1,
+                  textAlign: TextAlign.right,
                 )
               : Text('\$INFINITE', style: subTitle1),
         ),
