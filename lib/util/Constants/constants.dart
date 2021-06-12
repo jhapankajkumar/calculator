@@ -91,5 +91,23 @@ TextStyle buttonStyle = TextStyle(
 );
 
 int amountTextLimit = 16;
-int periodTextLimit = 2;
+int periodTextLimit = 3;
+int monthsLimit = 2;
 int interestRateTextLimit = 5;
+
+enum Screen {
+  home,
+  sip,
+  stepup,
+  swp,
+  lumpsum,
+  fd,
+  rd,
+  emi,
+  loan,
+  fv,
+  pv,
+  target,
+  retirement,
+  detail,
+}

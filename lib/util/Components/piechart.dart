@@ -98,7 +98,7 @@ class Chart extends StatelessWidget {
     } else {
       sectionData = List.generate(1, (i) {
         return PieChartSectionData(
-          color: const Color(0xfff8b250).withOpacity(1.0),
+          color: ternaryColor.withOpacity(1.0),
           value: _getInvestmentPercentage(),
           title: '',
           radius: radius,

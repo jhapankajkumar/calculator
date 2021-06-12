@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../Constants/constants.dart';
 
 enum Compounding { monthly, quaterly, annually }
-enum Period { months, years }
+enum Period { years, months }
+
+List<Period> periodList = [Period.years, Period.months];
 
 Widget buildRadioList(
     {Compounding? compounding, required Function onOptionChange}) {
@@ -99,5 +101,24 @@ Widget buildPeriodList(
         ),
       ],
     ),
+  );
+}
+
+Widget buildPeriodDropDown(Period? currentValue, Function onChanged) {
+  return DropdownButton<Period>(
+    value: currentValue,
+    dropdownColor: appTheme.primaryColor,
+    icon: const Icon(Icons.keyboard_arrow_down),
+    iconSize: 24,
+    //elevation: 16,
+    style: appTheme.textTheme.caption,
+    onChanged: (Period? newValue) {
+      onChanged(newValue);
+    },
+    items: periodList.map<DropdownMenuItem<Period>>((Period value) {
+      return DropdownMenuItem<Period>(
+          value: value,
+          child: Text(value == Period.months ? "Months" : "Years"));
+    }).toList(),
   );
 }

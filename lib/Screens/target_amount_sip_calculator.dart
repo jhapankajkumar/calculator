@@ -16,8 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TargetAmountSIPCalculator extends StatefulWidget {
-  TargetAmountSIPCalculator({Key? key, required this.title}) : super(key: key);
-  final String title;
+  TargetAmountSIPCalculator({Key? key, required this.category})
+      : super(key: key);
+  final Screen category;
 
   @override
   _TargetAmountSIPCalculatorState createState() =>
@@ -133,23 +134,33 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
     }
   }
 
+  void removeFocus() {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    if (this.currentFocus != null) {
+      setState(() {
+        this.currentFocus = null;
+      });
+    }
+  }
+
+  _onDoneButtonTapped() {
+    setState(() {
+      removeFocus();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
     double deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-        appBar: appBar(title: widget.title, context: context),
+        appBar: appBar(category: widget.category, context: context),
         body: GestureDetector(
             onTap: () {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus) {
-                currentFocus.unfocus();
-              }
-              if (this.currentFocus != null) {
-                setState(() {
-                  this.currentFocus = null;
-                });
-              }
+              removeFocus();
             },
             child: Container(
               margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -220,7 +231,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               containerTitle: StringConstants.futureTargetAmout,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
@@ -229,7 +241,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               containerTitle: StringConstants.futureAmountInvestmentPeriod,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,
@@ -238,7 +251,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               containerTitle: StringConstants.expectedReturn,
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 40),
           Row(children: [
             Expanded(

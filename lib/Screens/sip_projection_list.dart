@@ -1,43 +1,63 @@
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/indicator.dart';
+import 'package:calculator/util/Components/pdf_table.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/sip_data.dart';
+import 'package:calculator/util/utility.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 import 'package:material_segmented_control/material_segmented_control.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class SIPProjetionList extends StatefulWidget {
   final SIPResultData data;
-  SIPProjetionList(this.data);
+  final Screen category;
+  SIPProjetionList({required this.category, required this.data});
   @override
   _SIPProjetionListState createState() => _SIPProjetionListState();
 }
 
 class _SIPProjetionListState extends State<SIPProjetionList> {
-  final formatter = new NumberFormat("##,###");
   int _currentSelection = 0;
-  bool isExpanded = false;
+  ScreenshotController screenshotController = ScreenshotController();
+  Uint8List? chartImage;
   @override
   void initState() {
     super.initState();
-
     fillAmount(context);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      deletePreviousData();
+    });
   }
 
   void fillAmount(BuildContext context) {
     List<SIPData> list = [];
+    double sipAmount = widget.data.initialAmount;
+    double steupAmount = 0;
+    double counter = 1;
     for (int i = 1; i <= widget.data.tenor; i++) {
       SIPData sipData = SIPData();
       sipData.tenor = i;
+      double amount = 0;
       double corpus = getSipAmount(i.toDouble()) ?? 0;
-      double amount = widget.data.initialAmount * i * 12;
+      amount = (sipAmount * i) + (steupAmount * counter);
+      counter = counter + 1;
+      if (i % 12 == 0) {
+        counter = 1;
+        steupAmount = sipAmount * widget.data.initialSteupRate / 100;
+      }
+
       double? interest = corpus - amount;
       sipData.totalBalance = corpus;
       sipData.amount = amount;
@@ -49,10 +69,73 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     });
   }
 
+  Future<void> deletePreviousData() async {
+    var directory = await getApplicationDocumentsDirectory();
+    var pngFile = File('${directory.path}/chart.png');
+    var doesFileExist = await pngFile.exists();
+
+    if (doesFileExist) {
+      pngFile.delete();
+    }
+
+    var pdfFile = File('${directory.path}/detail.pdf');
+    doesFileExist = await pdfFile.exists();
+    if (doesFileExist) {
+      pdfFile.delete();
+    }
+  }
+
+  Future<void> takeScreenShot() async {
+    var directory = await getApplicationDocumentsDirectory();
+    screenshotController.capture().then((Uint8List? image) async {
+      //print("Capture Done");
+      setState(() async {
+        if (image != null) {
+          chartImage = image;
+          var file = File('${directory.path}/chart.png');
+          file.writeAsBytes(chartImage!);
+        } else if (chartImage != null) {
+          var file = File('${directory.path}/chart.png');
+          file.writeAsBytes(chartImage!);
+        }
+        createPDF(context, widget.data);
+      });
+    }).catchError((onError) {
+      print(onError);
+      if (chartImage != null) {
+        var file = File('${directory.path}/chart.png');
+        file.writeAsBytes(chartImage!);
+      }
+      createPDF(context, widget.data);
+    });
+  }
+
+  void onTapShareButton() {
+    takeScreenShot().then((value) async {
+      final box = context.findRenderObject() as RenderBox?;
+      var directory = await getApplicationDocumentsDirectory();
+      var imagePath = '${directory.path}/detail.pdf';
+      if (imagePath.isNotEmpty) {
+        await Share.shareFiles([imagePath],
+            text: "Please find attached detail",
+            subject: "Investment Detail",
+            sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      } else {
+        await Share.share("text",
+            subject: "subject",
+            sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      }
+    }).onError((error, stackTrace) {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: "Investment Detail", context: context),
+        appBar: appBar(
+            category: widget.category,
+            context: context,
+            isTrailing: true,
+            onTapShare: onTapShareButton),
         body: baseContainer(
             context: context,
             child: Container(
@@ -118,8 +201,8 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
   Widget buildTableContent(BuildContext context) {
     List<Widget> children = [];
-    int? limit = (widget.data.list?.length ?? 0) > 100
-        ? 100
+    int? limit = (widget.data.list?.length ?? 0) > 600
+        ? 600
         : (widget.data.list?.length ?? 0);
     for (int i = 0; i < (limit); i++) {
       var data = widget.data.list?[i];
@@ -143,17 +226,17 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   Widget buildContent(BuildContext context, SIPData data, int index) {
     double width = MediaQuery.of(context).size.width;
     double rowHeight = 80;
-    List<Widget> children = [];
-    for (int i = 0; i < (data.list?.length ?? 0); i++) {
-      var detailData = data.list?[i];
-      if (detailData != null) {
-        children.add(buildDetailContent(context, detailData, i));
-        children.add(Container(
-          height: 1,
-          color: Colors.grey,
-        ));
-      }
+    bool isYear = false;
+    String durationText = "";
+
+    if ((index + 1) % 12 == 0) {
+      isYear = true;
+      durationText = '${(data.tenor ?? 0) ~/ 12} Year';
+    } else {
+      durationText = '${(data.tenor ?? 0)} Month';
+      isYear = false;
     }
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -166,7 +249,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       },
       child: Container(
         decoration: BoxDecoration(
-            color: index == 0
+            color: isYear == true
                 ? appTheme.secondaryHeaderColor
                 : (index % 2 == 0 ? appTheme.primaryColor : Colors.white)),
         child: Column(
@@ -178,27 +261,16 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                   child: Container(
                     width: width / 4 + 20,
                     height: rowHeight,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Image(
-                        //   image: AssetImage('assets/images/expand.png'),
-                        //   width: 16,
-                        //   height: 16,
-                        // ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(4, 0, 0, 0),
-                          child: Center(
-                            child: Text(
-                              "${(data.tenor?.toInt())} Years",
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.clip,
-                              style: caption2,
-                            ),
-                          ),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(4, 0, 0, 0),
+                      child: Center(
+                        child: Text(
+                          "$durationText",
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.clip,
+                          style: caption2,
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -248,92 +320,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                 ),
               ],
             ),
-            // data.isExpanded == false
-            //     ? Container()
-            //     : Container(
-            //         decoration: BoxDecoration(
-            //           border: Border.all(color: appTheme.accentColor, width: 1),
-            //         ),
-            //         child: Column(
-            //           children: children,
-            //         )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildDetailContent(BuildContext context, SIPData data, int index) {
-    double width = MediaQuery.of(context).size.width;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-      child: Container(
-        height: 60,
-        decoration: BoxDecoration(color: appTheme.primaryColor),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              width: width / 4,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                child: Text(
-                  "Month ${(data.tenor?.toInt())} ",
-                  textAlign: TextAlign.center,
-                  style: caption2,
-                ),
-              ),
-            ),
-            Container(
-              width: 1,
-              color: Colors.grey,
-            ),
-            Flexible(
-              child: Container(
-                width: width / 4,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                  child: Text(
-                    "\$${data.amount?.toInt() ?? 0}",
-                    textAlign: TextAlign.center,
-                    style: caption3,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              width: 1,
-              color: Colors.grey,
-            ),
-            Flexible(
-              child: Container(
-                width: width / 4,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                  child: Text(
-                    "\$${data.amount?.toInt() ?? 0}",
-                    textAlign: TextAlign.center,
-                    style: caption3,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              width: 1,
-              color: Colors.grey,
-            ),
-            Flexible(
-              child: Container(
-                width: width / 4,
-                padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                child: Text(
-                  '\$${k_m_b_generator(data.totalBalance ?? 0)}',
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.fade,
-                  style: caption3,
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -381,141 +367,132 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  String k_m_b_generator(double num) {
-    if (num.isInfinite == true) {
-      return "INFINITE";
-    }
-    if (num < 999999999999999) {
-      return "${formatter.format(num)}";
-    } else {
-      return num.roundToDouble().toString();
-    }
-  }
-
   Widget buildChart(BuildContext context) {
     if (widget.data.corpus.toString().length > 16) {
       return Text('Data is too larget to fit in chart');
     }
-    return Container(
-      margin: EdgeInsets.all(8),
-      width: MediaQuery.of(context).size.width - 32,
-      height: MediaQuery.of(context).size.width + 32,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(18)),
-        gradient: LinearGradient(
-          colors: [
-            Color(0xff2c274c),
-            appTheme.accentColor,
-          ],
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-        ),
-      ),
-      child: Stack(
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                'Total Expected Amount',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: subTtitleFontSize,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(
-                height: 2,
-              ),
-              Text(
-                '\$ ${formatter.format(widget.data.corpus)}',
-                style: TextStyle(
-                    color: ternaryColor,
-                    fontSize: subTtitleFontSize,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                child: Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Indicator(
-                        color: Colors.green,
-                        size: indicatorSize,
-                        text: "Total Amount",
-                        isSquare: false,
-                        textColor: Colors.white,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Indicator(
-                        color: Colors.red,
-                        size: indicatorSize,
-                        text: "Invested amount",
-                        isSquare: false,
-                        textColor: Colors.white,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Indicator(
-                        color: Colors.yellow,
-                        size: indicatorSize,
-                        text: "Wealth gain",
-                        isSquare: false,
-                        textColor: Colors.white,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 18,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 16.0, left: 6.0),
-                  child: LineChart(
-                    sampleData1(),
-                    swapAnimationDuration: const Duration(milliseconds: 250),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'Duration ->>> ',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
+    return Screenshot(
+      controller: screenshotController,
+      child: Container(
+        margin: EdgeInsets.all(8),
+        width: MediaQuery.of(context).size.width - 32,
+        height: MediaQuery.of(context).size.width + 32,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(18)),
+          gradient: LinearGradient(
+            colors: [
+              Color(0xff2c274c),
+              appTheme.accentColor,
             ],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
           ),
-        ],
+        ),
+        child: Stack(
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Total Expected Amount',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: subTtitleFontSize,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 2,
+                ),
+                Text(
+                  '\$ ${formatter.format(widget.data.corpus)}',
+                  style: TextStyle(
+                      color: ternaryColor,
+                      fontSize: subTtitleFontSize,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                  child: Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Indicator(
+                          color: Colors.green,
+                          size: indicatorSize,
+                          text: "Total Amount",
+                          isSquare: false,
+                          textColor: Colors.white,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Indicator(
+                          color: Colors.red,
+                          size: indicatorSize,
+                          text: "Invested amount",
+                          isSquare: false,
+                          textColor: Colors.white,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Indicator(
+                          color: Colors.yellow,
+                          size: indicatorSize,
+                          text: "Wealth gain",
+                          isSquare: false,
+                          textColor: Colors.white,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16.0, left: 6.0),
+                    child: LineChart(
+                      sampleData1(),
+                      swapAnimationDuration: const Duration(milliseconds: 250),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Text(
+                  'Duration in Years ',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      letterSpacing: 2),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -547,30 +524,30 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   double amountInterval = 0;
   LineChartData sampleData1() {
     double xValue = widget.data.tenor;
-    if (xValue > 90) {
-      interval = 20;
-    } else if (xValue > 75) {
-      interval = 20;
-    } else if (xValue > 60) {
-      interval = 15;
-    } else if (xValue > 50) {
-      interval = 12;
-    } else if (xValue > 40) {
-      interval = 10;
-    } else if (xValue > 25) {
-      interval = 8;
-    } else if (xValue > 20) {
-      interval = 5;
-    } else if (xValue > 15) {
-      interval = 4;
-    } else if (xValue > 10) {
-      interval = 3;
-    } else if (xValue > 5) {
-      interval = 2;
+    if (xValue > 90 * 12) {
+      interval = 20 * 12;
+    } else if (xValue > 75 * 12) {
+      interval = 20 * 12;
+    } else if (xValue > 60 * 12) {
+      interval = 15 * 12;
+    } else if (xValue > 50 * 12) {
+      interval = 12 * 12;
+    } else if (xValue > 40 * 12) {
+      interval = 10 * 12;
+    } else if (xValue > 25 * 12) {
+      interval = 8 * 12;
+    } else if (xValue > 20 * 12) {
+      interval = 5 * 12;
+    } else if (xValue > 15 * 12) {
+      interval = 4 * 12;
+    } else if (xValue > 10 * 12) {
+      interval = 3 * 12;
+    } else if (xValue > 5 * 12) {
+      interval = 2 * 12;
     } else {
-      interval = 1;
+      interval = 1 * 12;
     }
-    // print('Year Interval, $interval');
+    //print('Year Interval, $interval');
     getYAxisData();
     return LineChartData(
       lineTouchData: LineTouchData(
@@ -582,11 +559,24 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
             double corpusAmount = 0;
             double investedAmount = 0;
             double wealthGain = 0;
-
+            //print('Index: ${bar.spotIndex}');
             int index = bar.spotIndex * interval.toInt();
-            corpusAmount = getSipAmount(index.toDouble()) ?? 0;
-            investedAmount = getSumAmount(index.toDouble());
-            wealthGain = corpusAmount - investedAmount;
+            var list = widget.data.list;
+            //print('Index: $index');
+            if (widget.data.tenor < index) {
+              corpusAmount =
+                  list?[widget.data.tenor.toInt() - 1].totalBalance ?? 0;
+              investedAmount = list?[widget.data.tenor.toInt() - 1].amount ?? 0;
+              wealthGain = list?[widget.data.tenor.toInt() - 1].interest ?? 0;
+            } else if (index > 1) {
+              corpusAmount = list?[index - 1].totalBalance ??
+                  0; //getSipAmount(index.toDouble()) ?? 0;
+              investedAmount = list?[index - 1].amount ??
+                  0; //getSumAmount(index.toDouble());
+              wealthGain = list?[index - 1].interest ??
+                  0; //corpusAmount - investedAmount;
+            }
+
             LineTooltipItem item1 = LineTooltipItem(
                 "\$ ${bar.spotIndex > 0 ? k_m_b_generator(corpusAmount) : 0}",
                 TextStyle(
@@ -628,13 +618,14 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
             if (value == 0) {
               return "0";
             }
+
             switch (value.toInt()) {
               case 20:
               case 40:
               case 60:
               case 80:
               case 100:
-                return ((value / 20 * interval)).toInt().toString();
+                return (((value / 20) / 12 * interval)).toInt().toString();
             }
 
             return '';
@@ -695,24 +686,28 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     list.add(FlSpot(0, 0));
     x = 20;
     int i = interval.toInt();
+    var datalist = widget.data.list;
     int tenor = widget.data.tenor.toInt();
-    for (; i <= (widget.data.list?.length ?? 0); i = i + interval.toInt()) {
-      var amount = getSipAmount(i.toDouble());
-      // print('$i SIP Amount $amount');
-      String sPoint = ((amount ?? 0) / amountInterval).toStringAsFixed(2);
+    for (; i <= (widget.data.tenor); i = i + interval.toInt()) {
+      var amount = datalist?[i - 1].totalBalance ?? 0;
+      //print('$i SIP Amount $amount');
+      String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
-      x = x + 20;
+      x = x + (20);
     }
 
     if (tenor % interval != 0) {
-      var amount = getSipAmount(tenor.toDouble());
-      // print('$tenor SIP Amount $amount');
-      x = x - 20 + ((20 / interval) * (tenor % interval));
-      String sPoint = ((amount ?? 0) / amountInterval).toStringAsFixed(2);
+      var amount = datalist?[tenor - 1].totalBalance ?? 0;
+      //print('$tenor SIP Amount $amount');
+      x = x - (20) + (((20) / interval) * (tenor % interval));
+      String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
     }
+    list.forEach((element) {
+      //print(element);
+    });
     return list;
   }
 
@@ -721,21 +716,22 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     List<FlSpot> list = [];
     list.add(FlSpot(0, 0));
     x = 20;
+    var datalist = widget.data.list;
     int tenor = widget.data.tenor.toInt();
     for (int i = interval.toInt();
-        i <= (widget.data.list?.length ?? 0);
+        i <= (widget.data.tenor);
         i = i + interval.toInt()) {
-      var amount = getSumAmount(i.toDouble());
-      // print('$i Sum Amount $amount');
+      var amount = datalist?[i - 1].amount ?? 0;
+      //print('$i Sum Amount $amount');
       String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
-      x = x + 20;
+      x = x + (20);
     }
     if (tenor % interval != 0) {
-      var amount = getSumAmount(tenor.toDouble());
-      // print('$tenor Sum Amount $amount');
-      x = x - 20 + ((20 / interval) * (tenor % interval));
+      var amount = datalist?[tenor - 1].amount ?? 0;
+      //print('$tenor Sum Amount $amount');
+      x = x - (20) + (((20) / interval) * (tenor % interval));
       String sPoint = ((amount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
@@ -748,25 +744,22 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     List<FlSpot> list = [];
     list.add(FlSpot(0, 0));
     x = 20;
+    var datalist = widget.data.list;
     int tenor = widget.data.tenor.toInt();
     for (int i = interval.toInt();
-        i <= (widget.data.list?.length ?? 0);
+        i <= (widget.data.tenor);
         i = i + interval.toInt()) {
-      var sipAmount = getSipAmount(i.toDouble());
-      var investmentAmount = getSumAmount(i.toDouble());
-      var wealthAmount = (sipAmount ?? 0) - (investmentAmount);
-      // print('$i Wealth Amount $wealthAmount');
+      var wealthAmount = datalist?[i - 1].interest ?? 0;
+      //print('$i Wealth Amount $wealthAmount');
       String sPoint = ((wealthAmount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
-      x = x + 20;
+      x = x + (20);
     }
     if (tenor % interval != 0) {
-      var sipAmount = getSipAmount(tenor.toDouble());
-      var investmentAmount = getSumAmount(tenor.toDouble());
-      var wealthAmount = (sipAmount ?? 0) - (investmentAmount);
-      // print('$tenor Wealth Amount $wealthAmount');
-      x = x - 20 + ((20 / interval) * (tenor % interval));
+      var wealthAmount = datalist?[tenor - 1].interest ?? 0;
+      //print('$tenor Wealth Amount $wealthAmount');
+      x = x - (20) + (((20) / interval) * (tenor % interval));
       String sPoint = ((wealthAmount) / amountInterval).toStringAsFixed(2);
       var spots = FlSpot(x, double.parse(sPoint));
       list.add(spots);
@@ -836,19 +829,20 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     ];
   }
 
-  double getSumAmount(double duration) {
-    double sum = 0;
-    var sipAmount = widget.data.initialAmount;
-    sum = sum + (sipAmount * duration * 12);
-    return sum;
-  }
+  // double getSumAmount(double duration) {
+  //   double sum = 0;
+  //   var sipAmount = widget.data.initialAmount;
+  //   sum = sum + (sipAmount * duration);
+  //   return sum;
+  // }
 
   double? getSipAmount(double? duration) {
+    print(duration);
     var stepupFinalAmount = 0.0;
     var sipAmount = widget.data.initialAmount;
     var totalInvestAmount = sipAmount;
     var s = (widget.data.initialSteupRate) / 100;
-    var n = (duration ?? 0) * 12;
+    var n = (duration ?? 0);
     var roi = (widget.data.initialInterestRate) / 100 / 12;
     var value3 = 1 + roi;
     var value4 = pow(value3, n);
@@ -863,6 +857,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         n = n - 1;
       } else {
         sipAmount = (sipAmount) + ((sipAmount) * s);
+        print(sipAmount);
         totalInvestAmount = (totalInvestAmount) + sipAmount;
         var value4 = pow(value3, n);
         finalValue = finalValue + sipAmount * value4;
@@ -906,7 +901,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     }
     String amount = amountInterval.toInt().toString().padRight(digitToPad, '0');
     amountInterval = double.parse(amount);
-    // print('Amount Interval, $amountInterval');
+    //print('Amount Interval, $amountInterval');
     return [];
   }
 }

@@ -3,8 +3,11 @@ class StringConstants {
   //Screen Title
   static String sipCalculator = 'SIP Calculator';
   static String incrementalSIPCalculator = 'Incremental SIP Calculator';
+  static String lumpsumAmountCalculator = 'Lumpsum Amount Calculator';
+  static String swpCalculator = 'SWP Calculator';
   static String futureValueCalculator = 'Future Value Calculator';
   static String fixedDepositCalculator = 'Fixed Deposit Calculator';
+  static String rdCalculator = 'Recurring Deposit Calculator';
   static String targetAmountCalculator = 'Target Amount Calculator';
   static String retirementCalcualtor = 'Retirement Calculator';
   static String emiCalcualtor = 'EMI Calculator';
@@ -18,6 +21,8 @@ class StringConstants {
   static String retirement = 'Retirement';
   static String emi = 'EMI';
   static String recurringDeposit = 'RD';
+  static String swp = 'SWP';
+  static String lumpsum = 'Lumpsum';
 
   static String expectedReturn = 'Expected annual return(%)';
   static String investmentPeriod = 'Investment period';
@@ -78,8 +83,11 @@ class StringConstants {
   static String totalAmountInvestedInSIP = 'Total Amount Invested';
 
 //Future Value
-  static String stringAmount = 'Starting Amount';
+  static String startingAmount = 'Starting Amount';
   static String interestRate = 'Interest Rate (%)';
   static String numberOfYears = 'Number of years';
   static String futureValueOfAmount = "Future Value";
+
+//Lumpsum
+  static String lumpsumAmount = "Lumpsum Amount";
 }

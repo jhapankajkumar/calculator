@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-String regexSource = "^\$|^(0|([1-9][0-9]{0,15}))(\\.[0-9]{0,2})?\$";
+String regexSource = "^\$|^(0|([1-9][0-9]{0,15}))(\\[0-9]{0,2})?\$";
 String decimalRegex = "^\$|^(0|([1-9][0-9]{0,2}))(\\.[0-9]{0,2})?\$";
 
 class InputFormatterValidator implements TextInputFormatter {
@@ -47,10 +47,6 @@ class DecimalRegexValidator extends AmountValidator {
     try {
       var regex = RegExp(source);
       var matches = regex.allMatches(value);
-      double amount = double.parse(value);
-      if (amount > 100) {
-        return false;
-      }
       for (Match match in matches) {
         if (match.start == 0 && match.end == value.length) {
           return true;

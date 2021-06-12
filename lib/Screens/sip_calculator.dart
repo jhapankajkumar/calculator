@@ -16,10 +16,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SIPCalculator extends StatefulWidget {
-  SIPCalculator({Key? key, required this.title, required this.isSteupUp})
-      : super(key: key);
-  final String title;
-  final bool isSteupUp;
+  SIPCalculator({Key? key, required this.category}) : super(key: key);
+  final Screen category;
 
   @override
   _SIPCalculatorState createState() => _SIPCalculatorState();
@@ -31,6 +29,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   double? rate;
   double? inflationrate;
   double? period;
+  double? months;
 
   double? wealthGain;
   double? investedAmount;
@@ -40,11 +39,18 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   SIPData detail = SIPData();
   String? errorText;
   SIPResultData? data;
+  Period? periodValue = Period.years;
 
   _calculateSIP() {
+    double? duration = 0;
     var helper = UtilityHelper();
+    if (periodValue == Period.years) {
+      duration = (period ?? 0) * 12;
+    } else {
+      duration = period;
+    }
     data = helper.getCorpusAmount(
-        amount ?? 0, rate ?? 0, period ?? 0, stepUpPercentage);
+        amount ?? 0, rate ?? 0, duration ?? 0, stepUpPercentage);
 
     setState(() {
       investedAmount = data?.totalInvestment;
@@ -113,6 +119,19 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       });
     }
 
+    if (textField == TextFieldFocus.period) {
+      setState(() {
+        if (inputtedValue > 0) {
+          months = inputtedValue;
+          // if (isAllInputValid()) {
+          //   _calculateSIP();
+          // }
+        } else {
+          months = null;
+        }
+      });
+    }
+
     if (textField == TextFieldFocus.interestRate) {
       setState(() {
         if (inputtedValue > 0) {
@@ -148,7 +167,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
     }
   }
 
-  void _removeFocus() {
+  void removeFocus() {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
@@ -161,25 +180,34 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   }
 
   void _onDetailButtonTap() {
-    _removeFocus();
+    removeFocus();
     if (data != null && data!.corpus.isFinite) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
-        return SIPProjetionList(data!);
+        return SIPProjetionList(
+          category: Screen.detail,
+          data: data!,
+        );
       }));
     }
   }
 
-  _onOptionChange(Compounding? value) {
+  _onOptionChange(Period? value) {
     setState(() {
-      //_compounding = value;
+      periodValue = value;
+    });
+  }
+
+  _onDoneButtonTapped() {
+    setState(() {
+      removeFocus();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: widget.title, context: context),
+        appBar: appBar(category: widget.category, context: context),
         body: baseContainer(
             context: context,
             child: SingleChildScrollView(
@@ -192,8 +220,10 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                     ),
                     buildSummeryContainer(
                         context: context,
-                        expectedAmountTitle: StringConstants.expectedAmount,
-                        investedAmountTitle: StringConstants.investedAmount,
+                        expectedAmountTitle:
+                            summaryExpectedAmountTitle(widget.category),
+                        investedAmountTitle:
+                            summaryInvestedAmountTitle(widget.category),
                         wealthGainTitle: StringConstants.wealthGain,
                         totalExpectedAmount: corpusAmount,
                         totalGainAmount: wealthGain,
@@ -215,7 +245,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                     ),
                   ],
                 )),
-            onTap: _removeFocus));
+            onTap: removeFocus));
   }
 
   Widget buildInputContainer(BuildContext context) {
@@ -226,33 +256,81 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         margin: EdgeInsets.fromLTRB(8, 10, 8, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.amount,
-              placeHolder: "5000",
-              textLimit: amountTextLimit,
-              containerTitle: StringConstants.monthlyInvestmentAmount,
-              focus: currentFocus,
-              onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+            textFieldType: TextFieldFocus.amount,
+            placeHolder: "5000",
+            textLimit: amountTextLimit,
+            containerTitle: amountTitle(widget.category),
+            focus: currentFocus,
+            onFocusChange: _onFocusChange,
+            onTextChange: _onTextChange,
+            onDoneButtonTapped: _onDoneButtonTapped,
+          ),
+          SizedBox(height: 20),
+          Row(mainAxisSize: MainAxisSize.max, children: [
+            Expanded(
+              child: buildTextFieldContainerSection(
+                textFieldType: TextFieldFocus.period,
+                placeHolder: "12",
+                textLimit: periodTextLimit,
+                containerTitle: periodTitle(widget.category),
+                focus: currentFocus,
+                onFocusChange: _onFocusChange,
+                onTextChange: _onTextChange,
+                onDoneButtonTapped: _onDoneButtonTapped,
+              ),
+            ),
+            widget.category == Screen.sip
+                ? SizedBox(
+                    width: 10,
+                  )
+                : Container(),
+            widget.category == Screen.sip
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                        Text(
+                          '',
+                          style: appTheme.textTheme.caption,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          height: textFieldContainerSize,
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Color(0xffEFEFEF),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                                spreadRadius: 0,
+                                blurRadius: 0,
+                                offset:
+                                    Offset(0, 0), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child:
+                              buildPeriodDropDown(periodValue, _onOptionChange),
+                        ),
+                      ])
+                : Container()
+          ]),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.period,
-              placeHolder: "12 Years",
-              textLimit: periodTextLimit,
-              containerTitle: StringConstants.investmentPeriod,
-              focus: currentFocus,
-              onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+            textFieldType: TextFieldFocus.interestRate,
+            placeHolder: "10",
+            textLimit: interestRateTextLimit,
+            containerTitle: interestRateTitle(widget.category),
+            focus: currentFocus,
+            onFocusChange: _onFocusChange,
+            onTextChange: _onTextChange,
+            onDoneButtonTapped: _onDoneButtonTapped,
+          ),
           SizedBox(height: 20),
-          buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.interestRate,
-              placeHolder: "10",
-              textLimit: interestRateTextLimit,
-              containerTitle: StringConstants.expectedReturn,
-              focus: currentFocus,
-              onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
-          SizedBox(height: 20),
-          widget.isSteupUp
+          widget.category == Screen.stepup
               ? buildTextFieldContainerSection(
                   textFieldType: TextFieldFocus.stepUp,
                   placeHolder: "10",
@@ -261,9 +339,11 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                       StringConstants.annualPercentageIncreamntOnSip,
                   focus: currentFocus,
                   onFocusChange: _onFocusChange,
-                  onTextChange: _onTextChange)
+                  onTextChange: _onTextChange,
+                  onDoneButtonTapped: _onDoneButtonTapped,
+                )
               : Container(),
-          widget.isSteupUp ? SizedBox(height: 20) : Container(),
+          widget.category == Screen.stepup ? SizedBox(height: 20) : Container(),
           SizedBox(height: 20),
           Row(children: [
             Expanded(

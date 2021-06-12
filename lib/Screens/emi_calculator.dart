@@ -12,10 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EMICalculator extends StatefulWidget {
-  final String title;
+  final Screen category;
   EMICalculator({
     Key? key,
-    required this.title,
+    required this.category,
   });
   @override
   _EMICalculatorState createState() => _EMICalculatorState();
@@ -126,10 +126,16 @@ class _EMICalculatorState extends State<EMICalculator> {
     }
   }
 
+  _onDoneButtonTapped() {
+    setState(() {
+      removeFocus();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: widget.title, context: context),
+        appBar: appBar(category: widget.category, context: context),
         body: baseContainer(
             context: context,
             child: SingleChildScrollView(
@@ -142,8 +148,10 @@ class _EMICalculatorState extends State<EMICalculator> {
                     ),
                     buildSummeryContainer(
                       context: context,
-                      expectedAmountTitle: StringConstants.loanEMI,
-                      investedAmountTitle: StringConstants.totalInterestPayable,
+                      expectedAmountTitle:
+                          summaryExpectedAmountTitle(widget.category),
+                      investedAmountTitle:
+                          summaryInvestedAmountTitle(widget.category),
                       wealthGainTitle: StringConstants.totalPayment,
                       totalExpectedAmount: loanEMIAmount,
                       totalGainAmount: totalPayment,
@@ -178,28 +186,31 @@ class _EMICalculatorState extends State<EMICalculator> {
               textFieldType: TextFieldFocus.amount,
               placeHolder: "50000000",
               textLimit: amountTextLimit,
-              containerTitle: StringConstants.loanAmount,
+              containerTitle: amountTitle(widget.category),
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
               placeHolder: "120",
               textLimit: periodTextLimit,
-              containerTitle: StringConstants.loanPeriod,
+              containerTitle: periodTitle(widget.category),
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,
               placeHolder: "10",
               textLimit: interestRateTextLimit,
-              containerTitle: StringConstants.loanIntrestRate,
+              containerTitle: interestRateTitle(widget.category),
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 40),
           Row(children: [
             Expanded(

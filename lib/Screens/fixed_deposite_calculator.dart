@@ -13,12 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class FixedDepositeCalculator extends StatefulWidget {
-  final String title;
-  final bool isFixedDeposit;
+  final Screen category;
   FixedDepositeCalculator({
     Key? key,
-    required this.title,
-    required this.isFixedDeposit,
+    required this.category,
   });
   @override
   _FixedDepositeCalculatorState createState() =>
@@ -36,7 +34,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
   Compounding? _compounding = Compounding.quaterly;
 
   _calculateAmount() {
-    _removeFocus(context);
+    removeFocus();
     var helper = UtilityHelper();
     var compoundedValue = 4;
     if (_compounding == Compounding.annually) {
@@ -121,7 +119,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
     });
   }
 
-  void _removeFocus(BuildContext context) {
+  void removeFocus() {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
@@ -143,10 +141,16 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
     }
   }
 
+  _onDoneButtonTapped() {
+    setState(() {
+      removeFocus();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: widget.title, context: context),
+        appBar: appBar(category: widget.category, context: context),
         body: baseContainer(
             context: context,
             child: SingleChildScrollView(
@@ -159,12 +163,10 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                     ),
                     buildSummeryContainer(
                       context: context,
-                      expectedAmountTitle: widget.isFixedDeposit
-                          ? StringConstants.expectedAmount
-                          : StringConstants.futureValueOfAmount,
-                      investedAmountTitle: widget.isFixedDeposit
-                          ? StringConstants.investedAmount
-                          : StringConstants.stringAmount,
+                      expectedAmountTitle:
+                          summaryExpectedAmountTitle(widget.category),
+                      investedAmountTitle:
+                          summaryInvestedAmountTitle(widget.category),
                       wealthGainTitle: StringConstants.wealthGain,
                       totalExpectedAmount: corpusAmount,
                       totalGainAmount: wealthGain,
@@ -185,11 +187,12 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                     ),
                   ],
                 )),
-            onTap: _removeFocus));
+            onTap: removeFocus));
   }
 
   Widget buildInputContainer(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
+
     return Container(
         width: deviceWidth,
         padding: EdgeInsets.all(16),
@@ -199,36 +202,33 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
               textFieldType: TextFieldFocus.amount,
               placeHolder: "5000",
               textLimit: amountTextLimit,
-              containerTitle: widget.isFixedDeposit
-                  ? StringConstants.fixedDepositAmount
-                  : StringConstants.stringAmount,
+              containerTitle: amountTitle(widget.category),
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.period,
               placeHolder: "12 Years",
               textLimit: periodTextLimit,
-              containerTitle: widget.isFixedDeposit
-                  ? StringConstants.depositPriod
-                  : StringConstants.numberOfYears,
+              containerTitle: periodTitle(widget.category),
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,
               placeHolder: "10",
               textLimit: interestRateTextLimit,
-              containerTitle: widget.isFixedDeposit
-                  ? StringConstants.depositIntrestRate
-                  : StringConstants.interestRate,
+              containerTitle: interestRateTitle(widget.category),
               focus: currentFocus,
               onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange),
+              onTextChange: _onTextChange,
+              onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
-          widget.isFixedDeposit
+          widget.category == Screen.fd
               ? buildRadioList(
                   compounding: _compounding, onOptionChange: _onOptionChange)
               : Text(

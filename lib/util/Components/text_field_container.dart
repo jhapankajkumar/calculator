@@ -4,6 +4,7 @@ import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 
 class TextFieldContainerData {
   final String? placeHolder;
@@ -13,6 +14,7 @@ class TextFieldContainerData {
   final TextFieldFocus? currentFocus;
   final int? textLimit;
   final String? errorText;
+  final Function? onDoneButtonTapped;
 
   TextFieldContainerData(
       {required this.placeHolder,
@@ -21,6 +23,7 @@ class TextFieldContainerData {
       required this.textField,
       required this.currentFocus,
       required this.textLimit,
+      required this.onDoneButtonTapped,
       this.errorText});
 }
 
@@ -36,7 +39,7 @@ class TextFieldContainer extends StatefulWidget {
 class _TextFieldContainerState extends State<TextFieldContainer> {
   TextEditingController? controller;
   TextFieldFocus? focusField;
-
+  FocusNode node = FocusNode();
   @override
   void initState() {
     super.initState();
@@ -73,44 +76,53 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
             ),
           ],
         ),
-        child: Center(
-          child: FocusScope(
-            child: Focus(
-              onFocusChange: (value) {
-                if (widget.containerData.onFocusChanged != null) {
-                  widget.containerData.onFocusChanged!(focusField, value);
-                }
-              },
-              child: TextField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: widget.containerData.placeHolder,
-                  hintStyle: TextStyle(color: Colors.grey[350]),
-                  errorText: widget.containerData.errorText,
-                  alignLabelWithHint: true,
-                  suffixIcon: shouldShowClearButton ? _getClearButton() : null,
+        child: KeyboardActions(
+            config: _buildConfig(context),
+            autoScroll: false,
+            disableScroll: true,
+            bottomAvoiderScrollPhysics: ScrollPhysics(),
+            child: Center(
+              child: FocusScope(
+                child: Focus(
+                  onFocusChange: (value) {
+                    if (widget.containerData.onFocusChanged != null) {
+                      widget.containerData.onFocusChanged!(focusField, value);
+                    }
+                  },
+                  child: TextField(
+                    focusNode: node,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: widget.containerData.placeHolder,
+                      hintStyle: TextStyle(color: Colors.grey[350]),
+                      errorText: widget.containerData.errorText,
+                      alignLabelWithHint: true,
+                      suffixIcon:
+                          shouldShowClearButton ? _getClearButton() : null,
+                    ),
+                    keyboardType: (widget.containerData.textField ==
+                                TextFieldFocus.amount ||
+                            widget.containerData.textField ==
+                                TextFieldFocus.period)
+                        ? TextInputType.numberWithOptions(decimal: false)
+                        : TextInputType.numberWithOptions(decimal: true),
+                    style: appTheme.textTheme.subtitle2,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(
+                          widget.containerData.textLimit),
+                      InputFormatterValidator(validator: validator)
+                    ],
+                    controller: controller,
+                    onChanged: (value) {
+                      if (widget.containerData.onTextChange != null) {
+                        widget.containerData.onTextChange!(focusField, value);
+                      }
+                    },
+                  ),
                 ),
-                keyboardType: (widget.containerData.textField ==
-                            TextFieldFocus.amount ||
-                        widget.containerData.textField == TextFieldFocus.period)
-                    ? TextInputType.numberWithOptions(decimal: false)
-                    : TextInputType.numberWithOptions(decimal: true),
-                style: appTheme.textTheme.subtitle2,
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(
-                      widget.containerData.textLimit),
-                  InputFormatterValidator(validator: validator)
-                ],
-                controller: controller,
-                onChanged: (value) {
-                  if (widget.containerData.onTextChange != null) {
-                    widget.containerData.onTextChange!(focusField, value);
-                  }
-                },
               ),
-            ),
-          ),
-        ));
+            )));
+
     return container;
   }
 
@@ -126,6 +138,39 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
       icon: Icon(Icons.highlight_off),
     );
   }
+
+  KeyboardActionsConfig _buildConfig(BuildContext context) {
+    return KeyboardActionsConfig(
+      keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
+      keyboardBarColor: Colors.grey[200],
+      nextFocus: false,
+      actions: [
+        KeyboardActionsItem(
+          focusNode: node,
+          toolbarButtons: [
+            //button 2
+            (node) {
+              return GestureDetector(
+                onTap: () {
+                  node.unfocus();
+                  if (widget.containerData.onDoneButtonTapped != null) {
+                    widget.containerData.onDoneButtonTapped!();
+                  }
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Done",
+                  ),
+                ),
+              );
+            }
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 Widget buildTextFieldContainerSection({
@@ -136,6 +181,7 @@ Widget buildTextFieldContainerSection({
   required String containerTitle,
   Function? onTextChange,
   Function? onFocusChange,
+  Function? onDoneButtonTapped,
 }) {
   TextFieldContainerData data = TextFieldContainerData(
       placeHolder: placeHolder,
@@ -143,7 +189,8 @@ Widget buildTextFieldContainerSection({
       onFocusChanged: onFocusChange,
       textField: textFieldType,
       currentFocus: focus,
-      textLimit: textLimit);
+      textLimit: textLimit,
+      onDoneButtonTapped: onDoneButtonTapped);
   return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

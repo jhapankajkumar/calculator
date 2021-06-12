@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:calculator/Screens/emi_calculator.dart';
 import 'package:calculator/Screens/sip_calculator.dart';
 import 'package:calculator/Screens/target_amount_sip_calculator.dart';
@@ -8,12 +10,13 @@ import 'package:calculator/util/Constants/image_constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'fixed_deposite_calculator.dart';
 import 'retirement_calclutator.dart';
 
 class LandingPage extends StatefulWidget {
-  final String title;
-  LandingPage({required this.title});
+  Screen category;
+  LandingPage({required this.category});
   @override
   _LandingPageState createState() => _LandingPageState();
 }
@@ -22,17 +25,15 @@ class _LandingPageState extends State<LandingPage> {
   void _sipClicked() {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return SIPCalculator(
-        isSteupUp: false,
-        title: StringConstants.sipCalculator,
+        category: Screen.sip,
       );
     }));
   }
 
-  void _stepUpSIPClicked() {
+  Future<void> _stepUpSIPClicked() async {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return SIPCalculator(
-        isSteupUp: true,
-        title: StringConstants.incrementalSIPCalculator,
+        category: Screen.stepup,
       );
     }));
   }
@@ -42,8 +43,7 @@ class _LandingPageState extends State<LandingPage> {
       context,
       MaterialPageRoute(builder: (BuildContext context) {
         return FixedDepositeCalculator(
-          title: StringConstants.futureValueCalculator,
-          isFixedDeposit: false,
+          category: Screen.fv,
         );
       }),
     );
@@ -52,8 +52,7 @@ class _LandingPageState extends State<LandingPage> {
   void _fdClicked() {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return FixedDepositeCalculator(
-        title: StringConstants.fixedDepositCalculator,
-        isFixedDeposit: true,
+        category: Screen.fd,
       );
     }));
   }
@@ -61,7 +60,7 @@ class _LandingPageState extends State<LandingPage> {
   void _targetAmountClicked() {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return TargetAmountSIPCalculator(
-        title: StringConstants.targetAmountCalculator,
+        category: Screen.target,
       );
     }));
   }
@@ -78,7 +77,7 @@ class _LandingPageState extends State<LandingPage> {
   void _emiClicked() {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return EMICalculator(
-        title: StringConstants.emiCalcualtor,
+        category: Screen.emi,
       );
     }));
   }
@@ -87,9 +86,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: appBar(
-            title: StringConstants.calculator,
-            context: context,
-            isBackButton: false),
+            category: widget.category, context: context, isBackButton: false),
         body: baseContainer(
           context: context,
           child: Padding(
@@ -97,7 +94,7 @@ class _LandingPageState extends State<LandingPage> {
               child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
@@ -111,6 +108,19 @@ class _LandingPageState extends State<LandingPage> {
                               ImageConstants.sip, _sipClicked),
                           buildSIPView(context, StringConstants.increamentalSIP,
                               ImageConstants.stepUpSIP, _stepUpSIPClicked)
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          buildSIPView(context, StringConstants.lumpsum,
+                              ImageConstants.lumpsum, _futureValueClicked),
+                          buildSIPView(context, StringConstants.swp,
+                              ImageConstants.swp, _futureValueClicked),
                         ],
                       ),
                       SizedBox(
@@ -149,8 +159,8 @@ class _LandingPageState extends State<LandingPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          buildSIPView(context, StringConstants.futureValue,
-                              ImageConstants.futureValue, _futureValueClicked),
+                          buildSIPView(context, StringConstants.swp,
+                              ImageConstants.swp, _futureValueClicked),
                           buildSIPView(
                               context,
                               StringConstants.targetAmount,
@@ -159,7 +169,7 @@ class _LandingPageState extends State<LandingPage> {
                         ],
                       ),
                       SizedBox(
-                        height: 10,
+                        height: 30,
                       ),
                     ],
                   ))),
@@ -178,7 +188,7 @@ class _LandingPageState extends State<LandingPage> {
         height: menuContainerSize,
         margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(24)),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           color: appTheme.primaryColor,
           boxShadow: [
             BoxShadow(

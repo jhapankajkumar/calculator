@@ -1,10 +1,12 @@
 class ImageConstants {
-  static String sip = 'sip';
-  static String stepUpSIP = 'step_up_sip';
+  static String sip = 'sip_new';
+  static String stepUpSIP = 'step_up_sip_new';
   static String futureValue = 'future_value';
-  static String fd = 'fixed_deposit';
-  static String targetAmount = 'target_amount';
+  static String fd = 'fd';
+  static String targetAmount = 'goal';
   static String retirement = 'retirement';
   static String emi = 'emi';
-  static String recurring = 'recurring';
+  static String recurring = 'rd';
+  static String swp = 'swp';
+  static String lumpsum = 'lumpsum';
 }
