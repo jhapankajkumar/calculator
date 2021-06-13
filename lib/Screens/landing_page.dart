@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:calculator/Screens/emi_calculator.dart';
 import 'package:calculator/Screens/sip_calculator.dart';
+import 'package:calculator/Screens/swp_calculator.dart';
 import 'package:calculator/Screens/target_amount_sip_calculator.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
@@ -64,7 +65,7 @@ class _LandingPageState extends State<LandingPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (BuildContext context) {
-        return FixedDepositeCalculator(
+        return SWPCalculator(
           category: Screen.swp,
         );
       }),

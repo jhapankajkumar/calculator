@@ -56,7 +56,8 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
     }
     AmountValidator validator = DecimalRegexValidator(source: decimalRegex);
     if (widget.containerData.textField == TextFieldFocus.amount ||
-        widget.containerData.textField == TextFieldFocus.period) {
+        widget.containerData.textField == TextFieldFocus.period ||
+        widget.containerData.textField == TextFieldFocus.investmentAmount) {
       validator = AmountRegexValidator(source: regexSource);
     }
     var container = Container(

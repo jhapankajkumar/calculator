@@ -265,8 +265,10 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                                 ),
                               ],
                             ),
-                            child: buildCompoundungDropDown(
-                                _compounding, _onOptionChange),
+                            child: Center(
+                              child: buildCompoundungDropDown(
+                                  _compounding, _onOptionChange),
+                            ),
                           ),
                         ])
                   : Container()

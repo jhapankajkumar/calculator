@@ -112,6 +112,7 @@ class UtilityHelper {
 }
 
 enum TextFieldFocus {
+  investmentAmount,
   amount,
   period,
   months,
@@ -167,7 +168,7 @@ String amountTitle(Screen category) {
     case Screen.sip:
     case Screen.stepup:
     case Screen.swp:
-      containerTitle = StringConstants.monthlyInvestmentAmount;
+      containerTitle = StringConstants.monthlyWithdrawalAmount;
       break;
     case Screen.fd:
       containerTitle = StringConstants.fixedDepositAmount;
@@ -230,8 +231,10 @@ String interestRateTitle(Screen category) {
   switch (category) {
     case Screen.sip:
     case Screen.stepup:
-    case Screen.swp:
       interestRateTitle = StringConstants.expectedReturn;
+      break;
+    case Screen.swp:
+      interestRateTitle = StringConstants.expectedReturnsOnInvestment;
       break;
     case Screen.fd:
     case Screen.rd:

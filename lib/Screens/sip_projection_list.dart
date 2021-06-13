@@ -92,17 +92,17 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       setState(() async {
         if (image != null) {
           chartImage = image;
-          var file = File('${directory.path}/chart.png');
+          var file = File('${directory.path}/chart');
           file.writeAsBytes(chartImage!);
         } else if (chartImage != null) {
-          var file = File('${directory.path}/chart.png');
+          var file = File('${directory.path}/chart');
           file.writeAsBytes(chartImage!);
         }
         createPDF(context, widget.data);
       });
     }).catchError((onError) {
       if (chartImage != null) {
-        var file = File('${directory.path}/chart.png');
+        var file = File('${directory.path}/chart');
         file.writeAsBytes(chartImage!);
       }
       createPDF(context, widget.data);

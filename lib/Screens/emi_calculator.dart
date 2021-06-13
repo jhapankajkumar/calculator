@@ -2,6 +2,7 @@ import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
+import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
@@ -30,15 +31,24 @@ class _EMICalculatorState extends State<EMICalculator> {
   double? period;
   double? loanAmount;
   TextFieldFocus? currentFocus;
+
+  Period? periodValue = Period.years;
   _calculateAmount() {
     removeFocus();
+    double? duration = 0;
     var helper = UtilityHelper();
+    if (periodValue == Period.years) {
+      duration = (period ?? 0) * 12;
+    } else {
+      duration = period;
+    }
+
     loanEMIAmount = helper
-        .getInstallmentAmount(amount ?? 0, period ?? 0, rate ?? 0)
+        .getInstallmentAmount(amount ?? 0, duration ?? 0, rate ?? 0)
         .roundToDouble();
     setState(() {
       loanAmount = amount;
-      totalPayment = (loanEMIAmount ?? 0) * (period ?? 0);
+      totalPayment = (loanEMIAmount ?? 0) * (duration ?? 0);
       totalIntrestPayble = (totalPayment ?? 0) - (loanAmount ?? 0);
       currentFocus = null;
     });
@@ -132,6 +142,15 @@ class _EMICalculatorState extends State<EMICalculator> {
     });
   }
 
+  _onOptionChange(Period? value) {
+    setState(() {
+      periodValue = value;
+      if (isAllInputValid()) {
+        _calculateButtonTapped();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,15 +211,55 @@ class _EMICalculatorState extends State<EMICalculator> {
               onTextChange: _onTextChange,
               onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
-          buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.period,
-              placeHolder: "120",
-              textLimit: periodTextLimit,
-              containerTitle: periodTitle(widget.category),
-              focus: currentFocus,
-              onFocusChange: _onFocusChange,
-              onTextChange: _onTextChange,
-              onDoneButtonTapped: _onDoneButtonTapped),
+          Row(
+            children: [
+              Expanded(
+                child: buildTextFieldContainerSection(
+                    textFieldType: TextFieldFocus.period,
+                    placeHolder: "12",
+                    textLimit: periodTextLimit,
+                    containerTitle: periodTitle(widget.category),
+                    focus: currentFocus,
+                    onFocusChange: _onFocusChange,
+                    onTextChange: _onTextChange,
+                    onDoneButtonTapped: _onDoneButtonTapped),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '',
+                      style: appTheme.textTheme.caption,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      height: textFieldContainerSize,
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Color(0xffEFEFEF),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            spreadRadius: 0,
+                            blurRadius: 0,
+                            offset: Offset(0, 0), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                          child: buildPeriodDropDown(
+                              periodValue, _onOptionChange)),
+                    ),
+                  ])
+            ],
+          ),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textFieldType: TextFieldFocus.interestRate,

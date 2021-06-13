@@ -24,9 +24,9 @@ class StringConstants {
   static String swp = 'SWP';
   static String lumpsum = 'Lumpsum';
 
-  static String monthlyInvestmentAmount = 'I WANT TO MONTHLY INVEST';
+  static String monthlyInvestmentAmount = 'I Want To Monthly Invest';
   static String annualPercentageIncreamntOnSip =
-      'WITH ANNUAL INCREAMENT OF (%)';
+      'With Annual Increament Of (%)';
 
   static String expectedAmount = 'Expected Amount';
   static String investedAmount = 'Invested Amount';
@@ -42,9 +42,9 @@ class StringConstants {
   static String investmentInformation = 'Investment information';
   static String currentInvestments = 'Your current investments';
   static String expectedReturnsOnInvestment =
-      'Expected returns on investments(%)';
+      'Expected Returns On Investments (%)';
   static String expectedReturnsOnRetirementCorpus =
-      'Expected returns on retirement corpus(%)';
+      'Expected Returns On Retirement Corpus(%)';
 
   static String expectedInflationRate = 'Expected inflation rate(%)';
 
@@ -59,12 +59,12 @@ class StringConstants {
 
   static String loanAmount = 'Loan amount';
 
-  static String loanPeriod = 'Number of installments (Years * 12)';
+  static String loanPeriod = 'Loan Period';
   static String loanIntrestRate = 'Loan interest rate (%)';
 
-  static String futureTargetAmout = 'I WANT TO ACHIEVE AMOUNT';
-  static String futureAmountInvestmentPeriod = "I HAVE PERIOD OF";
-  static String expectedReturnFuture = 'EXPECTING RETURN OF (%)';
+  static String futureTargetAmout = 'I Want To Achieve Amount';
+  static String futureAmountInvestmentPeriod = "I Have Period Of";
+  static String expectedReturnFuture = 'Expecting Return Of (%)';
   static String futureInvestmentPeriod = "Investment Period";
 
   static String loanEMI = 'Loan EMI';
@@ -88,8 +88,11 @@ class StringConstants {
 //Lumpsum
   static String lumpsumAmount = "Lumpsum Amount";
 
-  static String investmentAmount = "I WANT TO INVEST";
-  static String investmentPeriod = "FOR A PERIOD OF";
-  static String investmentPeriodYears = "FOR A PERIOD OF (YEARS)";
-  static String expectedReturn = 'AT AN EXPECTED RETURN OF (%)';
+  static String investmentAmount = "I Want To Invest";
+  static String investmentPeriod = "For A Period Of";
+  static String investmentPeriodYears = "For A Period Of (Years)";
+  static String expectedReturn = 'At An Expected Return Of (%)';
+
+  //SWP
+  static String monthlyWithdrawalAmount = 'I Want To Withdraw';
 }
