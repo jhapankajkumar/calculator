@@ -188,17 +188,24 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
                       SizedBox(
                         height: 20,
                       ),
-                      buildSummeryContainer(
-                          context: context,
-                          expectedAmountTitle: StringConstants.expectedAmount,
-                          investedAmountTitle: StringConstants.investedAmount,
-                          wealthGainTitle: StringConstants.wealthGain,
-                          targetAmount: amount,
-                          period: period,
-                          sipAmount: sipAmount,
-                          totalGainAmount: wealthGain,
-                          totalInvestedAmount: investedAmount,
-                          isTargetAmount: true),
+                      sipAmount != null
+                          ? buildSummeryContainer(
+                              context: context,
+                              child: buildTargetSummaryViews(
+                                context: context,
+                                expectedAmountTitle:
+                                    StringConstants.expectedAmount,
+                                investedAmountTitle:
+                                    StringConstants.investedAmount,
+                                wealthGainTitle: StringConstants.wealthGain,
+                                targetAmount: amount,
+                                period: period,
+                                sipAmount: sipAmount,
+                                totalGainAmount: wealthGain,
+                                totalInvestedAmount: investedAmount,
+                              ),
+                            )
+                          : Container(),
                       SizedBox(
                         height: 20,
                       ),

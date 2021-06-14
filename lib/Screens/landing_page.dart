@@ -99,14 +99,14 @@ class _LandingPageState extends State<LandingPage> {
     }));
   }
 
-  // void _retirementClicked() {
-  //   Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-  //     return RetirementCalculator(
-  //       title: StringConstants.retirementCalcualtor,
-  //       isSteupUp: false,
-  //     );
-  //   }));
-  // }
+  void _retirementClicked() {
+    // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+    //   return RetirementCalculator(
+    //     title: StringConstants.retirementCalcualtor,
+    //     isSteupUp: false,
+    //   );
+    // }));
+  }
 
   void _emiClicked() {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
@@ -193,8 +193,8 @@ class _LandingPageState extends State<LandingPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          buildSIPView(context, StringConstants.swp,
-                              ImageConstants.swp, _futureValueClicked),
+                          buildSIPView(context, StringConstants.retirement,
+                              ImageConstants.retirement, _retirementClicked),
                           buildSIPView(
                               context,
                               StringConstants.targetAmount,
@@ -222,7 +222,7 @@ class _LandingPageState extends State<LandingPage> {
         height: menuContainerSize,
         margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.all(Radius.circular(32)),
           color: appTheme.primaryColor,
           boxShadow: [
             BoxShadow(

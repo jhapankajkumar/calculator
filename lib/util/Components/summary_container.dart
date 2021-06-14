@@ -1,30 +1,19 @@
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
+import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 final formatter = new NumberFormat("##,###");
 
-Widget buildSummeryContainer(
-    {required BuildContext context,
-    required String expectedAmountTitle,
-    required String investedAmountTitle,
-    required String wealthGainTitle,
-    double? totalExpectedAmount,
-    double? totalInvestedAmount,
-    double? totalGainAmount,
-    double? sipAmount,
-    double? targetAmount,
-    double? period,
-    bool? isDetail,
-    bool? isTargetAmount,
-    Function? onTapDetail}) {
+Widget buildSummeryContainer({required BuildContext context, Widget? child}) {
   double deviceWidth = MediaQuery.of(context).size.width;
 
   var container = Container();
-  if (totalGainAmount != null) {
+  if (child != null) {
     container = Container(
       width: deviceWidth,
       padding: EdgeInsets.all(0),
@@ -49,54 +38,7 @@ Widget buildSummeryContainer(
                   style: appTheme.textTheme.bodyText1,
                 ),
               ),
-              isTargetAmount == null
-                  ? Column(
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        // Expected Amount
-                        buildSummaryRow(
-                            totalExpectedAmount, expectedAmountTitle),
-                        devider(),
-                        // Invested Amount
-                        buildSummaryRow(
-                            totalInvestedAmount, investedAmountTitle),
-                        devider(),
-                        buildSummaryRow(totalGainAmount, wealthGainTitle),
-                        // Wealth Gain/Lost
-
-                        SizedBox(height: 20),
-                        isDetail != null
-                            ? genericButton(
-                                title: "Detail", onPress: onTapDetail)
-                            : Container(),
-                        SizedBox(height: 10),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        // Expected Amount
-                        buildSummaryRow(
-                            targetAmount, StringConstants.targetAmount),
-                        devider(),
-                        buildPeriodRow(
-                            period, StringConstants.futureInvestmentPeriod),
-                        devider(),
-                        buildSummaryRow(
-                            sipAmount, StringConstants.monthlySIPRequired),
-                        devider(),
-                        buildSummaryRow(totalInvestedAmount,
-                            StringConstants.totalAmountInvestedInSIP),
-                        devider(),
-                        buildSummaryRow(
-                            totalGainAmount, StringConstants.wealthGain),
-                        SizedBox(height: 10),
-                      ],
-                    ),
+              child
             ],
           ),
         ],
@@ -104,6 +46,196 @@ Widget buildSummeryContainer(
     );
   }
   return container;
+}
+
+Widget? buildSummaryViews(
+    {required String expectedAmountTitle,
+    required String investedAmountTitle,
+    required String wealthGainTitle,
+    double? totalExpectedAmount,
+    double? totalInvestedAmount,
+    double? totalGainAmount,
+    double? sipAmount,
+    double? targetAmount,
+    double? period,
+    bool? isDetail,
+    bool? isTargetAmount,
+    Function? onTapDetail}) {
+  return totalExpectedAmount != null
+      ? Column(
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            // Expected Amount
+            buildSummaryRow(totalExpectedAmount, expectedAmountTitle),
+            devider(),
+            // Invested Amount
+            buildSummaryRow(totalInvestedAmount, investedAmountTitle),
+            devider(),
+            buildSummaryRow(totalGainAmount, wealthGainTitle),
+            // Wealth Gain/Lost
+            SizedBox(height: 20),
+            isDetail != null
+                ? genericButton(title: "Detail", onPress: onTapDetail)
+                : Container(),
+            SizedBox(height: 10),
+          ],
+        )
+      : Container();
+}
+
+Widget? buildTargetSummaryViews({
+  required BuildContext context,
+  required String expectedAmountTitle,
+  required String investedAmountTitle,
+  required String wealthGainTitle,
+  double? totalExpectedAmount,
+  double? totalInvestedAmount,
+  double? totalGainAmount,
+  double? sipAmount,
+  double? targetAmount,
+  double? period,
+}) {
+  return totalExpectedAmount != null
+      ? Column(
+          children: [
+            Column(
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                // Expected Amount
+                buildSummaryRow(targetAmount, StringConstants.targetAmount),
+                devider(),
+                buildPeriodRow(period, StringConstants.futureInvestmentPeriod),
+                devider(),
+                buildSummaryRow(sipAmount, StringConstants.monthlySIPRequired),
+                devider(),
+                buildSummaryRow(totalInvestedAmount,
+                    StringConstants.totalAmountInvestedInSIP),
+                devider(),
+                buildSummaryRow(totalGainAmount, StringConstants.wealthGain),
+                SizedBox(height: 10),
+              ],
+            ),
+          ],
+        )
+      : Container();
+}
+
+Widget? buildSWPSummaryViews({
+  double? totalInvestmentAmount,
+  double? totalProfit,
+  double? totalWithdrawal,
+  double? endBalance,
+  double? widthdrawalAmount,
+  double? withdrawalPeriod,
+  Compounding? withdrawalFrequency,
+  int? moneyFinishedAtMonth,
+}) {
+  double val = (moneyFinishedAtMonth ?? 0) / 12;
+  int years = val.toInt();
+  print(years);
+  int months = (moneyFinishedAtMonth ?? 0) % 12;
+  return widthdrawalAmount != null
+      ? Column(
+          children: [
+            Column(
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                // Expected Amount
+                buildSummaryRow(
+                    totalInvestmentAmount, StringConstants.totalInvestment),
+                devider(),
+                buildSummaryRow(
+                    totalWithdrawal, StringConstants.totalWithdrawal),
+                devider(),
+                buildSummaryRow(totalProfit, StringConstants.totalProfit),
+                devider(),
+                buildSummaryRow(endBalance, StringConstants.balanceLeft),
+                devider(),
+                //buildSummaryRow(totalGainAmount, StringConstants.wealthGain),
+                SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: (endBalance ?? 0) > 0
+                      ? RichText(
+                          text: TextSpan(
+                            text: '',
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: 'You would have total amount ',
+                                style: subTitle2,
+                              ),
+                              TextSpan(
+                                  text:
+                                      '\$${k_m_b_generator(endBalance ?? 0)} ',
+                                  style: subTitle1),
+                              TextSpan(
+                                  text: 'after withdrawing ', style: subTitle2),
+                              TextSpan(
+                                  text:
+                                      '\$${k_m_b_generator(widthdrawalAmount)} ',
+                                  style: subTitle1),
+                              TextSpan(
+                                  text:
+                                      '${getCompoundingTitle(withdrawalFrequency)} ',
+                                  style: subTitle2),
+                              TextSpan(text: 'for ', style: subTitle2),
+                              TextSpan(
+                                  text: '${withdrawalPeriod?.toInt()} Years',
+                                  style: subTitle1),
+                            ],
+                          ),
+                        )
+                      : RichText(
+                          text: TextSpan(
+                            text: '',
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: 'Your Investment would finish in ',
+                                style: subTitle2,
+                              ),
+                              TextSpan(text: '$years ', style: subTitle1),
+                              TextSpan(
+                                text: years > 1 ? 'years ' : 'year ',
+                                style: subTitle2,
+                              ),
+                              months > 0
+                                  ? TextSpan(text: '$months ', style: subTitle1)
+                                  : TextSpan(),
+                              months > 0
+                                  ? TextSpan(
+                                      text: years > 1 ? 'months ' : 'month ',
+                                      style: subTitle2,
+                                    )
+                                  : TextSpan(),
+                              // TextSpan(text: ' 0 ', style: subTitle1),
+                              TextSpan(
+                                  text: 'after withdrawing ', style: subTitle2),
+                              TextSpan(
+                                  text:
+                                      '\$${k_m_b_generator(widthdrawalAmount)} ',
+                                  style: subTitle1),
+                              TextSpan(
+                                  text:
+                                      '${getCompoundingTitle(withdrawalFrequency).toLowerCase()} ',
+                                  style: subTitle2),
+                              // TextSpan(text: 'for ', style: subTitle2),
+                            ],
+                          ),
+                        ),
+                ),
+
+                SizedBox(height: 40),
+              ],
+            ),
+          ],
+        )
+      : Container();
 }
 
 Widget devider() {

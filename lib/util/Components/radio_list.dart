@@ -12,8 +12,8 @@ List<Compounding> compoundingList = [
   Compounding.annually
 ];
 
-String getString(Compounding compounding) {
-  switch (compounding) {
+String getCompoundingTitle(Compounding? compounding) {
+  switch (compounding ?? Compounding.monthly) {
     case Compounding.monthly:
       return "Monthly";
     case Compounding.quaterly:
@@ -38,7 +38,7 @@ Widget buildCompoundungDropDown(Compounding? currentValue, Function onChanged) {
     items:
         compoundingList.map<DropdownMenuItem<Compounding>>((Compounding value) {
       return DropdownMenuItem<Compounding>(
-          value: value, child: Text(getString(value)));
+          value: value, child: Text(getCompoundingTitle(value)));
     }).toList(),
   );
 }

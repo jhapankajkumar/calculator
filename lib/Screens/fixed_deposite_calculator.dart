@@ -164,17 +164,20 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                     SizedBox(
                       height: 20,
                     ),
-                    buildSummeryContainer(
-                      context: context,
-                      expectedAmountTitle:
-                          summaryExpectedAmountTitle(widget.category),
-                      investedAmountTitle:
-                          summaryInvestedAmountTitle(widget.category),
-                      wealthGainTitle: StringConstants.wealthGain,
-                      totalExpectedAmount: corpusAmount,
-                      totalGainAmount: wealthGain,
-                      totalInvestedAmount: investedAmount,
-                    ),
+                    corpusAmount != null
+                        ? buildSummeryContainer(
+                            context: context,
+                            child: buildSummaryViews(
+                              expectedAmountTitle:
+                                  summaryExpectedAmountTitle(widget.category),
+                              investedAmountTitle:
+                                  summaryInvestedAmountTitle(widget.category),
+                              wealthGainTitle: StringConstants.wealthGain,
+                              totalExpectedAmount: corpusAmount,
+                              totalGainAmount: wealthGain,
+                              totalInvestedAmount: investedAmount,
+                            ))
+                        : Container(),
                     SizedBox(
                       height: 20,
                     ),

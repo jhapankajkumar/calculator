@@ -196,9 +196,12 @@ Widget buildTextFieldContainerSection({
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          containerTitle,
-          style: appTheme.textTheme.caption,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 0, 0),
+          child: Text(
+            containerTitle,
+            style: appTheme.textTheme.caption,
+          ),
         ),
         SizedBox(height: 10),
         TextFieldContainer(containerData: data)

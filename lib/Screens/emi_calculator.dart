@@ -165,17 +165,20 @@ class _EMICalculatorState extends State<EMICalculator> {
                     SizedBox(
                       height: 20,
                     ),
-                    buildSummeryContainer(
-                      context: context,
-                      expectedAmountTitle:
-                          summaryExpectedAmountTitle(widget.category),
-                      investedAmountTitle:
-                          summaryInvestedAmountTitle(widget.category),
-                      wealthGainTitle: StringConstants.totalPayment,
-                      totalExpectedAmount: loanEMIAmount,
-                      totalGainAmount: totalPayment,
-                      totalInvestedAmount: totalIntrestPayble,
-                    ),
+                    loanAmount != null
+                        ? buildSummeryContainer(
+                            context: context,
+                            child: buildSummaryViews(
+                                expectedAmountTitle:
+                                    summaryExpectedAmountTitle(widget.category),
+                                investedAmountTitle:
+                                    summaryInvestedAmountTitle(widget.category),
+                                wealthGainTitle: StringConstants.totalPayment,
+                                totalExpectedAmount: loanEMIAmount,
+                                totalGainAmount: totalPayment,
+                                totalInvestedAmount: totalIntrestPayble),
+                          )
+                        : Container(),
                     SizedBox(
                       height: 20,
                     ),

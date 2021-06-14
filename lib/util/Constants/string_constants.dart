@@ -95,4 +95,8 @@ class StringConstants {
 
   //SWP
   static String monthlyWithdrawalAmount = 'I Want To Withdraw';
+  static String totalInvestment = "Total Investment";
+  static String totalWithdrawal = "Total Withdrwal";
+  static String totalProfit = "Total Profit";
+  static String balanceLeft = "Balance Left";
 }

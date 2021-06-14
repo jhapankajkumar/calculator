@@ -24,18 +24,19 @@ class SWPCalculator extends StatefulWidget {
 }
 
 class _SWPCalculatorState extends State<SWPCalculator> {
-  double? corpusAmount;
   double? amount;
   double? rate;
   double? inflationrate;
   double? period;
   double? months;
 
-  double? wealthGain;
-  double? investedAmount;
   TextFieldFocus? currentFocus;
   double? stepUpPercentage;
   double? totalInvestmentAmount;
+  double totalWithdrawal = 0;
+  double totalProfit = 0;
+  double endBalance = 0;
+  int moneyLastedFor = 0;
 
   SIPData detail = SIPData();
   String? errorText;
@@ -43,7 +44,15 @@ class _SWPCalculatorState extends State<SWPCalculator> {
   Compounding? periodValue = Compounding.monthly;
 
   _calculateSIP() {
-    double tempTotalInvestmentAmount = totalInvestmentAmount!;
+    setState(() {
+      endBalance = 0;
+      totalProfit = 0;
+      totalWithdrawal = 0;
+    });
+
+    double tempEndAmount = totalInvestmentAmount!;
+    double tempTotalWithdrawal = 0;
+    double tempTotalProfit = 0;
     double withdrawalPeriod = 12;
     if (periodValue == Compounding.annually) {
       withdrawalPeriod = 1;
@@ -53,27 +62,28 @@ class _SWPCalculatorState extends State<SWPCalculator> {
 
     double roi = (rate! / 100) / withdrawalPeriod;
     for (int i = 1; i <= withdrawalPeriod * period!; i++) {
-      tempTotalInvestmentAmount = tempTotalInvestmentAmount - amount!;
-      double value = tempTotalInvestmentAmount * roi;
-      tempTotalInvestmentAmount = tempTotalInvestmentAmount + value.round();
-      print("\n");
-      print(value);
-      print(tempTotalInvestmentAmount);
-      print("\n");
+      if (tempEndAmount < 0) {
+        moneyLastedFor = i;
+        print(i);
+        break;
+      }
+      //withdraw money
+      tempEndAmount = tempEndAmount - amount!;
+      tempTotalWithdrawal = tempTotalWithdrawal + amount!;
+      double profit = tempEndAmount * roi;
+      tempTotalProfit = tempTotalProfit + profit;
+      //add interest
+      tempEndAmount = tempEndAmount + profit.round();
+      // print("\n");
+      // print(value);
+      // print(tempTotalInvestmentAmount);
+      // print("\n");
     }
 
-    // var helper = UtilityHelper();
-    // if (periodValue == Period.years) {
-    //   duration = (period ?? 0) * 12;
-    // } else {
-    //   duration = period;
-    // }
-    // data = helper.getCorpusAmount(
-    //     amount ?? 0, rate ?? 0, duration ?? 0, stepUpPercentage);
     setState(() {
-      investedAmount = totalInvestmentAmount;
-      corpusAmount = tempTotalInvestmentAmount;
-      wealthGain = 5000;
+      endBalance = tempEndAmount;
+      totalProfit = tempTotalProfit;
+      totalWithdrawal = tempTotalWithdrawal;
       currentFocus = null;
     });
   }
@@ -256,27 +266,19 @@ class _SWPCalculatorState extends State<SWPCalculator> {
                     SizedBox(
                       height: 20,
                     ),
-                    buildSummeryContainer(
-                      context: context,
-                      expectedAmountTitle:
-                          summaryExpectedAmountTitle(widget.category),
-                      investedAmountTitle:
-                          summaryInvestedAmountTitle(widget.category),
-                      wealthGainTitle: StringConstants.wealthGain,
-                      totalExpectedAmount: corpusAmount,
-                      totalGainAmount: wealthGain,
-                      totalInvestedAmount: investedAmount,
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    buildGraphContainer(
-                        context: context,
-                        totalExpectedAmount: corpusAmount,
-                        totalGainAmount: wealthGain,
-                        totalInvestedAmount: investedAmount,
-                        gainTitle: StringConstants.wealthGain,
-                        investedTitle: StringConstants.amountInvested),
+                    totalWithdrawal > 0
+                        ? buildSummeryContainer(
+                            context: context,
+                            child: buildSWPSummaryViews(
+                                endBalance: endBalance,
+                                totalInvestmentAmount: totalInvestmentAmount,
+                                totalProfit: totalProfit,
+                                totalWithdrawal: totalWithdrawal,
+                                widthdrawalAmount: amount,
+                                withdrawalPeriod: period,
+                                moneyFinishedAtMonth: moneyLastedFor,
+                                withdrawalFrequency: periodValue))
+                        : Container(),
                     SizedBox(
                       height: 20,
                     ),
