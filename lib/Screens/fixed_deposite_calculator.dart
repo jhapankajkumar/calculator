@@ -53,7 +53,6 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
     });
   }
 
-  final formatter = new NumberFormat("#,###");
   bool isAllInputValid() {
     bool isValid = true;
     if (rate == null) {

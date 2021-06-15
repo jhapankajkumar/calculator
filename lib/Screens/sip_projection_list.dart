@@ -35,13 +35,17 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   @override
   void initState() {
     super.initState();
-    fillAmount(context);
+    fillAmount(context, widget.category);
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       deletePreviousData();
     });
   }
 
-  void fillAmount(BuildContext context) {
+  void fillAmount(BuildContext context, Screen category) {
+    switch (category) {
+      default:
+        break;
+    }
     List<SIPData> list = [];
     double sipAmount = widget.data.initialAmount;
     double steupAmount = 0;

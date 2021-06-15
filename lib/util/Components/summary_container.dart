@@ -5,9 +5,6 @@ import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-final formatter = new NumberFormat("##,###");
 
 Widget buildSummeryContainer({required BuildContext context, Widget? child}) {
   double deviceWidth = MediaQuery.of(context).size.width;
@@ -124,16 +121,16 @@ Widget? buildTargetSummaryViews({
       : Container();
 }
 
-Widget? buildSWPSummaryViews({
-  double? totalInvestmentAmount,
-  double? totalProfit,
-  double? totalWithdrawal,
-  double? endBalance,
-  double? widthdrawalAmount,
-  double? withdrawalPeriod,
-  Compounding? withdrawalFrequency,
-  int? moneyFinishedAtMonth,
-}) {
+Widget? buildSWPSummaryViews(
+    {double? totalInvestmentAmount,
+    double? totalProfit,
+    double? totalWithdrawal,
+    double? endBalance,
+    double? widthdrawalAmount,
+    double? withdrawalPeriod,
+    Compounding? withdrawalFrequency,
+    int? moneyFinishedAtMonth,
+    Function? onTapDetail}) {
   double val = (moneyFinishedAtMonth ?? 0) / 12;
   int years = val.toInt();
   print(years);
@@ -156,79 +153,96 @@ Widget? buildSWPSummaryViews({
                 buildSummaryRow(totalProfit, StringConstants.totalProfit),
                 devider(),
                 buildSummaryRow(endBalance, StringConstants.balanceLeft),
-                devider(),
+                // devider(),
                 //buildSummaryRow(totalGainAmount, StringConstants.wealthGain),
                 SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: (endBalance ?? 0) > 0
-                      ? RichText(
-                          text: TextSpan(
-                            text: '',
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: 'You would have total amount ',
-                                style: subTitle2,
-                              ),
-                              TextSpan(
-                                  text:
-                                      '\$${k_m_b_generator(endBalance ?? 0)} ',
-                                  style: subTitle1),
-                              TextSpan(
-                                  text: 'after withdrawing ', style: subTitle2),
-                              TextSpan(
-                                  text:
-                                      '\$${k_m_b_generator(widthdrawalAmount)} ',
-                                  style: subTitle1),
-                              TextSpan(
-                                  text:
-                                      '${getCompoundingTitle(withdrawalFrequency)} ',
-                                  style: subTitle2),
-                              TextSpan(text: 'for ', style: subTitle2),
-                              TextSpan(
-                                  text: '${withdrawalPeriod?.toInt()} Years',
-                                  style: subTitle1),
-                            ],
+                Container(
+                  decoration: BoxDecoration(
+                      border:
+                          Border.all(color: appTheme.accentColor, width: 1.0),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey[80]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: (endBalance ?? 0) > 0
+                        ? RichText(
+                            text: TextSpan(
+                              text: '',
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: 'You would have total amount ',
+                                  style: subTitle2,
+                                ),
+                                TextSpan(
+                                    text:
+                                        '\$${k_m_b_generator(endBalance ?? 0)} ',
+                                    style: subTitle1),
+                                TextSpan(
+                                    text: 'after withdrawing ',
+                                    style: subTitle2),
+                                TextSpan(
+                                    text:
+                                        '\$${k_m_b_generator(widthdrawalAmount)} ',
+                                    style: subTitle1),
+                                TextSpan(
+                                    text:
+                                        '${getCompoundingTitle(withdrawalFrequency)} ',
+                                    style: subTitle2),
+                                TextSpan(text: 'for ', style: subTitle2),
+                                TextSpan(
+                                    text: '${withdrawalPeriod?.toInt()} Years',
+                                    style: subTitle1),
+                              ],
+                            ),
+                          )
+                        : RichText(
+                            text: TextSpan(
+                              text: '',
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: 'In ',
+                                  style: subTitle2,
+                                ),
+                                TextSpan(text: '$years ', style: subTitle1),
+                                TextSpan(
+                                  text: years > 1 ? 'Years ' : 'Year ',
+                                  style: subTitle2,
+                                ),
+                                months > 0
+                                    ? TextSpan(
+                                        text: '$months ', style: subTitle1)
+                                    : TextSpan(),
+                                months > 0
+                                    ? TextSpan(
+                                        text: years > 1 ? 'Months ' : 'Month ',
+                                        style: subTitle2,
+                                      )
+                                    : TextSpan(),
+                                TextSpan(
+                                  text: 'Your Investment Would Finish ',
+                                  style: subTitle2,
+                                ),
+
+                                // TextSpan(text: ' 0 ', style: subTitle1),
+                                TextSpan(
+                                    text: 'after withdrawing ',
+                                    style: subTitle2),
+                                TextSpan(
+                                    text:
+                                        '\$${k_m_b_generator(widthdrawalAmount)} ',
+                                    style: subTitle1),
+                                TextSpan(
+                                    text:
+                                        '${getCompoundingTitle(withdrawalFrequency).toLowerCase()}. ',
+                                    style: subTitle2),
+                                // TextSpan(text: 'for ', style: subTitle2),
+                              ],
+                            ),
                           ),
-                        )
-                      : RichText(
-                          text: TextSpan(
-                            text: '',
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: 'Your Investment would finish in ',
-                                style: subTitle2,
-                              ),
-                              TextSpan(text: '$years ', style: subTitle1),
-                              TextSpan(
-                                text: years > 1 ? 'years ' : 'year ',
-                                style: subTitle2,
-                              ),
-                              months > 0
-                                  ? TextSpan(text: '$months ', style: subTitle1)
-                                  : TextSpan(),
-                              months > 0
-                                  ? TextSpan(
-                                      text: years > 1 ? 'months ' : 'month ',
-                                      style: subTitle2,
-                                    )
-                                  : TextSpan(),
-                              // TextSpan(text: ' 0 ', style: subTitle1),
-                              TextSpan(
-                                  text: 'after withdrawing ', style: subTitle2),
-                              TextSpan(
-                                  text:
-                                      '\$${k_m_b_generator(widthdrawalAmount)} ',
-                                  style: subTitle1),
-                              TextSpan(
-                                  text:
-                                      '${getCompoundingTitle(withdrawalFrequency).toLowerCase()} ',
-                                  style: subTitle2),
-                              // TextSpan(text: 'for ', style: subTitle2),
-                            ],
-                          ),
-                        ),
+                  ),
                 ),
+                SizedBox(height: 20),
+                genericButton(title: "Detail", onPress: onTapDetail),
 
                 SizedBox(height: 40),
               ],
@@ -265,7 +279,7 @@ Widget buildSummaryRow(double? amount, String title) {
         child: ListTile(
           title: amount?.isInfinite == false
               ? Text(
-                  '\$${formatter.format(amount)}',
+                  '\$${k_m_b_generator(amount ?? 0)}',
                   textAlign: TextAlign.end,
                   style: subTitle1,
                 )

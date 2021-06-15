@@ -277,7 +277,8 @@ class _SWPCalculatorState extends State<SWPCalculator> {
                                 widthdrawalAmount: amount,
                                 withdrawalPeriod: period,
                                 moneyFinishedAtMonth: moneyLastedFor,
-                                withdrawalFrequency: periodValue))
+                                withdrawalFrequency: periodValue,
+                                onTapDetail: _onDetailButtonTap))
                         : Container(),
                     SizedBox(
                       height: 20,

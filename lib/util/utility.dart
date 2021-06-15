@@ -5,7 +5,7 @@ import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:intl/intl.dart';
 
-final formatter = new NumberFormat("##,###");
+final formatter = new NumberFormat("#,##,###");
 
 class UtilityHelper {
   SIPResultData getCorpusAmount(
