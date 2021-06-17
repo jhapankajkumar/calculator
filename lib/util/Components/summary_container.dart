@@ -94,7 +94,7 @@ Widget? buildTargetSummaryViews({
   double? targetAmount,
   double? period,
 }) {
-  return totalExpectedAmount != null
+  return sipAmount != null
       ? Column(
           children: [
             Column(
@@ -133,7 +133,6 @@ Widget? buildSWPSummaryViews(
     Function? onTapDetail}) {
   double val = (moneyFinishedAtMonth ?? 0) / 12;
   int years = val.toInt();
-  print(years);
   int months = (moneyFinishedAtMonth ?? 0) % 12;
   return widthdrawalAmount != null
       ? Column(
@@ -164,7 +163,7 @@ Widget? buildSWPSummaryViews(
                       color: Colors.grey[80]),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: (endBalance ?? 0) > 0
+                    child: moneyFinishedAtMonth == null
                         ? RichText(
                             text: TextSpan(
                               text: '',
@@ -188,9 +187,10 @@ Widget? buildSWPSummaryViews(
                                     text:
                                         '${getCompoundingTitle(withdrawalFrequency)} ',
                                     style: subTitle2),
-                                TextSpan(text: 'for ', style: subTitle2),
+                                TextSpan(text: 'in ', style: subTitle2),
                                 TextSpan(
-                                    text: '${withdrawalPeriod?.toInt()} Years',
+                                    text:
+                                        '${withdrawalPeriod?.toInt()} Year(s)',
                                     style: subTitle1),
                               ],
                             ),

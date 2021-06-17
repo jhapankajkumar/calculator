@@ -1,3 +1,4 @@
+import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
@@ -7,10 +8,10 @@ import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
+import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class FixedDepositeCalculator extends StatefulWidget {
   final Screen category;
@@ -31,6 +32,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
   double? wealthGain;
   double? investedAmount;
   TextFieldFocus? currentFocus;
+  FutureValue futureData = FutureValue();
   Compounding? _compounding = Compounding.quaterly;
 
   _calculateAmount() {
@@ -46,9 +48,16 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
         .getFutureValueAmount(
             amount ?? 0, rate ?? 0, period ?? 0, compoundedValue)
         .roundToDouble();
+
     setState(() {
+      futureData.tenor = period ?? 0;
+      futureData.corpus = corpusAmount ?? 0;
+      futureData.compounding = _compounding ?? Compounding.quaterly;
+      futureData.returnRate = rate ?? 0.0;
+      futureData.investmentAmount = amount ?? 0;
       investedAmount = amount;
       wealthGain = (corpusAmount ?? 0) - (investedAmount ?? 0);
+      futureData.totalProfit = wealthGain ?? 0;
       currentFocus = null;
     });
   }
@@ -149,6 +158,19 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
     });
   }
 
+  void _onDetailButtonTap() {
+    removeFocus();
+    if (futureData.corpus.isFinite) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (BuildContext context) {
+        return SIPProjetionList(
+          category: widget.category,
+          data: futureData,
+        );
+      }));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,6 +197,8 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                               totalExpectedAmount: corpusAmount,
                               totalGainAmount: wealthGain,
                               totalInvestedAmount: investedAmount,
+                              isDetail: true,
+                              onTapDetail: _onDetailButtonTap,
                             ))
                         : Container(),
                     SizedBox(

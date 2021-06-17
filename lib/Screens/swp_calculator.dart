@@ -36,11 +36,10 @@ class _SWPCalculatorState extends State<SWPCalculator> {
   double totalWithdrawal = 0;
   double totalProfit = 0;
   double endBalance = 0;
-  int moneyLastedFor = 0;
+  int? moneyLastedFor;
 
-  SIPData detail = SIPData();
   String? errorText;
-  SIPResultData? data;
+  SWPResult? result;
   Compounding? periodValue = Compounding.monthly;
 
   _calculateSIP() {
@@ -48,6 +47,7 @@ class _SWPCalculatorState extends State<SWPCalculator> {
       endBalance = 0;
       totalProfit = 0;
       totalWithdrawal = 0;
+      moneyLastedFor = null;
     });
 
     double tempEndAmount = totalInvestmentAmount!;
@@ -61,26 +61,36 @@ class _SWPCalculatorState extends State<SWPCalculator> {
     }
 
     double roi = (rate! / 100) / withdrawalPeriod;
+    // result = SIPResultData();
     for (int i = 1; i <= withdrawalPeriod * period!; i++) {
-      if (tempEndAmount < 0) {
+      // Data data = Data();
+      //data.startBalance = totalInvestmentAmount;
+      if (tempEndAmount - amount! < 0) {
         moneyLastedFor = i;
-        print(i);
+        print("Exit At $i");
         break;
       }
       //withdraw money
       tempEndAmount = tempEndAmount - amount!;
+      // data.amount = amount;
       tempTotalWithdrawal = tempTotalWithdrawal + amount!;
       double profit = tempEndAmount * roi;
+      //data.in
       tempTotalProfit = tempTotalProfit + profit;
       //add interest
       tempEndAmount = tempEndAmount + profit.round();
-      // print("\n");
-      // print(value);
-      // print(tempTotalInvestmentAmount);
-      // print("\n");
     }
 
     setState(() {
+      result?.tenor = period ?? 0;
+      result?.totalInvestment = totalInvestmentAmount ?? 0;
+      result?.endBalance = tempEndAmount;
+      result?.totalProfit = tempTotalProfit;
+      result?.totalWithdrawal = tempTotalWithdrawal;
+      result?.withdrawalAmount = amount ?? 0;
+      result?.returnRate = rate ?? 0;
+      result?.compounding = periodValue ?? Compounding.monthly;
+
       endBalance = tempEndAmount;
       totalProfit = tempTotalProfit;
       totalWithdrawal = tempTotalWithdrawal;
@@ -103,6 +113,9 @@ class _SWPCalculatorState extends State<SWPCalculator> {
       isValid = false;
     }
     if (period == null) {
+      isValid = false;
+    }
+    if ((amount ?? 0) > (totalInvestmentAmount ?? 0)) {
       isValid = false;
     }
     return isValid;
@@ -189,19 +202,6 @@ class _SWPCalculatorState extends State<SWPCalculator> {
         }
       });
     }
-
-    if (textField == TextFieldFocus.stepUp) {
-      setState(() {
-        if (inputtedValue > 0) {
-          stepUpPercentage = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
-        } else {
-          stepUpPercentage = null;
-        }
-      });
-    }
   }
 
   _onFocusChange(TextFieldFocus? textField, bool value) {
@@ -226,12 +226,12 @@ class _SWPCalculatorState extends State<SWPCalculator> {
 
   void _onDetailButtonTap() {
     removeFocus();
-    if (data != null && data!.corpus.isFinite) {
+    if (result != null) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
         return SIPProjetionList(
-          category: Screen.detail,
-          data: data!,
+          category: Screen.swp,
+          data: result!,
         );
       }));
     }
@@ -250,6 +250,12 @@ class _SWPCalculatorState extends State<SWPCalculator> {
         _calculateButtonTapped();
       }
     });
+  }
+
+  @override
+  void initState() {
+    result = SWPResult();
+    super.initState();
   }
 
   @override
@@ -279,7 +285,10 @@ class _SWPCalculatorState extends State<SWPCalculator> {
                                 moneyFinishedAtMonth: moneyLastedFor,
                                 withdrawalFrequency: periodValue,
                                 onTapDetail: _onDetailButtonTap))
-                        : Container(),
+                        : ((amount ?? 0) > (totalInvestmentAmount ?? 0))
+                            ? messageView(
+                                "Please enter withdrawal amount less than your total investment.")
+                            : Container(),
                     SizedBox(
                       height: 20,
                     ),
@@ -306,55 +315,15 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onDoneButtonTapped: _onDoneButtonTapped,
           ),
           SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: buildTextFieldContainerSection(
-                  textFieldType: TextFieldFocus.amount,
-                  placeHolder: "5000",
-                  textLimit: amountTextLimit,
-                  containerTitle: amountTitle(widget.category),
-                  focus: currentFocus,
-                  onFocusChange: _onFocusChange,
-                  onTextChange: _onTextChange,
-                  onDoneButtonTapped: _onDoneButtonTapped,
-                ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '',
-                      style: appTheme.textTheme.caption,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      height: textFieldContainerSize,
-                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Color(0xffEFEFEF),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey,
-                            spreadRadius: 0,
-                            blurRadius: 0,
-                            offset: Offset(0, 0), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                          child: buildCompoundungDropDown(
-                              periodValue, _onOptionChange)),
-                    ),
-                  ])
-            ],
+          buildTextFieldContainerSection(
+            textFieldType: TextFieldFocus.amount,
+            placeHolder: "5000",
+            textLimit: amountTextLimit,
+            containerTitle: amountTitle(widget.category),
+            focus: currentFocus,
+            onFocusChange: _onFocusChange,
+            onTextChange: _onTextChange,
+            onDoneButtonTapped: _onDoneButtonTapped,
           ),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
@@ -378,21 +347,6 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onTextChange: _onTextChange,
             onDoneButtonTapped: _onDoneButtonTapped,
           ),
-          SizedBox(height: 20),
-          widget.category == Screen.stepup
-              ? buildTextFieldContainerSection(
-                  textFieldType: TextFieldFocus.stepUp,
-                  placeHolder: "10",
-                  textLimit: interestRateTextLimit,
-                  containerTitle:
-                      StringConstants.annualPercentageIncreamntOnSip,
-                  focus: currentFocus,
-                  onFocusChange: _onFocusChange,
-                  onTextChange: _onTextChange,
-                  onDoneButtonTapped: _onDoneButtonTapped,
-                )
-              : Container(),
-          widget.category == Screen.stepup ? SizedBox(height: 20) : Container(),
           SizedBox(height: 20),
           Row(children: [
             Expanded(

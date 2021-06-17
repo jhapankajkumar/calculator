@@ -3,14 +3,15 @@ import 'dart:math';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/sip_data.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 final formatter = new NumberFormat("#,##,###");
 
 class UtilityHelper {
-  SIPResultData getCorpusAmount(
+  SIPResult getCorpusAmount(
       double amount, double interestRate, double period, double? stepUpRate) {
-    SIPResultData resultData = SIPResultData();
+    SIPResult resultData = SIPResult();
     if (interestRate == 0) {
       resultData.totalInvestment = amount * period * 12;
       resultData.corpus = amount * period * 12;
@@ -328,4 +329,20 @@ String k_m_b_generator(double num) {
   } else {
     return num.roundToDouble().toString();
   }
+}
+
+Widget messageView(String message) {
+  return Container(
+      margin: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+          border: Border.all(color: appTheme.accentColor, width: 1.0),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.grey[80]),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          message,
+          style: subTitle1,
+        ),
+      ));
 }

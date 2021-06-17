@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:calculator/util/Constants/constants.dart';
-import 'package:calculator/util/sip_data.dart';
+import 'package:calculator/util/investment_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,7 +19,7 @@ Future<String> get localPath async {
 Future<File> get localFile async {
   final path = await localPath;
   print('PATH $path');
-  var file = File('$path/detail.pdf');
+  var file = File('$path/GrowFundCalculator.pdf');
   return file;
 }
 
@@ -41,7 +41,8 @@ Future<Uint8List?> getImageData() async {
   }
 }
 
-Future<File> createPDF(BuildContext buildContext, SIPResultData data) async {
+Future<File> createPDF(
+    BuildContext buildContext, InvestmentResult data, Screen category) async {
   var file = await localFile;
   var pdf = pw.Document();
   var imageData = await getImageData();
@@ -68,7 +69,7 @@ Future<File> createPDF(BuildContext buildContext, SIPResultData data) async {
             return pw.Column(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  buildPDFTableContent(buildContext, data, ttf, i),
+                  buildPDFTableContent(buildContext, data, ttf, i, category),
                   pw.SizedBox(height: 50),
                   pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.start,
@@ -84,7 +85,7 @@ Future<File> createPDF(BuildContext buildContext, SIPResultData data) async {
           return pw.Column(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                buildPDFTableBelowOneYear(buildContext, data, ttf),
+                buildPDFTableBelowOneYear(buildContext, data, ttf, category),
                 pw.SizedBox(height: 50),
                 pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.start,
@@ -96,14 +97,14 @@ Future<File> createPDF(BuildContext buildContext, SIPResultData data) async {
   return file.writeAsBytes(await pdf.save());
 }
 
-pw.Widget buildPDFTableBelowOneYear(
-    BuildContext context, SIPResultData data, pw.Font? font) {
+pw.Widget buildPDFTableBelowOneYear(BuildContext context, InvestmentResult data,
+    pw.Font? font, Screen category) {
   List<pw.Widget> children = [];
-  children.add(buildPdfTableHeader(context, font));
+  children.add(buildPdfTableHeader(context, font, category));
   for (int i = 0; i < (data.tenor); i++) {
     var ldata = data.list?[i];
     if (ldata != null) {
-      children.add(buildPDFContent(context, ldata, i, font));
+      children.add(buildPDFContent(context, ldata, i, font, category));
       children.add(pw.SizedBox(height: 10));
     }
   }
@@ -114,14 +115,14 @@ pw.Widget buildPDFTableBelowOneYear(
   ));
 }
 
-pw.Widget buildPDFTableContent(
-    BuildContext context, SIPResultData data, pw.Font? font, int index) {
+pw.Widget buildPDFTableContent(BuildContext context, InvestmentResult data,
+    pw.Font? font, int index, Screen category) {
   List<pw.Widget> children = [];
-  children.add(buildPdfTableHeader(context, font));
+  children.add(buildPdfTableHeader(context, font, category));
   for (int i = (index * 12); i < (index + 1) * 12; i++) {
-    var ldata = data.list?[i];
-    if (ldata != null) {
-      children.add(buildPDFContent(context, ldata, i, font));
+    if (i < (data.list?.length ?? 0)) {
+      var ldata = data.list?[i];
+      children.add(buildPDFContent(context, ldata, i, font, category));
       children.add(pw.SizedBox(height: 10));
     }
   }
@@ -132,8 +133,8 @@ pw.Widget buildPDFTableContent(
   ));
 }
 
-pw.Widget buildPDFContent(
-    BuildContext context, SIPData data, int index, pw.Font? ttf) {
+pw.Widget buildPDFContent(BuildContext context, InvestmentData? data, int index,
+    pw.Font? ttf, Screen category) {
   pw.TextStyle style = pw.TextStyle(
       fontSize: 12,
       font: ttf,
@@ -142,12 +143,23 @@ pw.Widget buildPDFContent(
   double rowHeight = 40;
   bool isYear = false;
   String durationText = "";
-  if ((index + 1) % 12 == 0) {
-    isYear = true;
-    durationText = '${(data.tenor ?? 0) ~/ 12} Year';
+  if (category == Screen.fd ||
+      category == Screen.fv ||
+      category == Screen.lumpsum) {
+    durationText = '${data?.tenor} Year';
   } else {
-    durationText = '${(data.tenor ?? 0)} Month';
-    isYear = false;
+    if ((index + 1) % 12 == 0) {
+      isYear = true;
+      durationText = '${(data?.tenor ?? 0) ~/ 12} Year';
+    } else {
+      durationText = '${(data?.tenor ?? 0)} Month';
+      isYear = false;
+    }
+  }
+
+  bool isSwp = false;
+  if (category == Screen.swp) {
+    isSwp = true;
   }
 
   PdfColor color = isYear == true
@@ -183,10 +195,26 @@ pw.Widget buildPDFContent(
               child: pw.Container(
             height: rowHeight,
             child: pw.Center(
-              child: pw.Text("\$${k_m_b_generator(data.amount ?? 0)}",
+              child: pw.Text("\$${k_m_b_generator(data?.amount ?? 0)}",
                   textAlign: pw.TextAlign.left, style: style),
             ),
           )),
+          isSwp
+              ? pw.Flexible(
+                  child: pw.Container(
+                  height: rowHeight,
+                  // width: width / 4,
+                  child: pw.Padding(
+                    padding: pw.EdgeInsets.fromLTRB(8, 0, 8, 0),
+                    child: pw.Center(
+                      child: pw.Text(
+                          "\$${k_m_b_generator(data?.withdrawal ?? 0)}",
+                          textAlign: pw.TextAlign.left,
+                          style: style),
+                    ),
+                  ),
+                ))
+              : pw.Container(),
           pw.Flexible(
               child: pw.Container(
             height: rowHeight,
@@ -194,7 +222,7 @@ pw.Widget buildPDFContent(
             child: pw.Padding(
               padding: pw.EdgeInsets.fromLTRB(8, 0, 8, 0),
               child: pw.Center(
-                child: pw.Text("\$${k_m_b_generator(data.interest ?? 0)}",
+                child: pw.Text("\$${k_m_b_generator(data?.profit ?? 0)}",
                     textAlign: pw.TextAlign.left, style: style),
               ),
             ),
@@ -205,8 +233,7 @@ pw.Widget buildPDFContent(
                   padding: pw.EdgeInsets.fromLTRB(8, 0, 8, 0),
                   child: pw.Expanded(
                     child: pw.Center(
-                      child: pw.Text(
-                          '\$${k_m_b_generator(data.totalBalance ?? 0)}',
+                      child: pw.Text('\$${k_m_b_generator(data?.balance ?? 0)}',
                           textAlign: pw.TextAlign.left,
                           overflow: pw.TextOverflow.clip,
                           style: style),
@@ -216,12 +243,17 @@ pw.Widget buildPDFContent(
       ]));
 }
 
-pw.Widget buildPdfTableHeader(BuildContext context, pw.Font? ttf) {
+pw.Widget buildPdfTableHeader(
+    BuildContext context, pw.Font? ttf, Screen category) {
   pw.TextStyle style = pw.TextStyle(
       fontSize: captionFontSize,
       font: ttf,
       fontWeight: pw.FontWeight.bold,
       color: PdfColor.fromHex("FFFFFF"));
+  bool isSwp = false;
+  if (category == Screen.swp) {
+    isSwp = true;
+  }
   return pw.Container(
     color: PdfColor.fromHex('212E51'),
     height: 60,
@@ -230,28 +262,33 @@ pw.Widget buildPdfTableHeader(BuildContext context, pw.Font? ttf) {
       children: [
         pw.Expanded(
           child: pw.Center(
-            child: pw.Padding(
-              padding: pw.EdgeInsets.fromLTRB(8, 0, 0, 0),
-              child: pw.Text(
-                "Duration",
-                textAlign: pw.TextAlign.left,
-                style: style,
-              ),
+            child: pw.Text(
+              isSwp ? "Time" : "Duration",
+              textAlign: pw.TextAlign.left,
+              style: style,
             ),
           ),
         ),
         pw.Expanded(
           child: pw.Center(
-            child:
-                pw.Text("Amount", textAlign: pw.TextAlign.left, style: style),
+            child: pw.Text(isSwp ? "Start\nBalance" : "Amount",
+                textAlign: pw.TextAlign.left, style: style),
           ),
         ),
+        isSwp
+            ? pw.Expanded(
+                child: pw.Center(
+                  child: pw.Text("Withdrawal",
+                      textAlign: pw.TextAlign.left, style: style),
+                ),
+              )
+            : pw.Container(),
         pw.Expanded(
           child: pw.Center(
               child: pw.Padding(
             padding: pw.EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: pw.Text(
-              "Interest",
+              isSwp ? "Interest\nEarned" : "Interest",
               textAlign: pw.TextAlign.left,
               style: style,
             ),
@@ -261,7 +298,7 @@ pw.Widget buildPdfTableHeader(BuildContext context, pw.Font? ttf) {
           child: pw.Center(
             child: pw.Padding(
               padding: pw.EdgeInsets.fromLTRB(0, 0, 16, 0),
-              child: pw.Text("Balance",
+              child: pw.Text(isSwp ? "End\nBalance" : "Balance",
                   textAlign: pw.TextAlign.left, style: style),
             ),
           ),

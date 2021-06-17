@@ -94,7 +94,7 @@ class StringConstants {
   static String expectedReturn = 'At An Expected Return Of (%)';
 
   //SWP
-  static String monthlyWithdrawalAmount = 'I Want To Withdraw';
+  static String monthlyWithdrawalAmount = 'I Want To Withdraw Monthly';
   static String totalInvestment = "Total Investment";
   static String totalWithdrawal = "Total Withdrwal";
   static String totalProfit = "Total Profit";

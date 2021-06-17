@@ -1,5 +1,3 @@
-import 'dart:ffi';
-import 'dart:math';
 import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
@@ -9,8 +7,8 @@ import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
-import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
+import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,9 +34,8 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   TextFieldFocus? currentFocus;
   double? stepUpPercentage;
 
-  SIPData detail = SIPData();
   String? errorText;
-  SIPResultData? data;
+  SIPResult? data;
   Period? periodValue = Period.years;
 
   _calculateSIP() {

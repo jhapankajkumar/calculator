@@ -37,24 +37,21 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
   TextFieldFocus? currentFocus;
   double? stepUpPercentage;
 
-  SIPData detail = SIPData();
-
   _calculateTargetAmount() {
     var helper = UtilityHelper();
-    detail.amount = amount;
     double montlyAmount = helper
         .getSIPAmount(
             amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
         .roundToDouble();
     setState(() {
       sipAmount = montlyAmount;
+      print(sipAmount);
       investedAmount = (sipAmount ?? 0) * (period ?? 0) * 12;
       wealthGain = (amount ?? 0) - (investedAmount ?? 0);
       currentFocus = null;
     });
   }
 
-  final formatter = new NumberFormat("#,###");
   bool isAllInputValid() {
     bool isValid = true;
     if (rate == null) {
