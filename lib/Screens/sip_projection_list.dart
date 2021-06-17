@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/bar_chart.dart';
+import 'package:calculator/util/Components/excel_table.dart';
 import 'package:calculator/util/Components/line_chart.dart';
 
 import 'package:calculator/util/Components/base_container.dart';
@@ -53,10 +54,8 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         result.tenor = fValue.tenor.toInt();
         result.totalProfit = fValue.totalProfit;
         result.totalInvestedAmount = fValue.investmentAmount;
-
+        double startBalance = fValue.investmentAmount;
         List<InvestmentData> list = [];
-        double sipAmount = fValue.investmentAmount;
-        double steupAmount = 0;
         double counter = 1;
         var helper = UtilityHelper();
         var compoundedValue = 4;
@@ -67,18 +66,19 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
         }
         for (int i = 1; i <= fValue.tenor; i++) {
           InvestmentData sipData = InvestmentData();
+          sipData.amount = startBalance;
           sipData.tenor = i;
-          double amount = 0;
+
           double corpus = helper
               .getFutureValueAmount(fValue.investmentAmount, fValue.returnRate,
                   i.toDouble(), compoundedValue)
               .roundToDouble();
-          amount = fValue.investmentAmount;
           counter = counter + 1;
 
-          double? interest = corpus - amount;
+          double? interest = corpus - startBalance;
+          startBalance = corpus;
           sipData.balance = corpus;
-          sipData.amount = amount;
+
           sipData.profit = interest;
           list.add(sipData);
         }
@@ -179,7 +179,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
   Future<void> deletePreviousData() async {
     var directory = await getApplicationDocumentsDirectory();
-    var pngFile = File('${directory.path}/chart.png');
+    var pngFile = File('${directory.path}/chart');
     var doesFileExist = await pngFile.exists();
 
     if (doesFileExist) {
@@ -191,10 +191,17 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     if (doesFileExist) {
       pdfFile.delete();
     }
+
+    // var excelFile = File('${directory.path}/GrowFundCalculator.xlsx');
+    // doesFileExist = await excelFile.exists();
+    // if (doesFileExist) {
+    //   excelFile.delete();
+    // }
   }
 
   Future<void> takeScreenShot() async {
     var directory = await getApplicationDocumentsDirectory();
+    createExcel(context, result, widget.category);
     screenshotController.capture().then((Uint8List? image) async {
       setState(() async {
         if (image != null) {
@@ -216,22 +223,88 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     });
   }
 
-  void onTapShareButton() {
-    takeScreenShot().then((value) async {
-      final box = context.findRenderObject() as RenderBox?;
-      var directory = await getApplicationDocumentsDirectory();
-      var imagePath = '${directory.path}/GrowFundCalculator.pdf';
-      if (imagePath.isNotEmpty) {
-        await Share.shareFiles([imagePath],
-            text: "GrowFund",
-            subject: "Investment Detail",
-            sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-      } else {
-        await Share.share("text",
-            subject: "subject",
-            sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-      }
-    }).onError((error, stackTrace) {});
+  Future<void> onTapShareButton() async {
+    var directory = await getApplicationDocumentsDirectory();
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text('GrowFund'),
+        message: const Text('Share As'),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            child: const Text('PDF'),
+            onPressed: () {
+              Navigator.pop(context);
+              takeScreenShot().then((value) async {
+                var imagePath = '${directory.path}/GrowFundCalculator.pdf';
+                shareItem(imagePath);
+              }).onError((error, stackTrace) {
+                var imagePath = '${directory.path}/GrowFundCalculator.pdf';
+                shareItem(imagePath);
+              });
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Excel'),
+            onPressed: () {
+              Navigator.pop(context);
+              takeScreenShot().then((value) async {
+                var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
+                shareItem(imagePath);
+              }).onError((error, stackTrace) {
+                var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
+                shareItem(imagePath);
+              });
+            },
+          )
+        ],
+      ),
+    );
+    return;
+  }
+
+  Future<void> shareItem(String path) async {
+    final box = context.findRenderObject() as RenderBox?;
+    if (path.isNotEmpty) {
+      Share.shareFiles([path],
+              text: "GrowFund",
+              subject: "Investment Detail",
+              sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size)
+          .onError((error, stackTrace) {
+        _showErrorAlert();
+      });
+    } else {
+      Share.share("text",
+          subject: "subject",
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    }
+  }
+
+  Future<void> _showErrorAlert() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('GrowFund'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Sorry, It seems there is prolem, please try again.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

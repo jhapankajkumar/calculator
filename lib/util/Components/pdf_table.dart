@@ -1,49 +1,19 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:calculator/util/Components/directory.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/investment_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io' show Platform;
 
-Future<String> get localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-  return directory.path;
-}
-
-Future<File> get localFile async {
-  final path = await localPath;
-  print('PATH $path');
-  var file = File('$path/GrowFundCalculator.pdf');
-  return file;
-}
-
-Future<File> get imagePath async {
-  final path = await localPath;
-  var file = File('$path/chart');
-  return file;
-}
-
-Future<Uint8List?> getImageData() async {
-  var imageFilePath = await imagePath;
-  if (imageFilePath.existsSync()) {
-    try {
-      Uint8List image = imageFilePath.readAsBytesSync();
-      return image;
-    } catch (e) {
-      return null;
-    }
-  }
-}
-
 Future<File> createPDF(
     BuildContext buildContext, InvestmentResult data, Screen category) async {
-  var file = await localFile;
+  var file = await localFile('GrowFundCalculator', 'pdf');
   var pdf = pw.Document();
   var imageData = await getImageData();
   if (imageData != null) {

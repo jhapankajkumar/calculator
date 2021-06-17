@@ -102,27 +102,24 @@ class _LineChartViewState extends State<LineChartView> {
                       Indicator(
                         color: Colors.green,
                         size: indicatorSize,
-                        text: "Total Amount",
+                        text: isFutureValue ? 'End Balance' : "Total Amount",
                         isSquare: false,
                         textColor: Colors.white,
                       ),
                       SizedBox(
                         height: 10,
                       ),
-                      isFutureValue == false
-                          ? Indicator(
-                              color: Colors.red,
-                              size: indicatorSize,
-                              text: "Invested Amount",
-                              isSquare: false,
-                              textColor: Colors.white,
-                            )
-                          : Container(),
-                      isFutureValue == false
-                          ? SizedBox(
-                              height: 10,
-                            )
-                          : Container(),
+                      Indicator(
+                        color: Colors.red,
+                        size: indicatorSize,
+                        text:
+                            isFutureValue ? 'Start Balance' : "Invested Amount",
+                        isSquare: false,
+                        textColor: Colors.white,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Indicator(
                         color: Colors.yellow,
                         size: indicatorSize,
@@ -290,11 +287,7 @@ class _LineChartViewState extends State<LineChartView> {
                     color: Colors.yellow,
                     fontSize: 14,
                     fontWeight: FontWeight.bold));
-            if (isFutureValue) {
-              return [item1, item3];
-            } else {
-              return [item1, item2, item3];
-            }
+            return [item1, item2, item3];
           },
         ),
         touchCallback: (LineTouchResponse touchResponse) {},
@@ -439,6 +432,7 @@ class _LineChartViewState extends State<LineChartView> {
       return [
         getWealthGainBarData(),
         getFinalBalanceBarData(),
+        getInvestmentBarData(),
       ];
     } else {
       return [
@@ -486,7 +480,7 @@ class _LineChartViewState extends State<LineChartView> {
     if (isFutureValue) {
       String sPoint = ((widget.data.totalInvestedAmount) / amountInterval)
           .toStringAsFixed(2);
-      list.add(FlSpot(0, double.parse(sPoint)));
+      list.add(FlSpot(0, 0));
     } else {
       list.add(FlSpot(0, 0));
     }

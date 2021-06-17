@@ -168,6 +168,8 @@ String amountTitle(Screen category) {
   switch (category) {
     case Screen.sip:
     case Screen.stepup:
+      containerTitle = StringConstants.investmentAmount;
+      break;
     case Screen.swp:
       containerTitle = StringConstants.monthlyWithdrawalAmount;
       break;
