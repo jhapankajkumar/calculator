@@ -30,6 +30,22 @@ class FutureValue implements AbstractResult {
   Compounding compounding = Compounding.monthly;
 }
 
+class EMIData implements AbstractResult {
+  double loanAmount = 0;
+  double interestRate = 0;
+  double emiAmount = 0;
+  int period = 0;
+  List<InstalmentData> installments = [];
+}
+
+class InstalmentData {
+  double principalAmount = 0;
+  double interestAmount = 0;
+  double remainingLoanBalance = 0;
+  double emiAmount = 0;
+  int tenor = 0;
+}
+
 abstract class AbstractResult {}
 
 class SIPData implements AbstractData {

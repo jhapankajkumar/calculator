@@ -110,6 +110,50 @@ class UtilityHelper {
       return result.roundToDouble();
     }
   }
+
+  double pmt(double r, int nper, double pv, double fv, int type) {
+    double pmt = -r *
+        (pv * pow(1 + r, nper) + fv) /
+        ((1 + r * type) * (pow(1 + r, nper) - 1));
+    return pmt;
+  }
+
+  double fvs(double r, int nper, double c, double pv, int type) {
+    double fv = -(pv * pow(1 + r, nper) +
+        c * (1 + r * type) * (pow(1 + r, nper) - 1) / r);
+    return fv;
+  }
+
+  double ipmt(double r, int per, int nper, double pv, double fv, int type) {
+    double ipmt = fvs(r, per - 1, pmt(r, nper, pv, fv, type), pv, type) * r;
+    if (type == 1) ipmt /= (1 + r);
+    return ipmt;
+  }
+
+  double ppmt(double r, int per, int nper, double pv, double fv, int type) {
+    return pmt(r, nper, pv, fv, type) - ipmt(r, per, nper, pv, fv, type);
+  }
+}
+
+// ignore: non_constant_identifier_names
+String k_m_b_generators(double num) {
+  if (num < 1000) {
+    return num.toString();
+  } else if (num > 999 && num < 99999) {
+    return "${(num / 1000).toStringAsFixed(1)} K";
+  } else if (num > 99999 && num < 999999) {
+    return "${(num / 1000).toStringAsFixed(0)} K";
+  } else if (num > 999999 && num < 999999999) {
+    return "${(num / 1000000).toStringAsFixed(1)} M";
+  } else if (num > 999999999 && num < 999999999999) {
+    return "${(num / 1000000000).toStringAsFixed(1)} B";
+  } else if (num > 999999999999 && num < 999999999999999) {
+    return "${(num / 1000000000000).toStringAsFixed(1)} T";
+  } else if (num > 999999999999999 && num < 999999999999999999) {
+    return "${(num / 1000000000000000).toStringAsFixed(1)} Q";
+  } else {
+    return num.toStringAsExponential(1);
+  }
 }
 
 enum TextFieldFocus {

@@ -2,17 +2,20 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:calculator/util/Components/Charts/loan_chart.dart';
 import 'package:calculator/util/Components/appbar.dart';
-import 'package:calculator/util/Components/bar_chart.dart';
+import 'package:calculator/util/Components/Charts/bar_chart.dart';
 import 'package:calculator/util/Components/excel_table.dart';
-import 'package:calculator/util/Components/line_chart.dart';
+import 'package:calculator/util/Components/Charts/line_chart.dart';
 
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/investment_detail_table.dart';
+import 'package:calculator/util/Components/loan_detail_table.dart';
 import 'package:calculator/util/Components/pdf_table.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/investment_data.dart';
+import 'package:calculator/util/loan_pdf_table.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,6 +39,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   ScreenshotController screenshotController = ScreenshotController();
   Uint8List? chartImage;
   late InvestmentResult result;
+  late EMIData emiData;
   @override
   void initState() {
     super.initState();
@@ -48,6 +52,38 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
   void fillAmount(BuildContext context, Screen category) {
     switch (widget.data.runtimeType) {
+      case EMIData:
+        emiData = widget.data as EMIData;
+        print(emiData.emiAmount);
+        double loanAmount = emiData.loanAmount;
+        List<InstalmentData> installments = [];
+        var helper = UtilityHelper();
+        for (int i = 1; i <= emiData.period; i++) {
+          InstalmentData instalment = InstalmentData();
+          instalment.emiAmount = emiData.emiAmount;
+
+          var iPmt = helper
+              .ipmt(emiData.interestRate, i, emiData.period, emiData.loanAmount,
+                  0, 0)
+              .abs();
+          // .roundToDouble();
+          // print(iPmt);
+          instalment.interestAmount = iPmt;
+
+          var pPmt = helper
+              .ppmt(emiData.interestRate, i, emiData.period, emiData.loanAmount,
+                  0, 0)
+              .abs();
+          //.roundToDouble();
+          // print(pPmt);
+          instalment.principalAmount = pPmt;
+          loanAmount = loanAmount - pPmt;
+          instalment.remainingLoanBalance = loanAmount;
+          instalment.tenor = i;
+          installments.add(instalment);
+        }
+        emiData.installments = installments;
+        break;
       case FutureValue:
         FutureValue fValue = widget.data as FutureValue;
         result.finalBalance = fValue.corpus;
@@ -201,7 +237,12 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
   Future<void> takeScreenShot() async {
     var directory = await getApplicationDocumentsDirectory();
-    createExcel(context, result, widget.category);
+    if (widget.category == Screen.emi) {
+      ExcelSheetCreator.shared
+          .createEMIDetailSheet(context, emiData, widget.category);
+    } else {
+      ExcelSheetCreator.shared.createExcel(context, result, widget.category);
+    }
     screenshotController.capture().then((Uint8List? image) async {
       setState(() async {
         if (image != null) {
@@ -212,14 +253,23 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
           var file = File('${directory.path}/chart');
           file.writeAsBytes(chartImage!);
         }
-        createPDF(context, result, widget.category);
+        if (widget.category == Screen.emi) {
+          LoanPDFCreator.shared
+              .createLoanPDF(context, emiData, widget.category);
+        } else {
+          PDFCreator.shared.createPDF(context, result, widget.category);
+        }
       });
     }).catchError((onError) {
       if (chartImage != null) {
         var file = File('${directory.path}/chart');
         file.writeAsBytes(chartImage!);
       }
-      createPDF(context, result, widget.category);
+      if (widget.category == Screen.emi) {
+        LoanPDFCreator.shared.createLoanPDF(context, emiData, widget.category);
+      } else {
+        PDFCreator.shared.createPDF(context, result, widget.category);
+      }
     });
   }
 
@@ -230,6 +280,12 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       builder: (BuildContext context) => CupertinoActionSheet(
         title: const Text('GrowFund'),
         message: const Text('Share As'),
+        cancelButton: CupertinoActionSheetAction(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
             child: const Text('PDF'),
@@ -256,7 +312,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                 shareItem(imagePath);
               });
             },
-          )
+          ),
         ],
       ),
     );
@@ -309,6 +365,29 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
   @override
   Widget build(BuildContext context) {
+    Widget chartView = Container();
+    switch (widget.category) {
+      case Screen.swp:
+        chartView = BarChartView(
+          data: result,
+          barCount: 3,
+          cateogry: widget.category,
+        );
+        break;
+
+      case Screen.emi:
+        chartView = LoanChartView(
+            data: emiData, barCount: 0, cateogry: widget.category);
+        break;
+
+      default:
+        chartView = LineChartView(
+          data: result,
+          barCount: 3,
+          cateogry: widget.category,
+        );
+        break;
+    }
     return Scaffold(
         appBar: appBar(
             category: widget.category,
@@ -357,22 +436,15 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                   ),
                   _currentSelection == 0
                       ? Expanded(
-                          child: InvestmentListTableView(
-                              data: result, category: widget.category))
+                          child: widget.category == Screen.emi
+                              ? InstallmentListTableView(
+                                  data: emiData, category: widget.category)
+                              : InvestmentListTableView(
+                                  data: result, category: widget.category))
                       : Expanded(
                           child: Screenshot(
                               controller: screenshotController,
-                              child: widget.category == Screen.swp
-                                  ? BarChartView(
-                                      data: result,
-                                      barCount: 3,
-                                      cateogry: widget.category,
-                                    )
-                                  : LineChartView(
-                                      data: result,
-                                      barCount: 3,
-                                      cateogry: widget.category,
-                                    ))),
+                              child: chartView)),
                   SizedBox(
                     height: 20,
                   ),

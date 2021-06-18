@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:calculator/util/Components/directory.dart';
+import 'package:calculator/util/Components/pdf_table.dart';
 import 'package:calculator/util/Constants/constants.dart';
-import 'package:calculator/util/investment_data.dart';
+import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,15 +11,15 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io' show Platform;
 
-class PDFCreator {
-  static final PDFCreator shared = PDFCreator._internal();
-  factory PDFCreator() {
+class LoanPDFCreator {
+  static final LoanPDFCreator shared = LoanPDFCreator._internal();
+  factory LoanPDFCreator() {
     return shared;
   }
 
-  PDFCreator._internal();
-  Future<File> createPDF(
-      BuildContext buildContext, InvestmentResult data, Screen category) async {
+  LoanPDFCreator._internal();
+  Future<File> createLoanPDF(
+      BuildContext buildContext, EMIData data, Screen category) async {
     var file = await localFile('GrowFundCalculator', 'pdf');
     var pdf = pw.Document();
     var imageData = await getImageData();
@@ -35,7 +35,7 @@ class PDFCreator {
     pw.Font? ttf;
     final font = await rootBundle.load("assets/fonts/Oxygen-Regular.ttf");
     ttf = pw.Font.ttf(font);
-    double pageCount = data.tenor / 12;
+    double pageCount = data.period / 12;
 
     if (pageCount >= 1) {
       for (int i = 0; i < pageCount; i++) {
@@ -74,16 +74,14 @@ class PDFCreator {
     return file.writeAsBytes(await pdf.save());
   }
 
-  pw.Widget buildPDFTableBelowOneYear(BuildContext context,
-      InvestmentResult data, pw.Font? font, Screen category) {
+  pw.Widget buildPDFTableBelowOneYear(
+      BuildContext context, EMIData data, pw.Font? font, Screen category) {
     List<pw.Widget> children = [];
     children.add(buildPdfTableHeader(context, font, category));
-    for (int i = 0; i < (data.tenor); i++) {
-      var ldata = data.list?[i];
-      if (ldata != null) {
-        children.add(buildPDFContent(context, ldata, i, font, category));
-        children.add(pw.SizedBox(height: 10));
-      }
+    for (int i = 0; i < (data.period); i++) {
+      var ldata = data.installments[i];
+      children.add(buildPDFContent(context, ldata, i, font, category));
+      children.add(pw.SizedBox(height: 10));
     }
 
     return pw.Container(
@@ -92,13 +90,13 @@ class PDFCreator {
     ));
   }
 
-  pw.Widget buildPDFTableContent(BuildContext context, InvestmentResult data,
+  pw.Widget buildPDFTableContent(BuildContext context, EMIData data,
       pw.Font? font, int index, Screen category) {
     List<pw.Widget> children = [];
     children.add(buildPdfTableHeader(context, font, category));
     for (int i = (index * 12); i < (index + 1) * 12; i++) {
-      if (i < (data.list?.length ?? 0)) {
-        var ldata = data.list?[i];
+      if (i < (data.installments.length)) {
+        var ldata = data.installments[i];
         children.add(buildPDFContent(context, ldata, i, font, category));
         children.add(pw.SizedBox(height: 10));
       }
@@ -110,7 +108,7 @@ class PDFCreator {
     ));
   }
 
-  pw.Widget buildPDFContent(BuildContext context, InvestmentData? data,
+  pw.Widget buildPDFContent(BuildContext context, InstalmentData? data,
       int index, pw.Font? ttf, Screen category) {
     pw.TextStyle style = pw.TextStyle(
         fontSize: 12,
@@ -132,11 +130,6 @@ class PDFCreator {
         durationText = '${(data?.tenor ?? 0)} Month';
         isYear = false;
       }
-    }
-
-    bool isSwp = false;
-    if (category == Screen.swp) {
-      isSwp = true;
     }
 
     PdfColor color = isYear == true
@@ -172,26 +165,22 @@ class PDFCreator {
                 child: pw.Container(
               height: rowHeight,
               child: pw.Center(
-                child: pw.Text("\$${k_m_b_generator(data?.amount ?? 0)}",
-                    textAlign: pw.TextAlign.left, style: style),
+                child: pw.Text(
+                    "\$${k_m_b_generator(data?.principalAmount ?? 0)}",
+                    textAlign: pw.TextAlign.left,
+                    style: style),
               ),
             )),
-            isSwp
-                ? pw.Flexible(
-                    child: pw.Container(
-                    height: rowHeight,
-                    // width: width / 4,
-                    child: pw.Padding(
-                      padding: pw.EdgeInsets.fromLTRB(8, 0, 8, 0),
-                      child: pw.Center(
-                        child: pw.Text(
-                            "\$${k_m_b_generator(data?.withdrawal ?? 0)}",
-                            textAlign: pw.TextAlign.left,
-                            style: style),
-                      ),
-                    ),
-                  ))
-                : pw.Container(),
+            pw.Flexible(
+                child: pw.Container(
+              height: rowHeight,
+              child: pw.Center(
+                child: pw.Text(
+                    "\$${k_m_b_generator(data?.interestAmount ?? 0)}",
+                    textAlign: pw.TextAlign.left,
+                    style: style),
+              ),
+            )),
             pw.Flexible(
                 child: pw.Container(
               height: rowHeight,
@@ -199,7 +188,7 @@ class PDFCreator {
               child: pw.Padding(
                 padding: pw.EdgeInsets.fromLTRB(8, 0, 8, 0),
                 child: pw.Center(
-                  child: pw.Text("\$${k_m_b_generator(data?.profit ?? 0)}",
+                  child: pw.Text("\$${k_m_b_generator(data?.emiAmount ?? 0)}",
                       textAlign: pw.TextAlign.left, style: style),
                 ),
               ),
@@ -211,7 +200,7 @@ class PDFCreator {
                     child: pw.Expanded(
                       child: pw.Center(
                         child: pw.Text(
-                            '\$${k_m_b_generator(data?.balance ?? 0)}',
+                            '\$${k_m_b_generator(data?.remainingLoanBalance.abs() ?? 0)}',
                             textAlign: pw.TextAlign.left,
                             overflow: pw.TextOverflow.clip,
                             style: style),
@@ -241,7 +230,7 @@ class PDFCreator {
           pw.Expanded(
             child: pw.Center(
               child: pw.Text(
-                isSwp ? "Time" : "Duration",
+                "Time",
                 textAlign: pw.TextAlign.left,
                 style: style,
               ),
@@ -249,24 +238,22 @@ class PDFCreator {
           ),
           pw.Expanded(
             child: pw.Center(
-              child: pw.Text(isSwp ? "Start\nBalance" : "Amount",
+              child: pw.Text("Principal\n(A)",
                   textAlign: pw.TextAlign.left, style: style),
             ),
           ),
-          isSwp
-              ? pw.Expanded(
-                  child: pw.Center(
-                    child: pw.Text("Withdrawal",
-                        textAlign: pw.TextAlign.left, style: style),
-                  ),
-                )
-              : pw.Container(),
+          pw.Expanded(
+            child: pw.Center(
+              child: pw.Text("Interest\n(B)",
+                  textAlign: pw.TextAlign.left, style: style),
+            ),
+          ),
           pw.Expanded(
             child: pw.Center(
                 child: pw.Padding(
               padding: pw.EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: pw.Text(
-                isSwp ? "Interest\nEarned" : "Interest",
+                "Total Payment\n(A + B)",
                 textAlign: pw.TextAlign.left,
                 style: style,
               ),
@@ -276,7 +263,7 @@ class PDFCreator {
             child: pw.Center(
               child: pw.Padding(
                 padding: pw.EdgeInsets.fromLTRB(0, 0, 16, 0),
-                child: pw.Text(isSwp ? "End\nBalance" : "Balance",
+                child: pw.Text("Balance",
                     textAlign: pw.TextAlign.left, style: style),
               ),
             ),
@@ -296,35 +283,6 @@ class PDFCreator {
             color: PdfColor.fromHex("212E51")),
         text: "Provided by ",
       ),
-    );
-  }
-}
-
-//https://apps.apple.com/us/app/growfund/id1570488777
-//https://play.google.com/store/apps/details?id=com.appstack.fincal
-
-class UrlText extends pw.StatelessWidget {
-  UrlText(this.text);
-  final String text;
-
-  String getUrl() {
-    if (Platform.isAndroid) {
-      return 'https://play.google.com/store/apps/details?id=com.appstack.fincal';
-    } else if (Platform.isIOS) {
-      return 'https://apps.apple.com/us/app/growfund/id1570488777';
-    }
-    return "";
-  }
-
-  @override
-  pw.Widget build(pw.Context context) {
-    return pw.UrlLink(
-      destination: getUrl(),
-      child: pw.Text(text,
-          style: pw.TextStyle(
-            //decoration: pw.TextDecoration.underline,
-            color: PdfColors.blue,
-          )),
     );
   }
 }

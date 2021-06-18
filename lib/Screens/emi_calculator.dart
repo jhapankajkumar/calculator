@@ -1,3 +1,4 @@
+import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
@@ -7,6 +8,7 @@ import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
+import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +33,9 @@ class _EMICalculatorState extends State<EMICalculator> {
   double? period;
   double? loanAmount;
   TextFieldFocus? currentFocus;
-
+  EMIData? data;
   Period? periodValue = Period.years;
+
   _calculateAmount() {
     removeFocus();
     double? duration = 0;
@@ -43,9 +46,31 @@ class _EMICalculatorState extends State<EMICalculator> {
       duration = period;
     }
 
+    var rate = this.rate ?? 0;
+    rate = rate / 100 / 12;
+
     loanEMIAmount = helper
-        .getInstallmentAmount(amount ?? 0, duration ?? 0, rate ?? 0)
+        .pmt(rate, duration?.toInt() ?? 0, amount ?? 0, 0, 0)
+        .abs()
         .roundToDouble();
+    data?.loanAmount = amount ?? 0;
+    data?.emiAmount = loanEMIAmount ?? 0;
+    data?.period = duration?.toInt() ?? 0;
+    data?.interestRate = rate;
+
+    print(loanEMIAmount);
+
+    // var iPmt = helper
+    //     .ipmt(rate, 2, duration?.toInt() ?? 0, amount ?? 0, 0, 0)
+    //     .abs()
+    //     .roundToDouble();
+    // print(iPmt);
+
+    // var pPmt = helper
+    //     .ppmt(rate, 2, duration?.toInt() ?? 0, amount ?? 0, 0, 0)
+    //     .abs()
+    //     .roundToDouble();
+    // print(pPmt);
     setState(() {
       loanAmount = amount;
       totalPayment = (loanEMIAmount ?? 0) * (duration ?? 0);
@@ -54,7 +79,6 @@ class _EMICalculatorState extends State<EMICalculator> {
     });
   }
 
-  final formatter = new NumberFormat("#,###");
   bool isAllInputValid() {
     bool isValid = true;
     if (rate == null) {
@@ -151,6 +175,25 @@ class _EMICalculatorState extends State<EMICalculator> {
     });
   }
 
+  void _onDetailButtonTap() {
+    removeFocus();
+    if (data != null && data?.emiAmount != null) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (BuildContext context) {
+        return SIPProjetionList(
+          category: Screen.emi,
+          data: data!,
+        );
+      }));
+    }
+  }
+
+  @override
+  void initState() {
+    data = EMIData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,7 +219,9 @@ class _EMICalculatorState extends State<EMICalculator> {
                                 wealthGainTitle: StringConstants.totalPayment,
                                 totalExpectedAmount: loanEMIAmount,
                                 totalGainAmount: totalPayment,
-                                totalInvestedAmount: totalIntrestPayble),
+                                totalInvestedAmount: totalIntrestPayble,
+                                isDetail: true,
+                                onTapDetail: _onDetailButtonTap),
                           )
                         : Container(),
                     SizedBox(
