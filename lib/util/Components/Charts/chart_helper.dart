@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 enum SpotsType { amount, interest, withdrawal, balance }
 
 class ChartHelper {
-  static final ChartHelper shared = ChartHelper._internal();
   final Color withdrawalColor = const Color(0xff53fdd7);
   final Color startBalanceColor = const Color(0xffff5182);
   final Color interestEarnedColor = Colors.yellow;
   final Color finalBalanceColor = Colors.green;
   final double barWidth = 5;
   final double space = 10;
+  static final ChartHelper shared = ChartHelper._internal();
   factory ChartHelper() {
     return shared;
   }
@@ -422,7 +422,7 @@ class ChartHelper {
       double amount = 0;
       switch (type) {
         case SpotsType.amount:
-          amount = datalist?[i - 1].amount ?? 0;
+          amount = datalist?[tenor - 1].amount ?? 0;
           break;
         case SpotsType.interest:
           amount = datalist?[tenor - 1].cumulatveProfit ?? 0;

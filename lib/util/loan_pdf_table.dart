@@ -217,10 +217,6 @@ class LoanPDFCreator {
         font: ttf,
         fontWeight: pw.FontWeight.bold,
         color: PdfColor.fromHex("FFFFFF"));
-    bool isSwp = false;
-    if (category == Screen.swp) {
-      isSwp = true;
-    }
     return pw.Container(
       color: PdfColor.fromHex('212E51'),
       height: 60,
