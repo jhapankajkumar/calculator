@@ -20,6 +20,7 @@ class ExcelSheetCreator {
     bold: true,
     backgroundColorHex: '#212E51',
     fontColorHex: '#FFFFFF',
+    horizontalAlign: HorizontalAlign.Right,
     textWrapping: TextWrapping.WrapText,
     fontFamily: getFontFamily(FontFamily.Comic_Sans_MS),
     rotation: 0,
@@ -184,7 +185,7 @@ class ExcelSheetCreator {
     cell5.cellStyle = cellHeaderStyle;
 
     var cell7 = sheet.cell(CellIndex.indexByString("D1"));
-    cell7.value = "Total Payment/n(A + B)";
+    cell7.value = "Total Payment\n(A + B)";
     cell7.cellStyle = cellHeaderStyle;
 
     var cell9 = sheet.cell(CellIndex.indexByString("E1"));

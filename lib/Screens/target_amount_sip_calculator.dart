@@ -36,6 +36,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
   double? investedAmount;
   TextFieldFocus? currentFocus;
   double? stepUpPercentage;
+  double? lumpsumAmount;
+  double? targetAmount;
 
   _calculateTargetAmount() {
     var helper = UtilityHelper();
@@ -43,8 +45,15 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
         .getSIPAmount(
             amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
         .roundToDouble();
+    var lumpsum =
+        helper.getLumpsumValueAmount(amount ?? 0, rate ?? 0, period ?? 0, 1);
+
+    print(lumpsum);
     setState(() {
       sipAmount = montlyAmount;
+      lumpsumAmount = lumpsum;
+      print(lumpsumAmount);
+      targetAmount = amount;
       print(sipAmount);
       investedAmount = (sipAmount ?? 0) * (period ?? 0) * 12;
       wealthGain = (amount ?? 0) - (investedAmount ?? 0);
@@ -195,7 +204,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
                                 investedAmountTitle:
                                     StringConstants.investedAmount,
                                 wealthGainTitle: StringConstants.wealthGain,
-                                targetAmount: amount,
+                                targetAmount: targetAmount,
+                                lumpsum: lumpsumAmount,
                                 period: period,
                                 sipAmount: sipAmount,
                                 totalGainAmount: wealthGain,
@@ -208,7 +218,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
                       ),
                       buildGraphContainer(
                           context: context,
-                          totalExpectedAmount: amount,
+                          totalExpectedAmount: targetAmount,
                           totalGainAmount: wealthGain,
                           totalInvestedAmount: investedAmount,
                           gainTitle: StringConstants.wealthGain,

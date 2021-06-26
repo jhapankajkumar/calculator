@@ -15,7 +15,7 @@ import 'package:calculator/util/Components/pdf_table.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/investment_data.dart';
-import 'package:calculator/util/loan_pdf_table.dart';
+import 'package:calculator/util/Components/loan_pdf_table.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
@@ -228,11 +228,11 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       pdfFile.delete();
     }
 
-    // var excelFile = File('${directory.path}/GrowFundCalculator.xlsx');
-    // doesFileExist = await excelFile.exists();
-    // if (doesFileExist) {
-    //   excelFile.delete();
-    // }
+    var excelFile = File('${directory.path}/GrowFundCalculator.xlsx');
+    doesFileExist = await excelFile.exists();
+    if (doesFileExist) {
+      excelFile.delete();
+    }
   }
 
   Future<void> takeScreenShot() async {
@@ -293,10 +293,14 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
               Navigator.pop(context);
               takeScreenShot().then((value) async {
                 var imagePath = '${directory.path}/GrowFundCalculator.pdf';
-                shareItem(imagePath);
+                Future.delayed(const Duration(microseconds: 500), () {
+                  shareItem(imagePath);
+                });
               }).onError((error, stackTrace) {
                 var imagePath = '${directory.path}/GrowFundCalculator.pdf';
-                shareItem(imagePath);
+                Future.delayed(const Duration(microseconds: 500), () {
+                  shareItem(imagePath);
+                });
               });
             },
           ),
@@ -306,10 +310,14 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
               Navigator.pop(context);
               takeScreenShot().then((value) async {
                 var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
-                shareItem(imagePath);
+                Future.delayed(const Duration(microseconds: 500), () {
+                  shareItem(imagePath);
+                });
               }).onError((error, stackTrace) {
                 var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
-                shareItem(imagePath);
+                Future.delayed(const Duration(microseconds: 500), () {
+                  shareItem(imagePath);
+                });
               });
             },
           ),

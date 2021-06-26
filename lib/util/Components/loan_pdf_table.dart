@@ -7,6 +7,7 @@ import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image/image.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io' show Platform;
@@ -23,13 +24,18 @@ class LoanPDFCreator {
     var file = await localFile('GrowFundCalculator', 'pdf');
     var pdf = pw.Document();
     var imageData = await getImageData();
+
+    //Check for valid png
     if (imageData != null) {
-      var image = pw.MemoryImage(imageData);
-      pdf.addPage(pw.Page(build: (pw.Context context) {
-        return pw.Center(
-          child: pw.Image(image),
-        ); // Center
-      }));
+      PngDecoder png = PngDecoder();
+      if (png.isValidFile(imageData)) {
+        var image = pw.MemoryImage(imageData);
+        pdf.addPage(pw.Page(build: (pw.Context context) {
+          return pw.Center(
+            child: pw.Image(image),
+          ); // Center
+        }));
+      }
     }
 
     pw.Font? ttf;

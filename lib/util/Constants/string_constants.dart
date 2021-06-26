@@ -76,8 +76,9 @@ class StringConstants {
 
   static String amountInvested = "Amount Invested";
   static String monthlySIPRequired = 'Monthly SIP Required';
+  static String lumpsumRequired = 'Lumpsum Amount Required';
 
-  static String totalAmountInvestedInSIP = 'Total Amount Invested';
+  static String totalAmountInvestedInSIP = 'Total Amount Invested In SIP';
 
 //Future Value
   static String startingAmount = 'Starting Amount';

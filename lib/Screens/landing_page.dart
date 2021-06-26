@@ -11,7 +11,6 @@ import 'package:calculator/util/Constants/image_constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'fixed_deposite_calculator.dart';
 import 'retirement_calclutator.dart';
 
@@ -134,6 +133,18 @@ class _LandingPageState extends State<LandingPage> {
                       SizedBox(
                         height: 10,
                       ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.start,
+                      //   children: [
+                      //     Container(
+                      //       child: Center(
+                      //           child: Padding(
+                      //         padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),
+                      //         child: Text("Investments"),
+                      //       )),
+                      //     )
+                      //   ],
+                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -160,6 +171,18 @@ class _LandingPageState extends State<LandingPage> {
                       SizedBox(
                         height: 10,
                       ),
+                      // SizedBox(
+                      //   height: 30,
+                      // ),
+                      // Container(
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),
+                      //     child: Text(
+                      //       "Banking",
+                      //       textAlign: TextAlign.start,
+                      //     ),
+                      //   ),
+                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -197,7 +220,7 @@ class _LandingPageState extends State<LandingPage> {
                               ImageConstants.retirement, _retirementClicked),
                           buildSIPView(
                               context,
-                              StringConstants.targetAmount,
+                              "Goal",
                               ImageConstants.targetAmount,
                               _targetAmountClicked),
                         ],
@@ -217,12 +240,12 @@ class _LandingPageState extends State<LandingPage> {
         onTap();
       },
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(5),
         width: menuContainerSize,
         height: menuContainerSize,
         margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(32)),
+          borderRadius: BorderRadius.all(Radius.circular(24)),
           color: appTheme.primaryColor,
           boxShadow: [
             BoxShadow(

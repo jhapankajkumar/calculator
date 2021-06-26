@@ -94,6 +94,18 @@ class UtilityHelper {
     return value;
   }
 
+  double getLumpsumValueAmount(
+      double amount, double interestRate, double period, int compounding) {
+    if (interestRate == 0) {
+      return amount * period * 12;
+    }
+
+    double roi = interestRate / 100 / compounding;
+    num power = pow(1 + roi, compounding * (period));
+    double value = amount / power;
+    return value;
+  }
+
   double getInstallmentAmount(double amount, double period, double rate) {
     double fVal = 0;
     double pVal = amount;

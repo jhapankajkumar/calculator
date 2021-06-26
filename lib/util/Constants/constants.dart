@@ -18,8 +18,9 @@ double captionFontSize = device == DeviceType.Phone ? 12 : 20;
 double subTtitleFontSize = device == DeviceType.Phone ? 16 : 24;
 double indicatorFontSize = device == DeviceType.Phone ? 12 : 26;
 double bodyText1FontSize = device == DeviceType.Phone ? 20 : 28;
-double bodyText2FontSize = device == DeviceType.Phone ? 18 : 26;
+double bodyText2FontSize = device == DeviceType.Phone ? 14 : 26;
 double calculateButtonFont = device == DeviceType.Phone ? 20 : 28;
+double menuFontSize = device == DeviceType.Phone ? 10 : 20;
 
 //ComponentsR
 double menuContainerSize = device == DeviceType.Phone ? 120 : 220;
@@ -32,10 +33,11 @@ double textFieldContainerSize = device == DeviceType.Phone ? 50 : 80;
 
 Color ternaryColor = Color(0xffFA6A30);
 Color wealthColor = Color(0xff5c76bc);
+Color ascentColor = Color(0xff212E51);
 
 ThemeData appTheme = ThemeData(
   primaryColor: Color(0xffEFEFEF),
-  accentColor: Color(0xff212E51),
+  accentColor: ascentColor,
   fontFamily: 'Oxygen',
   scaffoldBackgroundColor: Color(0xffEFEFEF),
   brightness: Brightness.light,
@@ -47,11 +49,11 @@ ThemeData appTheme = ThemeData(
     bodyText2: TextStyle(
         fontSize: bodyText2FontSize,
         fontWeight: FontWeight.bold,
-        color: Color(0xff212E51)),
+        color: ascentColor),
     caption: TextStyle(
       fontSize: captionFontSize,
       fontWeight: FontWeight.bold,
-      color: Color(0xff212E51),
+      color: ascentColor,
     ),
     subtitle1: TextStyle(
         fontSize: subTtitleFontSize,
@@ -71,7 +73,7 @@ TextStyle subTitle1 = TextStyle(
 TextStyle subTitle2 = TextStyle(
     fontSize: subTtitleFontSize,
     fontWeight: FontWeight.bold,
-    color: Color(0xff212E51));
+    color: ascentColor);
 TextStyle caption3 = TextStyle(
   fontSize: captionFontSize,
   fontWeight: FontWeight.normal,
@@ -81,7 +83,7 @@ TextStyle caption3 = TextStyle(
 TextStyle caption2 = TextStyle(
   fontSize: captionFontSize,
   fontWeight: FontWeight.normal,
-  color: Color(0xff212E51),
+  color: ascentColor,
 );
 
 TextStyle captionHeader = TextStyle(

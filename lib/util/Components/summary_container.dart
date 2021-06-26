@@ -82,6 +82,41 @@ Widget? buildSummaryViews(
       : Container();
 }
 
+Widget? buildEMISummaryViews(
+    {double? loanAmount,
+    double? totalPaymentAmount,
+    double? totalInterestAmount,
+    double? emiAmount,
+    double? period,
+    bool? isDetail,
+    Function? onTapDetail}) {
+  return totalPaymentAmount != null
+      ? Column(
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            // EMI Amount
+            buildSummaryRow(emiAmount, StringConstants.loanEMI),
+            devider(),
+            // Invested Amount
+            buildSummaryRow(loanAmount, StringConstants.loanAmount),
+            devider(),
+            buildSummaryRow(
+                totalInterestAmount, StringConstants.totalInterestPayable),
+            devider(),
+            buildSummaryRow(totalPaymentAmount, StringConstants.totalPayment),
+            // Wealth Gain/Lost
+            SizedBox(height: 20),
+            isDetail != null
+                ? genericButton(title: "Detail", onPress: onTapDetail)
+                : Container(),
+            SizedBox(height: 10),
+          ],
+        )
+      : Container();
+}
+
 Widget? buildTargetSummaryViews({
   required BuildContext context,
   required String expectedAmountTitle,
@@ -91,6 +126,7 @@ Widget? buildTargetSummaryViews({
   double? totalInvestedAmount,
   double? totalGainAmount,
   double? sipAmount,
+  double? lumpsum,
   double? targetAmount,
   double? period,
 }) {
@@ -108,6 +144,8 @@ Widget? buildTargetSummaryViews({
                 buildPeriodRow(period, StringConstants.futureInvestmentPeriod),
                 devider(),
                 buildSummaryRow(sipAmount, StringConstants.monthlySIPRequired),
+                devider(),
+                buildSummaryRow(lumpsum, StringConstants.lumpsumRequired),
                 devider(),
                 buildSummaryRow(totalInvestedAmount,
                     StringConstants.totalAmountInvestedInSIP),

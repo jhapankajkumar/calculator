@@ -211,15 +211,11 @@ class _EMICalculatorState extends State<EMICalculator> {
                     loanAmount != null
                         ? buildSummeryContainer(
                             context: context,
-                            child: buildSummaryViews(
-                                expectedAmountTitle:
-                                    summaryExpectedAmountTitle(widget.category),
-                                investedAmountTitle:
-                                    summaryInvestedAmountTitle(widget.category),
-                                wealthGainTitle: StringConstants.totalPayment,
-                                totalExpectedAmount: loanEMIAmount,
-                                totalGainAmount: totalPayment,
-                                totalInvestedAmount: totalIntrestPayble,
+                            child: buildEMISummaryViews(
+                                loanAmount: loanAmount,
+                                emiAmount: loanEMIAmount,
+                                totalPaymentAmount: totalPayment,
+                                totalInterestAmount: totalIntrestPayble,
                                 isDetail: true,
                                 onTapDetail: _onDetailButtonTap),
                           )

@@ -55,9 +55,6 @@ class _LoanChartViewState extends State<LoanChartView> {
   }
 
   BarChartGroupData makeGroupData(int x, double y1, double y2, double y3) {
-    print("Y1:$y1");
-    print("Y2:$y2");
-    print("Y3:${y1 - y2}");
     return BarChartGroupData(barsSpace: 2, x: x, barRods: [
       BarChartRodData(
         y: y1,
@@ -202,7 +199,6 @@ class _LoanChartViewState extends State<LoanChartView> {
     for (; i <= (data.period); i = i + interval.toInt()) {
       double amount = 0;
       amount = data.loanAmount;
-      print(amount);
       // print("Amount $amount");
       String sPoint = ((amount) / amountInterval).toStringAsFixed(4);
       list.add(double.parse(sPoint));
@@ -216,7 +212,7 @@ class _LoanChartViewState extends State<LoanChartView> {
       list.add(double.parse(sPoint));
     }
     list.forEach((element) {
-      print(element);
+      // print(element);
     });
     return list;
   }
@@ -229,7 +225,6 @@ class _LoanChartViewState extends State<LoanChartView> {
     for (; i <= (data.period); i = i + interval.toInt()) {
       double amount = 0;
       amount = datalist[i - 1].remainingLoanBalance;
-      print(i);
       // print("Amount $amount");
       String sPoint = ((amount) / amountInterval).toStringAsFixed(4);
       list.add(double.parse(sPoint));
@@ -243,7 +238,7 @@ class _LoanChartViewState extends State<LoanChartView> {
       list.add(double.parse(sPoint));
     }
     list.forEach((element) {
-      print(element);
+      // print(element);
     });
     return list;
   }
