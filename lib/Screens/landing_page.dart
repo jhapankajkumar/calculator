@@ -99,12 +99,11 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   void _retirementClicked() {
-    // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-    //   return RetirementCalculator(
-    //     title: StringConstants.retirementCalcualtor,
-    //     isSteupUp: false,
-    //   );
-    // }));
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return RetirementCalculator(
+        category: Screen.retirement,
+      );
+    }));
   }
 
   void _emiClicked() {

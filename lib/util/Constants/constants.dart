@@ -21,6 +21,7 @@ double bodyText1FontSize = device == DeviceType.Phone ? 20 : 28;
 double bodyText2FontSize = device == DeviceType.Phone ? 14 : 26;
 double calculateButtonFont = device == DeviceType.Phone ? 20 : 28;
 double menuFontSize = device == DeviceType.Phone ? 10 : 20;
+double headerFontSize = device == DeviceType.Phone ? 30 : 40;
 
 //ComponentsR
 double menuContainerSize = device == DeviceType.Phone ? 120 : 220;
@@ -98,10 +99,24 @@ TextStyle buttonStyle = TextStyle(
   color: Colors.white,
 );
 
+TextStyle headerTitleStyle = TextStyle(
+  fontSize: headerFontSize,
+  fontWeight: FontWeight.bold,
+  color: ascentColor,
+);
+
+TextStyle headerValueStyle = TextStyle(
+  fontSize: headerFontSize,
+  fontWeight: FontWeight.bold,
+  color: ternaryColor,
+);
+
 int amountTextLimit = 16;
 int periodTextLimit = 3;
 int monthsLimit = 2;
 int interestRateTextLimit = 5;
+int ageLimit = 2;
+int expensLimit = 8;
 
 enum Screen {
   home,
@@ -117,5 +132,6 @@ enum Screen {
   pv,
   target,
   retirement,
+  retirementResult,
   detail,
 }

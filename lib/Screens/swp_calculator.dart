@@ -1,10 +1,7 @@
-import 'dart:ffi';
-import 'dart:math';
 import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
-import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
@@ -304,8 +301,10 @@ class _SWPCalculatorState extends State<SWPCalculator> {
         padding: EdgeInsets.all(16),
         margin: EdgeInsets.fromLTRB(8, 10, 8, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          //invested amount
           buildTextFieldContainerSection(
-            textFieldType: TextFieldFocus.investmentAmount,
+            textField: TextFieldFocus.investmentAmount,
+            textFieldType: TextFieldType.number,
             placeHolder: "500000000",
             textLimit: amountTextLimit,
             containerTitle: "Total Invstment",
@@ -315,8 +314,10 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onDoneButtonTapped: _onDoneButtonTapped,
           ),
           SizedBox(height: 20),
+          //withdrawal amount
           buildTextFieldContainerSection(
-            textFieldType: TextFieldFocus.amount,
+            textField: TextFieldFocus.amount,
+            textFieldType: TextFieldType.number,
             placeHolder: "5000",
             textLimit: amountTextLimit,
             containerTitle: amountTitle(widget.category),
@@ -326,8 +327,10 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onDoneButtonTapped: _onDoneButtonTapped,
           ),
           SizedBox(height: 20),
+          //period
           buildTextFieldContainerSection(
-            textFieldType: TextFieldFocus.period,
+            textField: TextFieldFocus.period,
+            textFieldType: TextFieldType.number,
             placeHolder: "12",
             textLimit: periodTextLimit,
             containerTitle: periodTitle(widget.category),
@@ -337,8 +340,10 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onDoneButtonTapped: _onDoneButtonTapped,
           ),
           SizedBox(height: 20),
+          //return rate
           buildTextFieldContainerSection(
-            textFieldType: TextFieldFocus.interestRate,
+            textField: TextFieldFocus.interestRate,
+            textFieldType: TextFieldType.decimal,
             placeHolder: "10",
             textLimit: interestRateTextLimit,
             containerTitle: interestRateTitle(widget.category),

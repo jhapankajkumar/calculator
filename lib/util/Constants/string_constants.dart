@@ -10,6 +10,7 @@ class StringConstants {
   static String rdCalculator = 'Recurring Deposit Calculator';
   static String targetAmountCalculator = 'Target Amount Calculator';
   static String retirementCalcualtor = 'Retirement Calculator';
+  static String retirementResult = 'Retirement Amount';
   static String emiCalcualtor = 'EMI Calculator';
 
   //Landing Page calcualtors

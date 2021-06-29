@@ -260,7 +260,8 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         margin: EdgeInsets.fromLTRB(8, 10, 8, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           buildTextFieldContainerSection(
-            textFieldType: TextFieldFocus.amount,
+            textField: TextFieldFocus.amount,
+            textFieldType: TextFieldType.number,
             placeHolder: "5000",
             textLimit: amountTextLimit,
             containerTitle: amountTitle(widget.category),
@@ -273,7 +274,8 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           Row(mainAxisSize: MainAxisSize.max, children: [
             Expanded(
               child: buildTextFieldContainerSection(
-                textFieldType: TextFieldFocus.period,
+                textField: TextFieldFocus.period,
+                textFieldType: TextFieldType.number,
                 placeHolder: "12",
                 textLimit: periodTextLimit,
                 containerTitle: periodTitle(widget.category),
@@ -325,7 +327,8 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           ]),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
-            textFieldType: TextFieldFocus.interestRate,
+            textField: TextFieldFocus.interestRate,
+            textFieldType: TextFieldType.decimal,
             placeHolder: "10",
             textLimit: interestRateTextLimit,
             containerTitle: interestRateTitle(widget.category),
@@ -337,7 +340,8 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           SizedBox(height: 20),
           widget.category == Screen.stepup
               ? buildTextFieldContainerSection(
-                  textFieldType: TextFieldFocus.stepUp,
+                  textField: TextFieldFocus.stepUp,
+                  textFieldType: TextFieldType.decimal,
                   placeHolder: "10",
                   textLimit: interestRateTextLimit,
                   containerTitle:

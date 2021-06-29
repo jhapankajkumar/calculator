@@ -246,7 +246,8 @@ class _EMICalculatorState extends State<EMICalculator> {
         margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.amount,
+              textField: TextFieldFocus.amount,
+              textFieldType: TextFieldType.number,
               placeHolder: "50000000",
               textLimit: amountTextLimit,
               containerTitle: amountTitle(widget.category),
@@ -259,7 +260,8 @@ class _EMICalculatorState extends State<EMICalculator> {
             children: [
               Expanded(
                 child: buildTextFieldContainerSection(
-                    textFieldType: TextFieldFocus.period,
+                    textField: TextFieldFocus.period,
+                    textFieldType: TextFieldType.number,
                     placeHolder: "12",
                     textLimit: periodTextLimit,
                     containerTitle: periodTitle(widget.category),
@@ -306,7 +308,8 @@ class _EMICalculatorState extends State<EMICalculator> {
           ),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.interestRate,
+              textField: TextFieldFocus.interestRate,
+              textFieldType: TextFieldType.decimal,
               placeHolder: "10",
               textLimit: interestRateTextLimit,
               containerTitle: interestRateTitle(widget.category),

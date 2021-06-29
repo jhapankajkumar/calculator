@@ -349,7 +349,7 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('GrowFund'),
           content: SingleChildScrollView(
             child: ListBody(

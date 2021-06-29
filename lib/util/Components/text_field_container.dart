@@ -10,21 +10,23 @@ class TextFieldContainerData {
   final String? placeHolder;
   final Function? onTextChange;
   final Function? onFocusChanged;
+  final TextFieldType? textFieldType;
   final TextFieldFocus? textField;
   final TextFieldFocus? currentFocus;
   final int? textLimit;
-  final String? errorText;
+  final bool? isError;
   final Function? onDoneButtonTapped;
 
   TextFieldContainerData(
       {required this.placeHolder,
       required this.onTextChange,
       required this.onFocusChanged,
+      required this.textFieldType,
       required this.textField,
       required this.currentFocus,
       required this.textLimit,
       required this.onDoneButtonTapped,
-      this.errorText});
+      this.isError});
 }
 
 class TextFieldContainer extends StatefulWidget {
@@ -55,9 +57,7 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
       shouldShowClearButton = true;
     }
     AmountValidator validator = DecimalRegexValidator(source: decimalRegex);
-    if (widget.containerData.textField == TextFieldFocus.amount ||
-        widget.containerData.textField == TextFieldFocus.period ||
-        widget.containerData.textField == TextFieldFocus.investmentAmount) {
+    if (widget.containerData.textFieldType == TextFieldType.number) {
       validator = AmountRegexValidator(source: regexSource);
     }
     var container = Container(
@@ -68,10 +68,12 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
           color: Color(0xffEFEFEF),
           boxShadow: [
             BoxShadow(
-              color: widget.containerData.currentFocus == focusField
-                  ? Colors.blue
-                  : Colors.grey,
-              spreadRadius: 0,
+              color: widget.containerData.isError == true
+                  ? Colors.red
+                  : widget.containerData.currentFocus == focusField
+                      ? Colors.blue
+                      : Colors.grey,
+              spreadRadius: 1,
               blurRadius: 0,
               offset: Offset(0, 0), // changes position of shadow
             ),
@@ -96,15 +98,12 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
                       border: InputBorder.none,
                       hintText: widget.containerData.placeHolder,
                       hintStyle: TextStyle(color: Colors.grey[350]),
-                      errorText: widget.containerData.errorText,
                       alignLabelWithHint: true,
                       suffixIcon:
                           shouldShowClearButton ? _getClearButton() : null,
                     ),
-                    keyboardType: (widget.containerData.textField ==
-                                TextFieldFocus.amount ||
-                            widget.containerData.textField ==
-                                TextFieldFocus.period)
+                    keyboardType: (widget.containerData.textFieldType ==
+                            TextFieldType.number)
                         ? TextInputType.numberWithOptions(decimal: false)
                         : TextInputType.numberWithOptions(decimal: true),
                     style: appTheme.textTheme.subtitle2,
@@ -174,24 +173,27 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
   }
 }
 
-Widget buildTextFieldContainerSection({
-  required String placeHolder,
-  required TextFieldFocus textFieldType,
-  TextFieldFocus? focus,
-  required int textLimit,
-  required String containerTitle,
-  Function? onTextChange,
-  Function? onFocusChange,
-  Function? onDoneButtonTapped,
-}) {
+Widget buildTextFieldContainerSection(
+    {required String placeHolder,
+    required TextFieldFocus textField,
+    TextFieldFocus? focus,
+    TextFieldType? textFieldType,
+    required int textLimit,
+    required String containerTitle,
+    Function? onTextChange,
+    Function? onFocusChange,
+    Function? onDoneButtonTapped,
+    bool? isError}) {
   TextFieldContainerData data = TextFieldContainerData(
       placeHolder: placeHolder,
       onTextChange: onTextChange,
       onFocusChanged: onFocusChange,
-      textField: textFieldType,
+      textField: textField,
+      textFieldType: textFieldType,
       currentFocus: focus,
       textLimit: textLimit,
-      onDoneButtonTapped: onDoneButtonTapped);
+      onDoneButtonTapped: onDoneButtonTapped,
+      isError: isError);
   return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -45,8 +45,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
         .getSIPAmount(
             amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
         .roundToDouble();
-    var lumpsum =
-        helper.getLumpsumValueAmount(amount ?? 0, rate ?? 0, period ?? 0, 1);
+    var lumpsum = helper.getLumpsumValueAmount(
+        amount ?? 0, rate ?? 0, period ?? 0, 1, null, false);
 
     print(lumpsum);
     setState(() {
@@ -239,7 +239,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
         margin: EdgeInsets.fromLTRB(8, 20, 8, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.amount,
+              textField: TextFieldFocus.amount,
+              textFieldType: TextFieldType.number,
               placeHolder: "100000000",
               textLimit: amountTextLimit,
               containerTitle: StringConstants.futureTargetAmout,
@@ -249,7 +250,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.period,
+              textField: TextFieldFocus.period,
+              textFieldType: TextFieldType.number,
               placeHolder: "12 Years",
               textLimit: periodTextLimit,
               containerTitle: StringConstants.futureAmountInvestmentPeriod,
@@ -259,7 +261,8 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               onDoneButtonTapped: _onDoneButtonTapped),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
-              textFieldType: TextFieldFocus.interestRate,
+              textField: TextFieldFocus.interestRate,
+              textFieldType: TextFieldType.decimal,
               placeHolder: "10",
               textLimit: interestRateTextLimit,
               containerTitle: StringConstants.expectedReturn,

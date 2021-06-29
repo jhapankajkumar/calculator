@@ -63,7 +63,7 @@ class UtilityHelper {
   double getSIPAmount(double amount, double interestRate, double period,
       double? inflationRate, bool isMonthlyInvestment, bool adjustInflation) {
     if (adjustInflation && inflationRate != null) {
-      interestRate = interestRate - inflationRate;
+      interestRate = (1 + interestRate) / (1 + inflationRate) - 1;
     }
     if (isMonthlyInvestment) {
       period = period / 12;
@@ -77,8 +77,8 @@ class UtilityHelper {
     double sipAmount =
         ((amount * roi) / ((1 + roi) * (power - 1))).roundToDouble();
     double value = (((power - 1) * (sipAmount)) / roi) * (1 + roi);
-    print(sipAmount);
-    print(value);
+    // print(sipAmount);
+    // print(value);
     return sipAmount;
   }
 
@@ -95,7 +95,15 @@ class UtilityHelper {
   }
 
   double getLumpsumValueAmount(
-      double amount, double interestRate, double period, int compounding) {
+      double amount,
+      double interestRate,
+      double period,
+      int compounding,
+      double? inflationRate,
+      bool adjustInflation) {
+    if (adjustInflation && inflationRate != null) {
+      interestRate = (1 + interestRate) / (1 + inflationRate) - 1;
+    }
     if (interestRate == 0) {
       return amount * period * 12;
     }
@@ -145,6 +153,22 @@ class UtilityHelper {
   double ppmt(double r, int per, int nper, double pv, double fv, int type) {
     return pmt(r, nper, pv, fv, type) - ipmt(r, per, nper, pv, fv, type);
   }
+
+  double pv(rate, periods, payment, future, type) {
+    // Initialize type
+    var type = 1;
+
+    // Return present value
+    if (rate == 0) {
+      return -payment * periods - future;
+    } else {
+      return (((1 - pow(1 + rate, periods)) / rate) *
+                  payment *
+                  (1 + rate * type) -
+              future) /
+          pow(1 + rate, periods);
+    }
+  }
 }
 
 // ignore: non_constant_identifier_names
@@ -175,7 +199,18 @@ enum TextFieldFocus {
   months,
   interestRate,
   inflationrate,
-  stepUp
+  stepUp,
+
+  age,
+  retirementAge,
+  lifeExpectancy,
+  roi,
+  expenses,
+}
+
+enum TextFieldType {
+  number,
+  decimal,
 }
 
 String headerTitle(Screen category) {
@@ -213,6 +248,9 @@ String headerTitle(Screen category) {
       break;
     case Screen.retirement:
       headerTitle = StringConstants.retirementCalcualtor;
+      break;
+    case Screen.retirementResult:
+      headerTitle = StringConstants.retirementResult;
       break;
     default:
   }
