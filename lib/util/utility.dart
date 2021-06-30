@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:calculator/util/Constants/constants.dart';
@@ -441,4 +442,21 @@ Widget messageView(String message) {
           style: subTitle1,
         ),
       ));
+}
+
+String getAppUrl() {
+  if (Platform.isAndroid) {
+    return 'https://play.google.com/store/apps/details?id=com.appstack.fincal';
+  } else if (Platform.isIOS) {
+    return 'https://apps.apple.com/us/app/growfund/id1570488777';
+  }
+  return "";
+}
+
+String getiPhoneAppUrl() {
+  return 'https://apps.apple.com/us/app/growfund/id1570488777';
+}
+
+String getAndroidAppUrl() {
+  return 'https://play.google.com/store/apps/details?id=com.appstack.fincal';
 }

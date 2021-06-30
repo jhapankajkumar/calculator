@@ -61,8 +61,9 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         .getFutureValueAmount(
             currentInvestments ?? 0, expectedROI ?? 0, period.toDouble(), 1)
         .roundToDouble();
-    double? interestRate =
-        (1 + (expectedRORetirement! / 100)) / (1 + (inflationrate! / 100)) - 1;
+    double? interestRate = (1 + (expectedRORetirement! / 100)) /
+            (1 + ((inflationrate ?? 0) / 100)) -
+        1;
 
     print(interestRate);
     retirementCorpus = helper.pv(

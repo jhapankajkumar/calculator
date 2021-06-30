@@ -26,6 +26,7 @@ double headerFontSize = device == DeviceType.Phone ? 30 : 40;
 //ComponentsR
 double menuContainerSize = device == DeviceType.Phone ? 120 : 220;
 double menuImageSize = device == DeviceType.Phone ? 60 : 120;
+double shareImageSize = device == DeviceType.Phone ? 45 : 80;
 double chartSectionSize = device == DeviceType.Phone ? 150 : 300;
 double chartRadisuSize = device == DeviceType.Phone ? 75 : 150;
 double indicatorSize = device == DeviceType.Phone ? 16 : 32;

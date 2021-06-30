@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'dart:io' show Platform;
 
 class PDFCreator {
   static final PDFCreator shared = PDFCreator._internal();
@@ -307,19 +306,10 @@ class UrlText extends pw.StatelessWidget {
   UrlText(this.text);
   final String text;
 
-  String getUrl() {
-    if (Platform.isAndroid) {
-      return 'https://play.google.com/store/apps/details?id=com.appstack.fincal';
-    } else if (Platform.isIOS) {
-      return 'https://apps.apple.com/us/app/growfund/id1570488777';
-    }
-    return "";
-  }
-
   @override
   pw.Widget build(pw.Context context) {
     return pw.UrlLink(
-      destination: getUrl(),
+      destination: getAppUrl(),
       child: pw.Text(text,
           style: pw.TextStyle(
             //decoration: pw.TextDecoration.underline,

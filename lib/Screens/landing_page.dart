@@ -6,11 +6,15 @@ import 'package:calculator/Screens/swp_calculator.dart';
 import 'package:calculator/Screens/target_amount_sip_calculator.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
+import 'package:calculator/util/Components/directory.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/image_constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
+import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:social_share/social_share.dart';
 import 'fixed_deposite_calculator.dart';
 import 'retirement_calclutator.dart';
 
@@ -114,6 +118,7 @@ class _LandingPageState extends State<LandingPage> {
     }));
   }
 
+  ScreenshotController screenshotController = ScreenshotController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,23 +132,11 @@ class _LandingPageState extends State<LandingPage> {
                   scrollDirection: Axis.vertical,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
                         height: 10,
                       ),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.start,
-                      //   children: [
-                      //     Container(
-                      //       child: Center(
-                      //           child: Padding(
-                      //         padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),
-                      //         child: Text("Investments"),
-                      //       )),
-                      //     )
-                      //   ],
-                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -170,18 +163,6 @@ class _LandingPageState extends State<LandingPage> {
                       SizedBox(
                         height: 10,
                       ),
-                      // SizedBox(
-                      //   height: 30,
-                      // ),
-                      // Container(
-                      //   child: Padding(
-                      //     padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),
-                      //     child: Text(
-                      //       "Banking",
-                      //       textAlign: TextAlign.start,
-                      //     ),
-                      //   ),
-                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -225,7 +206,73 @@ class _LandingPageState extends State<LandingPage> {
                         ],
                       ),
                       SizedBox(
-                        height: 30,
+                        height: 50,
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
+                          child: Text(
+                            "Found Interesting?   Share Now",
+                            style: subTitle2,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            padding: EdgeInsets.all(0),
+                            icon: Image.asset('assets/images/twitter.png'),
+                            iconSize: shareImageSize,
+                            onPressed: () {
+                              SocialShare.shareTwitter(
+                                "I found this cool application. Let me recommend you this.",
+                                hashtags: [
+                                  "finance",
+                                  "calculator",
+                                  "sip",
+                                  "emi",
+                                  "loan",
+                                  "financecalculator",
+                                  "\n"
+                                ],
+                                url: '${getiPhoneAppUrl()}',
+                              );
+                            },
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.all(0),
+                            icon: Image.asset('assets/images/whatsapp.png'),
+                            iconSize: shareImageSize,
+                            onPressed: () {
+                              SocialShare.shareWhatsapp(
+                                  "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
+                            },
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.all(0),
+                            icon: Image.asset('assets/images/telegram.png'),
+                            iconSize: shareImageSize,
+                            onPressed: () {
+                              SocialShare.shareTelegram(
+                                  "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
+                            },
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 50,
                       ),
                     ],
                   ))),
