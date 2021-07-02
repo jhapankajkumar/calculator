@@ -2,6 +2,7 @@ import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/error_message_view.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
@@ -12,6 +13,7 @@ import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 class SIPCalculator extends StatefulWidget {
   SIPCalculator({Key? key, required this.category}) : super(key: key);
@@ -33,10 +35,14 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   double? investedAmount;
   TextFieldFocus? currentFocus;
   double? stepUpPercentage;
-
+  TextEditingController? controller;
   String? errorText;
   SIPResult? data;
   Period? periodValue = Period.years;
+
+  bool invalidPeriod = false;
+  bool invalidInterest = false;
+  bool invalidStepup = false;
 
   _calculateSIP() {
     double? duration = 0;
@@ -71,6 +77,15 @@ class _SIPCalculatorState extends State<SIPCalculator> {
     if (period == null) {
       isValid = false;
     }
+    if (invalidPeriod == true) {
+      isValid = false;
+    }
+    if (invalidInterest == true) {
+      isValid = false;
+    }
+    if (invalidStepup == true) {
+      isValid = false;
+    }
     return isValid;
   }
 
@@ -94,9 +109,6 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           amount = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
         } else {
           amount = null;
         }
@@ -107,24 +119,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           period = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
+          validatePeriod();
         } else {
           period = null;
-        }
-      });
-    }
-
-    if (textField == TextFieldFocus.period) {
-      setState(() {
-        if (inputtedValue > 0) {
-          months = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
-        } else {
-          months = null;
         }
       });
     }
@@ -133,9 +130,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           rate = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
+          validateInterest();
         } else {
           rate = null;
         }
@@ -146,6 +141,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           stepUpPercentage = inputtedValue;
+          validateStepup();
           // if (isAllInputValid()) {
           //   _calculateSIP();
           // }
@@ -156,11 +152,58 @@ class _SIPCalculatorState extends State<SIPCalculator> {
     }
   }
 
+  void validatePeriod() {
+    setState(() {
+      if (periodValue == Period.months &&
+          (period ?? 0) > periodMonthsMaxValue) {
+        invalidPeriod = true;
+      } else if (periodValue == Period.years &&
+          (period ?? 0) > periodYearMaxValue) {
+        invalidPeriod = true;
+      } else {
+        invalidPeriod = false;
+      }
+    });
+  }
+
+  void validateInterest() {
+    setState(() {
+      if ((rate ?? 0) > interestRateMaxValue) {
+        invalidInterest = true;
+      } else {
+        invalidInterest = false;
+      }
+    });
+  }
+
+  void validateStepup() {
+    setState(() {
+      if ((stepUpPercentage ?? 0) > interestRateMaxValue) {
+        invalidStepup = true;
+      } else {
+        invalidStepup = false;
+      }
+    });
+  }
+
   _onFocusChange(TextFieldFocus? textField, bool value) {
+    print('object');
     if (value == true) {
       setState(() {
         currentFocus = textField;
       });
+    } else {
+      if (Platform.isAndroid) {
+        removeFocus();
+      }
+
+      if (textField == TextFieldFocus.period) {
+        validatePeriod();
+      } else if (textField == TextFieldFocus.interestRate) {
+        validateInterest();
+      } else if (textField == TextFieldFocus.stepUp) {
+        validateStepup();
+      }
     }
   }
 
@@ -192,6 +235,17 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   _onOptionChange(Period? value) {
     setState(() {
       periodValue = value;
+      if (period != null) {
+        if (periodValue == Period.years) {
+          period = ((period ?? 0) ~/ 12).toDouble();
+          controller?.text = (period ?? 0).toInt().toString();
+        } else {
+          period = (period ?? 0) * 12;
+          controller?.text = (period ?? 0).toInt().toString();
+        }
+        validatePeriod();
+      }
+
       if (isAllInputValid()) {
         _calculateButtonTapped();
       }
@@ -202,6 +256,12 @@ class _SIPCalculatorState extends State<SIPCalculator> {
     setState(() {
       removeFocus();
     });
+  }
+
+  @override
+  void initState() {
+    controller = TextEditingController();
+    super.initState();
   }
 
   @override
@@ -274,16 +334,18 @@ class _SIPCalculatorState extends State<SIPCalculator> {
           Row(mainAxisSize: MainAxisSize.max, children: [
             Expanded(
               child: buildTextFieldContainerSection(
-                textField: TextFieldFocus.period,
-                textFieldType: TextFieldType.number,
-                placeHolder: "12",
-                textLimit: periodTextLimit,
-                containerTitle: periodTitle(widget.category),
-                focus: currentFocus,
-                onFocusChange: _onFocusChange,
-                onTextChange: _onTextChange,
-                onDoneButtonTapped: _onDoneButtonTapped,
-              ),
+                  initialText: period.toString(),
+                  textField: TextFieldFocus.period,
+                  textFieldType: TextFieldType.number,
+                  placeHolder: "12",
+                  textLimit: periodTextLimit,
+                  containerTitle: periodTitle(widget.category),
+                  focus: currentFocus,
+                  onFocusChange: _onFocusChange,
+                  onTextChange: _onTextChange,
+                  onDoneButtonTapped: _onDoneButtonTapped,
+                  controller: controller,
+                  isError: invalidPeriod),
             ),
             (widget.category == Screen.sip || widget.category == Screen.rd)
                 ? SizedBox(
@@ -325,6 +387,9 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                       ])
                 : Container()
           ]),
+          invalidPeriod == true
+              ? buildErrorView(ErrorType.maxPeriodYears)
+              : Container(),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
             textField: TextFieldFocus.interestRate,
@@ -336,7 +401,13 @@ class _SIPCalculatorState extends State<SIPCalculator> {
             onFocusChange: _onFocusChange,
             onTextChange: _onTextChange,
             onDoneButtonTapped: _onDoneButtonTapped,
+            isError: invalidInterest,
           ),
+          invalidInterest == true
+              ? buildErrorView(widget.category == Screen.rd
+                  ? ErrorType.maxInterestRate
+                  : ErrorType.maxReturnRate)
+              : Container(),
           SizedBox(height: 20),
           widget.category == Screen.stepup
               ? buildTextFieldContainerSection(
@@ -350,7 +421,11 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                   onFocusChange: _onFocusChange,
                   onTextChange: _onTextChange,
                   onDoneButtonTapped: _onDoneButtonTapped,
+                  isError: invalidStepup,
                 )
+              : Container(),
+          invalidStepup == true
+              ? buildErrorView(ErrorType.maxStepUpRate)
               : Container(),
           widget.category == Screen.stepup ? SizedBox(height: 20) : Container(),
           SizedBox(height: 20),

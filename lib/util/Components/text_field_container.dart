@@ -1,3 +1,4 @@
+import 'package:calculator/util/Components/error_message_view.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/InputValidator.dart/input_validator.dart';
 import 'package:calculator/util/utility.dart';
@@ -5,8 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'dart:io';
 
 class TextFieldContainerData {
+  final String? initialValue;
   final String? placeHolder;
   final Function? onTextChange;
   final Function? onFocusChanged;
@@ -16,9 +19,11 @@ class TextFieldContainerData {
   final int? textLimit;
   final bool? isError;
   final Function? onDoneButtonTapped;
+  final TextEditingController? controller;
 
   TextFieldContainerData(
-      {required this.placeHolder,
+      {this.initialValue,
+      required this.placeHolder,
       required this.onTextChange,
       required this.onFocusChanged,
       required this.textFieldType,
@@ -26,7 +31,8 @@ class TextFieldContainerData {
       required this.currentFocus,
       required this.textLimit,
       required this.onDoneButtonTapped,
-      this.isError});
+      this.isError,
+      this.controller});
 }
 
 class TextFieldContainer extends StatefulWidget {
@@ -45,7 +51,11 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController();
+    if (widget.containerData.controller == null) {
+      controller = TextEditingController();
+    } else {
+      controller = widget.containerData.controller;
+    }
     focusField = widget.containerData.textField;
   }
 
@@ -73,7 +83,7 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
                   : widget.containerData.currentFocus == focusField
                       ? Colors.blue
                       : Colors.grey,
-              spreadRadius: 1,
+              spreadRadius: widget.containerData.isError == true ? 1 : 0,
               blurRadius: 0,
               offset: Offset(0, 0), // changes position of shadow
             ),
@@ -144,37 +154,40 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
       keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
       keyboardBarColor: Colors.grey[200],
       nextFocus: false,
-      actions: [
-        KeyboardActionsItem(
-          focusNode: node,
-          toolbarButtons: [
-            //button 2
-            (node) {
-              return GestureDetector(
-                onTap: () {
-                  node.unfocus();
-                  if (widget.containerData.onDoneButtonTapped != null) {
-                    widget.containerData.onDoneButtonTapped!();
+      actions: Platform.isIOS
+          ? [
+              KeyboardActionsItem(
+                focusNode: node,
+                toolbarButtons: [
+                  //button 2
+                  (node) {
+                    return GestureDetector(
+                      onTap: () {
+                        node.unfocus();
+                        if (widget.containerData.onDoneButtonTapped != null) {
+                          widget.containerData.onDoneButtonTapped!();
+                        }
+                      },
+                      child: Container(
+                        color: Colors.transparent,
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "Done",
+                        ),
+                      ),
+                    );
                   }
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    "Done",
-                  ),
-                ),
-              );
-            }
-          ],
-        ),
-      ],
+                ],
+              ),
+            ]
+          : [],
     );
   }
 }
 
 Widget buildTextFieldContainerSection(
-    {required String placeHolder,
+    {String? initialText,
+    required String placeHolder,
     required TextFieldFocus textField,
     TextFieldFocus? focus,
     TextFieldType? textFieldType,
@@ -183,7 +196,9 @@ Widget buildTextFieldContainerSection(
     Function? onTextChange,
     Function? onFocusChange,
     Function? onDoneButtonTapped,
-    bool? isError}) {
+    bool? isError,
+    ErrorType? errorType,
+    TextEditingController? controller}) {
   TextFieldContainerData data = TextFieldContainerData(
       placeHolder: placeHolder,
       onTextChange: onTextChange,
@@ -193,7 +208,8 @@ Widget buildTextFieldContainerSection(
       currentFocus: focus,
       textLimit: textLimit,
       onDoneButtonTapped: onDoneButtonTapped,
-      isError: isError);
+      isError: isError,
+      controller: controller);
   return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,6 +222,6 @@ Widget buildTextFieldContainerSection(
           ),
         ),
         SizedBox(height: 10),
-        TextFieldContainer(containerData: data)
+        TextFieldContainer(containerData: data),
       ]);
 }

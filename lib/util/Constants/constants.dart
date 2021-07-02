@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'dart:io' show Platform;
-
 import 'package:flutter/widgets.dart';
 
 enum DeviceType { Phone, Tablet }
@@ -113,11 +110,30 @@ TextStyle headerValueStyle = TextStyle(
 );
 
 int amountTextLimit = 16;
-int periodTextLimit = 3;
+int periodTextLimit = 4;
 int monthsLimit = 2;
 int interestRateTextLimit = 5;
-int ageLimit = 2;
+int ageLimit = 3;
 int expensLimit = 8;
+int currentinvestmentLimit = 11;
+
+int periodYearMaxValue = 100;
+int periodMonthsMaxValue = 100 * 12;
+double interestRateMaxValue = 100;
+
+//EMI
+int loanPeriodYearMaxValue = 30;
+int loanPeriodMonthsMaxValue = 30 * 12;
+int loanMaxInterestValue = 30;
+int minCurrentAge = 15;
+int maxCurrentAge = 98;
+
+int minRetirementAge = 25;
+int maxRetirementAge = 99;
+int minLifeExpectancy = 30;
+int maxLifeExpectancy = 100;
+
+double maxInflationRate = 100;
 
 enum Screen {
   home,
@@ -135,4 +151,26 @@ enum Screen {
   retirement,
   retirementResult,
   detail,
+}
+
+enum ErrorType {
+  minAge,
+  maxAge,
+  minRetirementAge,
+  maxRetirementAge,
+  minLifeExpectancy,
+  maxLifeExpectancy,
+  invalidAge,
+  invalidRetirementAge,
+  invalidLifeExpectancy,
+  maxRetirementCorpusReturn,
+  maxLoanPeriodMonth,
+  maxLoanInterestRate,
+  maxLoanPeriodYear,
+  maxPeriodMonths,
+  maxPeriodYears,
+  maxInterestRate,
+  maxReturnRate,
+  maxStepUpRate,
+  maxInflationRate,
 }

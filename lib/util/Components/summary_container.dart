@@ -317,7 +317,9 @@ Widget buildSummaryRow(double? amount, String title) {
         child: ListTile(
           title: amount?.isInfinite == false
               ? Text(
-                  '\$${k_m_b_generator(amount ?? 0)}',
+                  (amount ?? 0) < 1
+                      ? '${amount?.toStringAsFixed(3)}'
+                      : '\$${k_m_b_generator(amount ?? 0)}',
                   textAlign: TextAlign.end,
                   style: subTitle1,
                 )

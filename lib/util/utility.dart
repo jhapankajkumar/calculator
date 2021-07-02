@@ -75,18 +75,17 @@ class UtilityHelper {
 
     double roi = interestRate / 100 / 12;
     num power = pow(1 + roi, 12 * (period));
-    double sipAmount =
-        ((amount * roi) / ((1 + roi) * (power - 1))).roundToDouble();
-    double value = (((power - 1) * (sipAmount)) / roi) * (1 + roi);
-    // print(sipAmount);
-    // print(value);
+    double sipAmount = ((amount * roi) / ((1 + roi) * (power - 1)));
+    if (sipAmount > 1) {
+      sipAmount = sipAmount.roundToDouble();
+    }
     return sipAmount;
   }
 
   double getFutureValueAmount(
       double amount, double interestRate, double period, int compounding) {
     if (interestRate == 0) {
-      return amount * period * 12;
+      return amount;
     }
 
     double roi = interestRate / 100 / compounding;
@@ -442,6 +441,49 @@ Widget messageView(String message) {
           style: subTitle1,
         ),
       ));
+}
+
+String getErrorMessageFromType(ErrorType errorType) {
+  switch (errorType) {
+    case ErrorType.minAge:
+      return StringConstants.mininumAge;
+    case ErrorType.maxAge:
+      return StringConstants.maxAge;
+    case ErrorType.minRetirementAge:
+      return StringConstants.mininumRetirementAge;
+    case ErrorType.maxRetirementAge:
+      return StringConstants.maxRetirementAge;
+    case ErrorType.minLifeExpectancy:
+      return StringConstants.minLifeExpectancyAge;
+    case ErrorType.maxLifeExpectancy:
+      return StringConstants.maxLifeExpectancyAge;
+    case ErrorType.invalidAge:
+      return StringConstants.invalidAgeText;
+    case ErrorType.invalidRetirementAge:
+      return StringConstants.invalidRetirementAgeText;
+    case ErrorType.invalidLifeExpectancy:
+      return StringConstants.invalidExpectancyText;
+    case ErrorType.maxRetirementCorpusReturn:
+      return StringConstants.maxReturnMessage;
+    case ErrorType.maxLoanPeriodMonth:
+      return StringConstants.maxLoanPeriod;
+    case ErrorType.maxLoanPeriodYear:
+      return StringConstants.maxLoanPeriod;
+    case ErrorType.maxLoanInterestRate:
+      return StringConstants.maxLoanInterestRate;
+    case ErrorType.maxPeriodMonths:
+      return StringConstants.maxPeriodMessage;
+    case ErrorType.maxPeriodYears:
+      return StringConstants.maxPeriodMessage;
+    case ErrorType.maxInterestRate:
+      return StringConstants.maxInterestMessage;
+    case ErrorType.maxReturnRate:
+      return StringConstants.maxReturnMessage;
+    case ErrorType.maxStepUpRate:
+      return StringConstants.maxStepUpMessage;
+    case ErrorType.maxInflationRate:
+      return StringConstants.maxInflationRateMessage;
+  }
 }
 
 String getAppUrl() {

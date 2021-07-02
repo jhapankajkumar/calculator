@@ -54,7 +54,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
     switch (widget.data.runtimeType) {
       case EMIData:
         emiData = widget.data as EMIData;
-        print(emiData.emiAmount);
         double loanAmount = emiData.loanAmount;
         List<InstalmentData> installments = [];
         var helper = UtilityHelper();
@@ -237,12 +236,6 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
 
   Future<void> takeScreenShot() async {
     var directory = await getApplicationDocumentsDirectory();
-    if (widget.category == Screen.emi) {
-      ExcelSheetCreator.shared
-          .createEMIDetailSheet(context, emiData, widget.category);
-    } else {
-      ExcelSheetCreator.shared.createExcel(context, result, widget.category);
-    }
     screenshotController.capture().then((Uint8List? image) async {
       setState(() async {
         if (image != null) {
@@ -308,17 +301,27 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
             child: const Text('Excel'),
             onPressed: () {
               Navigator.pop(context);
-              takeScreenShot().then((value) async {
-                var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
-                Future.delayed(const Duration(microseconds: 500), () {
-                  shareItem(imagePath);
+              if (widget.category == Screen.emi) {
+                ExcelSheetCreator.shared
+                    .createEMIDetailSheet(context, emiData, widget.category)
+                    .then((value) {
+                  var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
+                  Future.delayed(const Duration(microseconds: 500), () {
+                    shareItem(imagePath);
+                  });
+                }).onError((error, stackTrace) {
+                  _showErrorAlert();
                 });
-              }).onError((error, stackTrace) {
-                var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
-                Future.delayed(const Duration(microseconds: 500), () {
-                  shareItem(imagePath);
-                });
-              });
+              } else {
+                ExcelSheetCreator.shared
+                    .createExcel(context, result, widget.category)
+                    .then((value) {
+                  var imagePath = '${directory.path}/GrowFundCalculator.xlsx';
+                  Future.delayed(const Duration(microseconds: 500), () {
+                    shareItem(imagePath);
+                  });
+                }).onError((error, stackTrace) {});
+              }
             },
           ),
         ],

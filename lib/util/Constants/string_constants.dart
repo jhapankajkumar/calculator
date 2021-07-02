@@ -101,4 +101,29 @@ class StringConstants {
   static String totalWithdrawal = "Total Withdrwal";
   static String totalProfit = "Total Profit";
   static String balanceLeft = "Balance Left";
+
+  static String mininumAge = 'You must be 15 year old';
+  static String maxAge = 'Your age should not be more than 98';
+  static String mininumRetirementAge = 'Retirement age must be 25 or more';
+  static String maxRetirementAge = 'Retirement age should not be more than 99';
+  static String minLifeExpectancyAge = 'Life expectancy must be 30 or more';
+  static String maxLifeExpectancyAge = 'Life expectancy should be 100 or less';
+
+  static String invalidAgeText = 'Age must be less than retirement age';
+  static String invalidRetirementAgeText =
+      'Retirement age must be more than current age \nand less than life expectancy';
+  static String invalidExpectancyText =
+      'Life expectancy must be more than retirement age';
+
+  static String maxPeriodMessage = "Duration should not be more than 100 years";
+  static String maxInterestMessage =
+      "Rate of interest should be less than 100 %";
+  static String maxReturnMessage = "Rate of return should be less than 100 %";
+  static String maxInflationRateMessage =
+      "Inflation rate should be less than 100 %";
+  static String maxStepUpMessage = "Stepup rate should be less than 100 %";
+
+  static String maxLoanPeriod = "Loan period should not be more than 30 years";
+  static String maxLoanInterestRate =
+      "Loan interest rate should not be more than 30 %";
 }

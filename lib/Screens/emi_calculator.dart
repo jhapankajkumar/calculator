@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/error_message_view.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
@@ -12,7 +15,6 @@ import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class EMICalculator extends StatefulWidget {
   final Screen category;
@@ -35,7 +37,9 @@ class _EMICalculatorState extends State<EMICalculator> {
   TextFieldFocus? currentFocus;
   EMIData? data;
   Period? periodValue = Period.years;
-
+  bool isInvalidPeriod = false;
+  bool isInvalidInterest = false;
+  TextEditingController? controller;
   _calculateAmount() {
     removeFocus();
     double? duration = 0;
@@ -90,6 +94,12 @@ class _EMICalculatorState extends State<EMICalculator> {
     if (period == null) {
       isValid = false;
     }
+    if (isInvalidPeriod) {
+      isValid = false;
+    }
+    if (isInvalidInterest) {
+      isValid = false;
+    }
     return isValid;
   }
 
@@ -113,6 +123,7 @@ class _EMICalculatorState extends State<EMICalculator> {
       setState(() {
         if (inputtedValue > 0) {
           period = inputtedValue;
+          validatePeriod();
         } else {
           period = null;
         }
@@ -123,6 +134,7 @@ class _EMICalculatorState extends State<EMICalculator> {
       setState(() {
         if (inputtedValue > 0) {
           rate = inputtedValue;
+          validateInterest();
         } else {
           rate = null;
         }
@@ -130,11 +142,44 @@ class _EMICalculatorState extends State<EMICalculator> {
     }
   }
 
+  void validatePeriod() {
+    setState(() {
+      if (periodValue == Period.months &&
+          (period ?? 0) > loanPeriodMonthsMaxValue) {
+        isInvalidPeriod = true;
+      } else if (periodValue == Period.years &&
+          (period ?? 0) > loanPeriodYearMaxValue) {
+        isInvalidPeriod = true;
+      } else {
+        isInvalidPeriod = false;
+      }
+    });
+  }
+
+  void validateInterest() {
+    setState(() {
+      if ((rate ?? 0) > loanMaxInterestValue) {
+        isInvalidInterest = true;
+      } else {
+        isInvalidInterest = false;
+      }
+    });
+  }
+
   _onFocusChange(TextFieldFocus? textField, bool value) {
     if (value == true) {
       setState(() {
         currentFocus = textField;
       });
+    } else {
+      if (Platform.isAndroid) {
+        removeFocus();
+      }
+      if (textField == TextFieldFocus.period) {
+        validatePeriod();
+      } else if (textField == TextFieldFocus.interestRate) {
+        validateInterest();
+      }
     }
   }
 
@@ -169,6 +214,16 @@ class _EMICalculatorState extends State<EMICalculator> {
   _onOptionChange(Period? value) {
     setState(() {
       periodValue = value;
+      if (period != null) {
+        if (periodValue == Period.years) {
+          period = ((period ?? 0) ~/ 12).toDouble();
+          controller?.text = (period ?? 0).toInt().toString();
+        } else {
+          period = (period ?? 0) * 12;
+          controller?.text = (period ?? 0).toInt().toString();
+        }
+        validatePeriod();
+      }
       if (isAllInputValid()) {
         _calculateButtonTapped();
       }
@@ -191,6 +246,7 @@ class _EMICalculatorState extends State<EMICalculator> {
   @override
   void initState() {
     data = EMIData();
+    controller = TextEditingController();
     super.initState();
   }
 
@@ -268,7 +324,9 @@ class _EMICalculatorState extends State<EMICalculator> {
                     focus: currentFocus,
                     onFocusChange: _onFocusChange,
                     onTextChange: _onTextChange,
-                    onDoneButtonTapped: _onDoneButtonTapped),
+                    onDoneButtonTapped: _onDoneButtonTapped,
+                    isError: isInvalidPeriod,
+                    controller: controller),
               ),
               SizedBox(
                 width: 10,
@@ -306,6 +364,9 @@ class _EMICalculatorState extends State<EMICalculator> {
                   ])
             ],
           ),
+          isInvalidPeriod == true
+              ? buildErrorView(ErrorType.maxLoanPeriodYear)
+              : Container(),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textField: TextFieldFocus.interestRate,
@@ -316,7 +377,11 @@ class _EMICalculatorState extends State<EMICalculator> {
               focus: currentFocus,
               onFocusChange: _onFocusChange,
               onTextChange: _onTextChange,
-              onDoneButtonTapped: _onDoneButtonTapped),
+              onDoneButtonTapped: _onDoneButtonTapped,
+              isError: isInvalidInterest),
+          isInvalidInterest == true
+              ? buildErrorView(ErrorType.maxLoanInterestRate)
+              : Container(),
           SizedBox(height: 40),
           Row(children: [
             Expanded(

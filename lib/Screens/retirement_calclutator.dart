@@ -2,11 +2,11 @@ import 'package:calculator/Screens/retirement_detail.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/error_message_view.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/retirement_data.dart';
-import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,9 +35,9 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
   double? expectedRORetirement;
   double? inflationrate;
   TextFieldFocus? currentFocus;
-  bool? invalidAge;
-  bool? invalidRetirementAge;
-  bool? invalidLifeExpectancy;
+  bool invalidAge = false;
+  bool invalidRetirementAge = false;
+  bool invalidLifeExpectancy = false;
 
   double? futureInvestmentValue;
   double? futureMonthlyExpenses;
@@ -45,8 +45,14 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
   double? retirementCorpus;
   double? sipAmount;
   double? lumpsumAmount;
-
+  ErrorType? ageErrorType;
+  ErrorType? retirementAgeErrorType;
+  ErrorType? lifeExpecancyErrorType;
   RetirementResult result = RetirementResult();
+
+  bool isInvalidInflation = false;
+  bool isInvalidReturn = false;
+  bool isInvalidReturnOnCorpus = false;
 
   _calculateSIP() {
     var helper = UtilityHelper();
@@ -68,10 +74,10 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     print(interestRate);
     retirementCorpus = helper.pv(
         interestRate, lifePeriod, -(futureMonthlyExpenses! * 12), 0, 1);
-    print('Corpus $retirementCorpus');
+    // print('Corpus $retirementCorpus');
     result.corpusAmount = retirementCorpus ?? 0;
     retirementCorpus = (retirementCorpus ?? 0) - (futureInvestmentValue ?? 0);
-    print('Corpus $retirementCorpus');
+    // print('Corpus $retirementCorpus');
     sipAmount = helper.getSIPAmount(
         retirementCorpus ?? 0,
         expectedRORetirement ?? 0,
@@ -79,15 +85,15 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         inflationrate ?? 0,
         false,
         false);
-
+    print(sipAmount);
     lumpsumAmount = helper.getLumpsumValueAmount(retirementCorpus ?? 0,
         expectedRORetirement ?? 0, period.toDouble(), 1, null, false);
 
-    print('Your Future monthly expenses $futureMonthlyExpenses \n');
-    print('Your Future Investment Value $futureInvestmentValue \n');
-    print('Amount needed for retirement $retirementCorpus \n');
-    print('SIP needed for retirement $sipAmount \n');
-    print('Lumpsum needed for retirement $lumpsumAmount \n');
+    // print('Your Future monthly expenses $futureMonthlyExpenses \n');
+    // print('Your Future Investment Value $futureInvestmentValue \n');
+    // print('Amount needed for retirement $retirementCorpus \n');
+    // print('SIP needed for retirement $sipAmount \n');
+    // print('Lumpsum needed for retirement $lumpsumAmount \n');
     result.period = period;
     result.currentExpenses = currentExpenses ?? 0;
     result.futureExpenses = futureMonthlyExpenses ?? 0;
@@ -108,26 +114,21 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
 
   bool isAllInputValid() {
     bool isValid = true;
-    if (age == null) {
-      isValid = false;
-    }
-    if (retirementAge == null) {
-      isValid = false;
-    }
-
-    if (lifeExpectancy == null) {
+    if (age == null ||
+        retirementAge == null ||
+        lifeExpectancy == null ||
+        expectedRORetirement == null ||
+        currentExpenses == null) {
       isValid = false;
     }
 
-    if ((retirementAge ?? 0) <= (age ?? 0)) {
+    if (isInvalidInflation || isInvalidReturn || isInvalidReturnOnCorpus) {
       isValid = false;
     }
 
-    if ((lifeExpectancy ?? 0) <= (age ?? 0)) {
-      isValid = false;
-    }
-
-    if (expectedRORetirement == null) {
+    if (ageErrorType != null ||
+        retirementAgeErrorType != null ||
+        lifeExpecancyErrorType != null) {
       isValid = false;
     }
 
@@ -144,7 +145,6 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     }
     if (textField == TextFieldFocus.age) {
       setState(() {
-        print(inputtedIntValue);
         if (inputtedIntValue > 0) {
           age = inputtedIntValue;
         } else {
@@ -197,6 +197,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           expectedROI = inputtedValue;
+          validateROI();
         } else {
           expectedROI = null;
         }
@@ -207,6 +208,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           expectedRORetirement = inputtedValue;
+          validateROR();
         } else {
           expectedRORetirement = null;
         }
@@ -217,6 +219,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           inflationrate = inputtedValue;
+          validateInflation();
         } else {
           inflationrate = null;
         }
@@ -225,131 +228,171 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
   }
 
   _onFocusChange(TextFieldFocus? textField, bool value) {
-    // if (textField == TextFieldFocus.age) {
-    //   //resigning responder
-    //   if (value == false) {
-    //     if (retirementAge != null && age != null) {
-    //       if (retirementAge! <= age!) {
-    //         // showAlert('Your age should be less than retirement age.');
-    //         setState(() {
-    //           invalidAge = true;
-    //         });
-    //       } else {
-    //         setState(() {
-    //           invalidAge = false;
-    //           invalidRetirementAge = false;
-    //         });
-    //       }
-    //     } else if (lifeExpectancy != null && age != null) {
-    //       if (lifeExpectancy! <= age!) {
-    //         setState(() {
-    //           invalidAge = true;
-    //         });
-    //         // showAlert('Your age should be less than lifeExpectancy.');
-    //       } else {
-    //         setState(() {
-    //           invalidAge = false;
-    //           invalidLifeExpectancy = false;
-    //         });
-    //       }
-    //     }
-    //   }
-    // } else if (textField == TextFieldFocus.retirementAge) {
-    //   //resigning responder
-    //   if (value == false) {
-    //     if (retirementAge != null && age != null) {
-    //       if (retirementAge! <= age!) {
-    //         setState(() {
-    //           invalidRetirementAge = true;
-    //         });
-    //         // showAlert('Retirement age should be more than current age.');
-    //       } else {
-    //         setState(() {
-    //           invalidRetirementAge = false;
-    //           invalidAge = false;
-    //         });
-    //       }
-    //     } else if (lifeExpectancy != null && retirementAge != null) {
-    //       if (retirementAge! >= lifeExpectancy!) {
-    //         setState(() {
-    //           invalidRetirementAge = true;
-    //         });
-    //         // showAlert('Retirement age should be less than life expectancy.');
-    //       } else {
-    //         setState(() {
-    //           invalidRetirementAge = false;
-    //           invalidLifeExpectancy = false;
-    //         });
-    //       }
-    //     }
-    //   }
-    // } else if (textField == TextFieldFocus.lifeExpectancy) {
-    //   if (value == false) {
-    //     if (retirementAge != null && lifeExpectancy != null && age != null) {
-    //       if (retirementAge! >= lifeExpectancy! && age! >= lifeExpectancy!) {
-    //         setState(() {
-    //           invalidLifeExpectancy = true;
-    //         });
-    //         // showAlert('Life expectancy should be more than retirement age.');
-    //       } else {
-    //         setState(() {
-    //           invalidLifeExpectancy = false;
-    //           invalidRetirementAge = false;
-    //         });
-    //       }
-    //     } else if (lifeExpectancy != null && age != null) {
-    //       print("hmmm $age   $lifeExpectancy");
-    //       if (age! >= lifeExpectancy!) {
-    //         setState(() {
-    //           invalidLifeExpectancy = true;
-    //         });
-    //         // showAlert('Life expectancy should be more than retirement age.');
-    //       } else {
-    //         setState(() {
-    //           invalidAge = false;
-    //           invalidLifeExpectancy = false;
-    //         });
-    //       }
-    //     }
-    //   }
-    // }
-    if (retirementAge != null && lifeExpectancy != null && age != null) {
-      if (age! < retirementAge! && age! < lifeExpectancy!) {
+    if (textField == TextFieldFocus.age) {
+      //resigning responder
+      if (value == false) {
+        if (age != null) {
+          validateAge();
+          if (ageErrorType == null) {
+            if (retirementAge != null) {
+              if (age! >= retirementAge!) {
+                // showAlert('Your age should be less than retirement age.');
+                setState(() {
+                  invalidAge = true;
+                  ageErrorType = ErrorType.invalidAge;
+                });
+              } else {
+                setState(() {
+                  invalidAge = false;
+                  ageErrorType = null;
+                });
+                if (lifeExpectancy != null) {
+                  if (retirementAge! < lifeExpectancy! &&
+                      retirementAgeErrorType ==
+                          ErrorType.invalidRetirementAge) {
+                    setState(() {
+                      invalidRetirementAge = false;
+                      retirementAgeErrorType = null;
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+      } // becoming responder
+      else {
         setState(() {
+          currentFocus = textField;
           invalidAge = false;
+          ageErrorType = null;
         });
       }
-      if (retirementAge! < lifeExpectancy!) {
-        setState(() {
-          invalidRetirementAge = false;
-          invalidLifeExpectancy = false;
-        });
-      }
-      if (retirementAge! >= lifeExpectancy! && age! >= lifeExpectancy!) {
-        setState(() {
-          invalidLifeExpectancy = true;
-        });
-        // showAlert('Life expectancy should be more than retirement age.');
+    } else if (textField == TextFieldFocus.retirementAge) {
+      //resigning responder
+      if (value == false) {
+        if (retirementAge != null) {
+          validateRetirementAge();
+          if (retirementAgeErrorType == null) {
+            if (age != null && lifeExpectancy != null) {
+              if (retirementAge! <= age! || retirementAge! >= lifeExpectancy!) {
+                setState(() {
+                  invalidRetirementAge = true;
+                  retirementAgeErrorType = ErrorType.invalidRetirementAge;
+                });
+                // showAlert('Retirement age should be more than current age.');
+              } else {
+                setState(() {
+                  invalidRetirementAge = false;
+                  retirementAgeErrorType = null;
+                  if (invalidAge == true &&
+                      ageErrorType == ErrorType.invalidAge) {
+                    invalidAge = false;
+                    ageErrorType = null;
+                  }
+                  if (invalidLifeExpectancy &&
+                      lifeExpecancyErrorType ==
+                          ErrorType.invalidLifeExpectancy) {
+                    invalidLifeExpectancy = false;
+                    lifeExpecancyErrorType = null;
+                  }
+                });
+              }
+            } else if (age != null) {
+              if (retirementAge! <= age!) {
+                setState(() {
+                  invalidRetirementAge = true;
+                  retirementAgeErrorType = ErrorType.invalidRetirementAge;
+                });
+              } else {
+                setState(() {
+                  invalidRetirementAge = false;
+                  retirementAgeErrorType = null;
+                  if (invalidAge == true &&
+                      ageErrorType == ErrorType.invalidAge) {
+                    invalidAge = false;
+                    ageErrorType = null;
+                  }
+                });
+              }
+            } else if (lifeExpectancy != null) {
+              if (retirementAge! >= lifeExpectancy!) {
+                setState(() {
+                  invalidRetirementAge = true;
+                  retirementAgeErrorType = ErrorType.invalidRetirementAge;
+                });
+                // showAlert('Retirement age should be less than life expectancy.');
+              } else {
+                setState(() {
+                  invalidRetirementAge = false;
+                  retirementAgeErrorType = null;
+                  if (invalidLifeExpectancy &&
+                      lifeExpecancyErrorType ==
+                          ErrorType.invalidLifeExpectancy) {
+                    invalidLifeExpectancy = false;
+                    lifeExpecancyErrorType = null;
+                  }
+                });
+              }
+            }
+          }
+        }
       } else {
         setState(() {
-          invalidLifeExpectancy = false;
+          currentFocus = textField;
           invalidRetirementAge = false;
+          retirementAgeErrorType = null;
         });
       }
-    } else if (retirementAge != null && lifeExpectancy != null) {
-    } else if (lifeExpectancy != null && age != null) {
-    } else if (retirementAge != null && age != null) {
+    } else if (textField == TextFieldFocus.lifeExpectancy) {
+      if (value == false) {
+        if (lifeExpectancy != null) {
+          validateLifeExpectancyAge();
+          if (lifeExpecancyErrorType == null) {
+            if (retirementAge != null) {
+              if (lifeExpectancy! <= retirementAge!) {
+                setState(() {
+                  invalidLifeExpectancy = true;
+                  lifeExpecancyErrorType = ErrorType.invalidLifeExpectancy;
+                });
+              } else {
+                setState(() {
+                  invalidLifeExpectancy = false;
+                  lifeExpecancyErrorType = null;
+                });
+                if (age != null) {
+                  if (retirementAge! > age! &&
+                      retirementAgeErrorType ==
+                          ErrorType.invalidRetirementAge) {
+                    setState(() {
+                      invalidRetirementAge = false;
+                      retirementAgeErrorType = null;
+                    });
+                  }
+                } else if (retirementAgeErrorType ==
+                    ErrorType.invalidRetirementAge) {
+                  setState(() {
+                    invalidRetirementAge = false;
+                    retirementAgeErrorType = null;
+                  });
+                }
+              }
+            }
+          }
+        }
+      } else {
+        setState(() {
+          currentFocus = textField;
+          invalidLifeExpectancy = false;
+          lifeExpecancyErrorType = null;
+        });
+      }
     } else {
-      setState(() {
-        invalidAge = false;
-        invalidLifeExpectancy = false;
-        invalidRetirementAge = false;
-      });
-    }
-    if (value == true) {
-      setState(() {
-        currentFocus = textField;
-      });
+      if (value == true) {
+        setState(() {
+          currentFocus = textField;
+        });
+      }
     }
   }
 
@@ -381,6 +424,87 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     }
   }
 
+  void validateAge() {
+    if (age != null) {
+      if ((age ?? 0) < minCurrentAge) {
+        setState(() {
+          invalidAge = true;
+          ageErrorType = ErrorType.minAge;
+        });
+      }
+      if ((age ?? 0) > maxCurrentAge) {
+        setState(() {
+          invalidAge = true;
+          ageErrorType = ErrorType.maxAge;
+        });
+      }
+    }
+  }
+
+  void validateRetirementAge() {
+    if (retirementAge != null) {
+      if ((retirementAge ?? 0) < minRetirementAge) {
+        setState(() {
+          invalidRetirementAge = true;
+          retirementAgeErrorType = ErrorType.minRetirementAge;
+        });
+      }
+      if ((retirementAge ?? 0) > maxRetirementAge) {
+        setState(() {
+          invalidRetirementAge = true;
+          retirementAgeErrorType = ErrorType.maxRetirementAge;
+        });
+      }
+    }
+  }
+
+  void validateLifeExpectancyAge() {
+    if (lifeExpectancy != null) {
+      if (lifeExpectancy! < minLifeExpectancy) {
+        setState(() {
+          invalidLifeExpectancy = true;
+          lifeExpecancyErrorType = ErrorType.minLifeExpectancy;
+        });
+      }
+      if (lifeExpectancy! > maxLifeExpectancy) {
+        setState(() {
+          invalidLifeExpectancy = true;
+          lifeExpecancyErrorType = ErrorType.maxLifeExpectancy;
+        });
+      }
+    }
+  }
+
+  void validateInflation() {
+    setState(() {
+      if ((inflationrate ?? 0) > maxInflationRate) {
+        isInvalidInflation = true;
+      } else {
+        isInvalidInflation = false;
+      }
+    });
+  }
+
+  void validateROI() {
+    setState(() {
+      if ((expectedROI ?? 0) > interestRateMaxValue) {
+        isInvalidReturn = true;
+      } else {
+        isInvalidReturn = false;
+      }
+    });
+  }
+
+  void validateROR() {
+    setState(() {
+      if ((expectedRORetirement ?? 0) > interestRateMaxValue) {
+        isInvalidReturnOnCorpus = true;
+      } else {
+        isInvalidReturnOnCorpus = false;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -393,29 +517,52 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 20, 0, 0),
-                      child: Text(
-                        "Personal information",
-                        style: appTheme.textTheme.subtitle1,
-                      ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            // color: appTheme.accentColor,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 5, 0, 10),
+                              child: Text(
+                                "Personal information",
+                                style: appTheme.textTheme.bodyText2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 0,
                     ),
                     buildPersonalInformationContainer(context),
                     SizedBox(
-                      height: 20,
+                      height: 30,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 10, 0, 0),
-                      child: Text(
-                        "Investment information",
-                        style: appTheme.textTheme.subtitle1,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            // color: appTheme.accentColor,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 5, 0, 10),
+                              child: Text(
+                                "Investment information",
+                                style: appTheme.textTheme.bodyText2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 0,
                     ),
                     buildInvestmentInformationContainer(context),
                     SizedBox(
@@ -445,35 +592,20 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         width: deviceWidth,
         padding: EdgeInsets.fromLTRB(16, 16, 16, 16),
         margin: EdgeInsets.fromLTRB(8, 5, 8, 0),
-        decoration: BoxDecoration(
-            // borderRadius: BorderRadius.all(Radius.circular(8)),
-            // color: Colors.white,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Colors.grey,
-            //     spreadRadius: 2,
-            //     blurRadius: 2,
-            //     offset: Offset(1, 1), // changes position of shadow
-            //   )
-            // ],
-            ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          // _ageSection(context),
-          // SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                  width: (deviceWidth - 64) / 2, child: _ageSection(context)),
-              Container(
-                  width: (deviceWidth - 64) / 2,
-                  child: _retirementAgeSection(context))
-            ],
-          ),
-          SizedBox(height: 10),
+          _ageSection(context),
+          invalidAge == true ? buildErrorView(ageErrorType) : Container(),
+          SizedBox(height: 20),
+          _retirementAgeSection(context),
+          invalidRetirementAge == true
+              ? buildErrorView(retirementAgeErrorType)
+              : Container(),
+          SizedBox(height: 20),
           _lifeExpectancy(context),
-          SizedBox(height: 10),
+          invalidLifeExpectancy == true
+              ? buildErrorView(lifeExpecancyErrorType)
+              : Container(),
+          SizedBox(height: 20),
           _currentHouseHoldExpenses(context),
         ]));
   }
@@ -484,26 +616,23 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         width: deviceWidth,
         padding: EdgeInsets.fromLTRB(16, 16, 16, 16),
         margin: EdgeInsets.fromLTRB(8, 5, 8, 0),
-        decoration: BoxDecoration(
-            // borderRadius: BorderRadius.all(Radius.circular(8)),
-            // color: Colors.white,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Colors.grey,
-            //     spreadRadius: 2,
-            //     blurRadius: 2,
-            //     offset: Offset(1, 1), // changes position of shadow
-            //   )
-            // ],
-            ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           _currentInvestments(context),
           SizedBox(height: 20),
           _returnRateOnInvestments(context),
+          isInvalidReturn
+              ? buildErrorView(ErrorType.maxReturnRate)
+              : Container(),
           SizedBox(height: 20),
           _returnOnRetirementCorpus(context),
+          isInvalidReturnOnCorpus
+              ? buildErrorView(ErrorType.maxRetirementCorpusReturn)
+              : Container(),
           SizedBox(height: 20),
           _inflationRate(context),
+          isInvalidInflation
+              ? buildErrorView(ErrorType.maxInflationRate)
+              : Container(),
           SizedBox(height: 20),
         ]));
   }
@@ -513,8 +642,8 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textField: TextFieldFocus.investmentAmount,
       textFieldType: TextFieldType.number,
       placeHolder: "10000000",
-      textLimit: amountTextLimit,
-      containerTitle: "Your current investments",
+      textLimit: currentinvestmentLimit,
+      containerTitle: "How much investments you have now?",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
@@ -526,13 +655,15 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     return buildTextFieldContainerSection(
       textField: TextFieldFocus.roi,
       textFieldType: TextFieldType.decimal,
-      placeHolder: "10",
+      placeHolder: "12",
       textLimit: interestRateTextLimit,
-      containerTitle: "Expected return on investments(%)",
+      containerTitle:
+          "Expected rate of return on your investments (% per annum)",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
       onDoneButtonTapped: _onDoneButtonTapped,
+      isError: isInvalidReturn,
     );
   }
 
@@ -540,13 +671,14 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     return buildTextFieldContainerSection(
       textField: TextFieldFocus.interestRate,
       textFieldType: TextFieldType.decimal,
-      placeHolder: "10",
+      placeHolder: "8",
       textLimit: interestRateTextLimit,
-      containerTitle: "Expected return on retirement corpus (%)",
+      containerTitle: "Expect on your retirement corpus (% per annum)",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
       onDoneButtonTapped: _onDoneButtonTapped,
+      isError: isInvalidReturnOnCorpus,
     );
   }
 
@@ -554,13 +686,14 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     return buildTextFieldContainerSection(
       textField: TextFieldFocus.inflationrate,
       textFieldType: TextFieldType.decimal,
-      placeHolder: "10",
+      placeHolder: "6",
       textLimit: interestRateTextLimit,
-      containerTitle: "Expected inflation rate (%)",
+      containerTitle: "Expected inflation rate over the years (% per annum)",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
       onDoneButtonTapped: _onDoneButtonTapped,
+      isError: isInvalidInflation,
     );
   }
 
@@ -570,7 +703,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         textFieldType: TextFieldType.number,
         placeHolder: "25",
         textLimit: ageLimit,
-        containerTitle: "Your current age",
+        containerTitle: "What is your current age?",
         focus: currentFocus,
         onFocusChange: _onFocusChange,
         onTextChange: _onTextChange,
@@ -584,7 +717,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textFieldType: TextFieldType.number,
       placeHolder: "55",
       textLimit: ageLimit,
-      containerTitle: "Retirement age",
+      containerTitle: "At what age you want to retire?",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
@@ -599,7 +732,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         textFieldType: TextFieldType.number,
         placeHolder: "85",
         textLimit: ageLimit,
-        containerTitle: "Life expectancy",
+        containerTitle: "How many years you are expecting to live?",
         focus: currentFocus,
         onFocusChange: _onFocusChange,
         onTextChange: _onTextChange,
@@ -611,9 +744,9 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     return buildTextFieldContainerSection(
       textField: TextFieldFocus.expenses,
       textFieldType: TextFieldType.number,
-      placeHolder: "85",
+      placeHolder: "25000",
       textLimit: expensLimit,
-      containerTitle: "Current household expenses",
+      containerTitle: "Your current monthly household expenses?",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,

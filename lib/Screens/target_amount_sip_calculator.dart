@@ -1,19 +1,17 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/error_message_view.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
 import 'package:calculator/util/Constants/constants.dart';
-import 'package:calculator/util/Components/indicator.dart';
-import 'package:calculator/util/Components/piechart.dart';
-import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class TargetAmountSIPCalculator extends StatefulWidget {
   TargetAmountSIPCalculator({Key? key, required this.category})
@@ -38,23 +36,22 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
   double? stepUpPercentage;
   double? lumpsumAmount;
   double? targetAmount;
-
+  bool isInvalidPeriod = false;
+  bool isInvalidInterest = false;
   _calculateTargetAmount() {
     var helper = UtilityHelper();
-    double montlyAmount = helper
-        .getSIPAmount(
-            amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false)
-        .roundToDouble();
+    double montlyAmount = helper.getSIPAmount(
+        amount ?? 0, rate ?? 0, period ?? 0, inflationrate, false, false);
+    print(montlyAmount);
+    if (montlyAmount > 1) {
+      montlyAmount = montlyAmount.roundToDouble();
+    }
     var lumpsum = helper.getLumpsumValueAmount(
         amount ?? 0, rate ?? 0, period ?? 0, 1, null, false);
-
-    print(lumpsum);
     setState(() {
       sipAmount = montlyAmount;
       lumpsumAmount = lumpsum;
-      print(lumpsumAmount);
       targetAmount = amount;
-      print(sipAmount);
       investedAmount = (sipAmount ?? 0) * (period ?? 0) * 12;
       wealthGain = (amount ?? 0) - (investedAmount ?? 0);
       currentFocus = null;
@@ -70,6 +67,12 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
       isValid = false;
     }
     if (period == null) {
+      isValid = false;
+    }
+    if (isInvalidPeriod) {
+      isValid = false;
+    }
+    if (isInvalidInterest) {
       isValid = false;
     }
     return isValid;
@@ -105,6 +108,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           period = inputtedValue;
+          validatePeriod();
         } else {
           period = null;
         }
@@ -115,6 +119,7 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           rate = inputtedValue;
+          validateInterest();
         } else {
           rate = null;
         }
@@ -137,7 +142,36 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
       setState(() {
         currentFocus = textField;
       });
+    } else {
+      if (Platform.isAndroid) {
+        removeFocus();
+      }
+      if (textField == TextFieldFocus.period) {
+        validatePeriod();
+      } else if (textField == TextFieldFocus.interestRate) {
+        validateInterest();
+      }
     }
+  }
+
+  void validatePeriod() {
+    setState(() {
+      if ((period ?? 0) > periodYearMaxValue) {
+        isInvalidPeriod = true;
+      } else {
+        isInvalidPeriod = false;
+      }
+    });
+  }
+
+  void validateInterest() {
+    setState(() {
+      if ((rate ?? 0) > interestRateMaxValue) {
+        isInvalidInterest = true;
+      } else {
+        isInvalidInterest = false;
+      }
+    });
   }
 
   void removeFocus() {
@@ -258,7 +292,11 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               focus: currentFocus,
               onFocusChange: _onFocusChange,
               onTextChange: _onTextChange,
-              onDoneButtonTapped: _onDoneButtonTapped),
+              onDoneButtonTapped: _onDoneButtonTapped,
+              isError: isInvalidPeriod),
+          isInvalidPeriod == true
+              ? buildErrorView(ErrorType.maxPeriodYears)
+              : Container(),
           SizedBox(height: 20),
           buildTextFieldContainerSection(
               textField: TextFieldFocus.interestRate,
@@ -269,7 +307,11 @@ class _TargetAmountSIPCalculatorState extends State<TargetAmountSIPCalculator> {
               focus: currentFocus,
               onFocusChange: _onFocusChange,
               onTextChange: _onTextChange,
-              onDoneButtonTapped: _onDoneButtonTapped),
+              onDoneButtonTapped: _onDoneButtonTapped,
+              isError: isInvalidInterest),
+          isInvalidInterest == true
+              ? buildErrorView(ErrorType.maxReturnRate)
+              : Container(),
           SizedBox(height: 40),
           Row(children: [
             Expanded(

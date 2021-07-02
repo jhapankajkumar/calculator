@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/error_message_view.dart';
 import 'package:calculator/util/Components/piechartsection.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
@@ -34,7 +37,8 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
   TextFieldFocus? currentFocus;
   FutureValue futureData = FutureValue();
   Compounding? _compounding = Compounding.quaterly;
-
+  bool isInvalidPeriod = false;
+  bool isInvalidInterest = false;
   _calculateAmount() {
     removeFocus();
     var helper = UtilityHelper();
@@ -73,6 +77,12 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
     if (period == null) {
       isValid = false;
     }
+    if (isInvalidPeriod) {
+      isValid = false;
+    }
+    if (isInvalidInterest) {
+      isValid = false;
+    }
     return isValid;
   }
 
@@ -96,6 +106,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           period = inputtedValue;
+          validatePeriod();
         } else {
           period = null;
         }
@@ -106,6 +117,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           rate = inputtedValue;
+          validateInterest();
         } else {
           rate = null;
         }
@@ -118,7 +130,36 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
       setState(() {
         currentFocus = textField;
       });
+    } else {
+      if (Platform.isAndroid) {
+        removeFocus();
+      }
+      if (textField == TextFieldFocus.period) {
+        validatePeriod();
+      } else if (textField == TextFieldFocus.interestRate) {
+        validateInterest();
+      }
     }
+  }
+
+  void validatePeriod() {
+    setState(() {
+      if ((period ?? 0) > periodYearMaxValue) {
+        isInvalidPeriod = true;
+      } else {
+        isInvalidPeriod = false;
+      }
+    });
+  }
+
+  void validateInterest() {
+    setState(() {
+      if ((rate ?? 0) > interestRateMaxValue) {
+        isInvalidInterest = true;
+      } else {
+        isInvalidInterest = false;
+      }
+    });
   }
 
   _onOptionChange(Compounding? value) {
@@ -247,7 +288,11 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
               focus: currentFocus,
               onFocusChange: _onFocusChange,
               onTextChange: _onTextChange,
-              onDoneButtonTapped: _onDoneButtonTapped),
+              onDoneButtonTapped: _onDoneButtonTapped,
+              isError: isInvalidPeriod),
+          isInvalidPeriod == true
+              ? buildErrorView(ErrorType.maxPeriodYears)
+              : Container(),
           SizedBox(height: 20),
           Row(
             children: [
@@ -261,7 +306,8 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                     focus: currentFocus,
                     onFocusChange: _onFocusChange,
                     onTextChange: _onTextChange,
-                    onDoneButtonTapped: _onDoneButtonTapped),
+                    onDoneButtonTapped: _onDoneButtonTapped,
+                    isError: isInvalidInterest),
               ),
               widget.category == Screen.fd
                   ? SizedBox(
@@ -303,6 +349,11 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                   : Container()
             ],
           ),
+          isInvalidInterest == true
+              ? buildErrorView(widget.category == Screen.fd
+                  ? ErrorType.maxInterestRate
+                  : ErrorType.maxReturnRate)
+              : Container(),
           SizedBox(height: 20),
           widget.category == Screen.fv
               ? Text(
