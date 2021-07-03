@@ -172,9 +172,6 @@ class _EMICalculatorState extends State<EMICalculator> {
         currentFocus = textField;
       });
     } else {
-      if (Platform.isAndroid) {
-        removeFocus();
-      }
       if (textField == TextFieldFocus.period) {
         validatePeriod();
       } else if (textField == TextFieldFocus.interestRate) {

@@ -131,9 +131,6 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
         currentFocus = textField;
       });
     } else {
-      if (Platform.isAndroid) {
-        removeFocus();
-      }
       if (textField == TextFieldFocus.period) {
         validatePeriod();
       } else if (textField == TextFieldFocus.interestRate) {

@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:image/image.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'dart:io' show Platform;
 
 class LoanPDFCreator {
   static final LoanPDFCreator shared = LoanPDFCreator._internal();

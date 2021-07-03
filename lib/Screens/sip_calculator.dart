@@ -192,10 +192,6 @@ class _SIPCalculatorState extends State<SIPCalculator> {
         currentFocus = textField;
       });
     } else {
-      if (Platform.isAndroid) {
-        removeFocus();
-      }
-
       if (textField == TextFieldFocus.period) {
         validatePeriod();
       } else if (textField == TextFieldFocus.interestRate) {

@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:calculator/util/Components/directory.dart';
 import 'package:calculator/util/Constants/constants.dart';
 import 'package:calculator/util/investment_data.dart';

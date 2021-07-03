@@ -1,8 +1,5 @@
-import 'dart:math';
-
 import 'package:calculator/util/Components/Charts/chart_helper.dart';
 import 'package:calculator/util/Constants/constants.dart';
-import 'package:calculator/util/investment_data.dart';
 import 'package:calculator/util/sip_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -194,7 +191,6 @@ class _LoanChartViewState extends State<LoanChartView> {
   List<double>? getPointSpots(double amountInterval, EMIData data) {
     List<double> list = [];
     int i = interval.toInt();
-    var datalist = data.installments;
     int tenor = data.period.toInt();
     for (; i <= (data.period); i = i + interval.toInt()) {
       double amount = 0;
