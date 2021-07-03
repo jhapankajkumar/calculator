@@ -483,6 +483,8 @@ String getErrorMessageFromType(ErrorType errorType) {
       return StringConstants.maxStepUpMessage;
     case ErrorType.maxInflationRate:
       return StringConstants.maxInflationRateMessage;
+    case ErrorType.invalidWithdrawalAmount:
+      return StringConstants.maxWithdrawalAmount;
   }
 }
 
@@ -501,4 +503,20 @@ String getiPhoneAppUrl() {
 
 String getAndroidAppUrl() {
   return 'https://play.google.com/store/apps/details?id=com.appstack.fincal';
+}
+
+String getBanner1AdUnit() {
+  if (Platform.isAndroid) {
+    return StringConstants.androidBanner1;
+  } else {
+    return StringConstants.iOSBanner1;
+  }
+}
+
+String getBanner2AdUnit() {
+  if (Platform.isAndroid) {
+    return StringConstants.androidBanner2;
+  } else {
+    return StringConstants.iOSBanner2;
+  }
 }

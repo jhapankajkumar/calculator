@@ -129,152 +129,152 @@ class _LandingPageState extends State<LandingPage> {
           child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          buildSIPView(context, StringConstants.sip,
-                              ImageConstants.sip, _sipClicked),
-                          buildSIPView(context, StringConstants.increamentalSIP,
-                              ImageConstants.stepUpSIP, _stepUpSIPClicked)
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          buildSIPView(context, StringConstants.lumpsum,
-                              ImageConstants.lumpsum, _lumpsumClicked),
-                          buildSIPView(context, StringConstants.swp,
-                              ImageConstants.swp, _swpClicked),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          buildSIPView(context, StringConstants.fixedDeposit,
-                              ImageConstants.fd, _fdClicked),
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildSIPView(context, StringConstants.sip,
+                            ImageConstants.sip, _sipClicked),
+                        buildSIPView(context, StringConstants.increamentalSIP,
+                            ImageConstants.stepUpSIP, _stepUpSIPClicked)
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildSIPView(context, StringConstants.lumpsum,
+                            ImageConstants.lumpsum, _lumpsumClicked),
+                        buildSIPView(context, StringConstants.swp,
+                            ImageConstants.swp, _swpClicked),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildSIPView(context, StringConstants.fixedDeposit,
+                            ImageConstants.fd, _fdClicked),
                           buildSIPView(
                               context,
                               StringConstants.recurringDeposit,
                               ImageConstants.recurring,
                               _rdClicked),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          buildSIPView(context, StringConstants.emi,
-                              ImageConstants.emi, _emiClicked),
-                          buildSIPView(context, StringConstants.futureValue,
-                              ImageConstants.futureValue, _futureValueClicked),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          buildSIPView(context, StringConstants.retirement,
-                              ImageConstants.retirement, _retirementClicked),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildSIPView(context, StringConstants.emi,
+                            ImageConstants.emi, _emiClicked),
+                        buildSIPView(context, StringConstants.futureValue,
+                            ImageConstants.futureValue, _futureValueClicked),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildSIPView(context, StringConstants.retirement,
+                            ImageConstants.retirement, _retirementClicked),
                           buildSIPView(
                               context,
                               "Goal",
                               ImageConstants.targetAmount,
                               _targetAmountClicked),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 50,
-                      ),
-                      Container(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
-                          child: Text(
-                            "Found Interesting?   Share Now",
-                            style: subTitle2,
-                            textAlign: TextAlign.center,
-                          ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    Container(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
+                        child: Text(
+                          "Found Interesting?   Share Now",
+                          style: subTitle2,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            icon: Image.asset('assets/images/twitter.png'),
-                            iconSize: shareImageSize,
-                            onPressed: () {
-                              SocialShare.shareTwitter(
-                                "I found this cool application. Let me recommend you this.",
-                                hashtags: [
-                                  "finance",
-                                  "calculator",
-                                  "sip",
-                                  "emi",
-                                  "loan",
-                                  "financecalculator",
-                                  "\n"
-                                ],
-                                url: '${getiPhoneAppUrl()}',
-                              );
-                            },
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            icon: Image.asset('assets/images/whatsapp.png'),
-                            iconSize: shareImageSize,
-                            onPressed: () {
-                              SocialShare.shareWhatsapp(
-                                  "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
-                            },
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            icon: Image.asset('assets/images/telegram.png'),
-                            iconSize: shareImageSize,
-                            onPressed: () {
-                              SocialShare.shareTelegram(
-                                  "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
-                            },
-                          )
-                        ],
-                      ),
-                      SizedBox(
-                        height: 50,
-                      ),
-                    ],
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.all(0),
+                          icon: Image.asset('assets/images/twitter.png'),
+                          iconSize: shareImageSize,
+                          onPressed: () {
+                            SocialShare.shareTwitter(
+                              "I found this cool application. Let me recommend you this.",
+                              hashtags: [
+                                "finance",
+                                "calculator",
+                                "sip",
+                                "emi",
+                                "loan",
+                                "financecalculator",
+                                "\n"
+                              ],
+                              url: '${getiPhoneAppUrl()}',
+                            );
+                          },
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.all(0),
+                          icon: Image.asset('assets/images/whatsapp.png'),
+                          iconSize: shareImageSize,
+                          onPressed: () {
+                            SocialShare.shareWhatsapp(
+                                "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
+                          },
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.all(0),
+                          icon: Image.asset('assets/images/telegram.png'),
+                          iconSize: shareImageSize,
+                          onPressed: () {
+                            SocialShare.shareTelegram(
+                                "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
+                          },
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                  ],
                   ))),
         ));
   }

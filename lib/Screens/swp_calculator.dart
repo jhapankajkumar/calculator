@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:calculator/Screens/sip_projection_list.dart';
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
 import 'package:calculator/util/Components/button.dart';
+import 'package:calculator/util/Components/error_message_view.dart';
 import 'package:calculator/util/Components/radio_list.dart';
 import 'package:calculator/util/Components/summary_container.dart';
 import 'package:calculator/util/Components/text_field_container.dart';
@@ -35,6 +38,9 @@ class _SWPCalculatorState extends State<SWPCalculator> {
   double endBalance = 0;
   int? moneyLastedFor;
 
+  bool isInvalidPeriod = false;
+  bool isInvalidInterest = false;
+  bool isInvalidWithdrawalAmount = false;
   String? errorText;
   SWPResult? result;
   Compounding? periodValue = Compounding.monthly;
@@ -112,7 +118,13 @@ class _SWPCalculatorState extends State<SWPCalculator> {
     if (period == null) {
       isValid = false;
     }
-    if ((amount ?? 0) > (totalInvestmentAmount ?? 0)) {
+    if (isInvalidPeriod) {
+      isValid = false;
+    }
+    if (isInvalidInterest) {
+      isValid = false;
+    }
+    if (isInvalidWithdrawalAmount) {
       isValid = false;
     }
     return isValid;
@@ -139,9 +151,6 @@ class _SWPCalculatorState extends State<SWPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           totalInvestmentAmount = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
         } else {
           totalInvestmentAmount = null;
         }
@@ -152,9 +161,7 @@ class _SWPCalculatorState extends State<SWPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           amount = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
+          validateWithdrawalAmount();
         } else {
           amount = null;
         }
@@ -165,24 +172,9 @@ class _SWPCalculatorState extends State<SWPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           period = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
+          validatePeriod();
         } else {
           period = null;
-        }
-      });
-    }
-
-    if (textField == TextFieldFocus.period) {
-      setState(() {
-        if (inputtedValue > 0) {
-          months = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
-        } else {
-          months = null;
         }
       });
     }
@@ -191,9 +183,7 @@ class _SWPCalculatorState extends State<SWPCalculator> {
       setState(() {
         if (inputtedValue > 0) {
           rate = inputtedValue;
-          // if (isAllInputValid()) {
-          //   _calculateSIP();
-          // }
+          validateInterest();
         } else {
           rate = null;
         }
@@ -206,7 +196,51 @@ class _SWPCalculatorState extends State<SWPCalculator> {
       setState(() {
         currentFocus = textField;
       });
+    } else {
+      if (Platform.isAndroid) {
+        removeFocus();
+      }
+
+      if (textField == TextFieldFocus.period) {
+        validatePeriod();
+      } else if (textField == TextFieldFocus.interestRate) {
+        validateInterest();
+      } else if (textField == TextFieldFocus.investmentAmount) {
+        validateWithdrawalAmount();
+      }
     }
+  }
+
+  void validatePeriod() {
+    setState(() {
+      if ((period ?? 0) > periodYearMaxValue) {
+        isInvalidPeriod = true;
+      } else {
+        isInvalidPeriod = false;
+      }
+    });
+  }
+
+  void validateInterest() {
+    setState(() {
+      if ((rate ?? 0) > interestRateMaxValue) {
+        isInvalidInterest = true;
+      } else {
+        isInvalidInterest = false;
+      }
+    });
+  }
+
+  void validateWithdrawalAmount() {
+    setState(() {
+      if (totalInvestmentAmount != null) {
+        if ((amount ?? 0) > totalInvestmentAmount!) {
+          isInvalidWithdrawalAmount = true;
+        } else {
+          isInvalidWithdrawalAmount = false;
+        }
+      }
+    });
   }
 
   void removeFocus() {
@@ -237,15 +271,6 @@ class _SWPCalculatorState extends State<SWPCalculator> {
   _onDoneButtonTapped() {
     setState(() {
       removeFocus();
-    });
-  }
-
-  _onOptionChange(Compounding? value) {
-    setState(() {
-      periodValue = value;
-      if (isAllInputValid()) {
-        _calculateButtonTapped();
-      }
     });
   }
 
@@ -282,10 +307,7 @@ class _SWPCalculatorState extends State<SWPCalculator> {
                                 moneyFinishedAtMonth: moneyLastedFor,
                                 withdrawalFrequency: periodValue,
                                 onTapDetail: _onDetailButtonTap))
-                        : ((amount ?? 0) > (totalInvestmentAmount ?? 0))
-                            ? messageView(
-                                "Please enter withdrawal amount less than your total investment.")
-                            : Container(),
+                        : Container(),
                     SizedBox(
                       height: 20,
                     ),
@@ -307,7 +329,7 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             textFieldType: TextFieldType.number,
             placeHolder: "500000000",
             textLimit: amountTextLimit,
-            containerTitle: "Total Invstment",
+            containerTitle: "My Total Invstment is",
             focus: currentFocus,
             onFocusChange: _onFocusChange,
             onTextChange: _onTextChange,
@@ -325,7 +347,11 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onFocusChange: _onFocusChange,
             onTextChange: _onTextChange,
             onDoneButtonTapped: _onDoneButtonTapped,
+            isError: isInvalidWithdrawalAmount,
           ),
+          isInvalidWithdrawalAmount
+              ? buildErrorView(ErrorType.invalidWithdrawalAmount)
+              : Container(),
           SizedBox(height: 20),
           //period
           buildTextFieldContainerSection(
@@ -338,7 +364,11 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onFocusChange: _onFocusChange,
             onTextChange: _onTextChange,
             onDoneButtonTapped: _onDoneButtonTapped,
+            isError: isInvalidPeriod,
           ),
+          isInvalidPeriod
+              ? buildErrorView(ErrorType.maxPeriodYears)
+              : Container(),
           SizedBox(height: 20),
           //return rate
           buildTextFieldContainerSection(
@@ -351,7 +381,11 @@ class _SWPCalculatorState extends State<SWPCalculator> {
             onFocusChange: _onFocusChange,
             onTextChange: _onTextChange,
             onDoneButtonTapped: _onDoneButtonTapped,
+            isError: isInvalidInterest,
           ),
+          isInvalidInterest
+              ? buildErrorView(ErrorType.maxReturnRate)
+              : Container(),
           SizedBox(height: 20),
           Row(children: [
             Expanded(

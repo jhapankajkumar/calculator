@@ -11,7 +11,6 @@ class ChartHelper {
   final Color startBalanceColor = const Color(0xffff5182);
   final Color interestEarnedColor = Colors.yellow;
   final Color finalBalanceColor = Colors.green;
-  final double barWidth = 5;
   final double space = 10;
   static final ChartHelper shared = ChartHelper._internal();
   factory ChartHelper() {
@@ -197,22 +196,22 @@ class ChartHelper {
       BarChartRodData(
         y: y1,
         colors: [startBalanceColor],
-        width: barWidth,
+        width: swpBarWidht,
       ),
       BarChartRodData(
         y: y2,
         colors: [finalBalanceColor],
-        width: barWidth,
+        width: swpBarWidht,
       ),
       BarChartRodData(
         y: y3,
         colors: [withdrawalColor],
-        width: barWidth,
+        width: swpBarWidht,
       ),
       BarChartRodData(
         y: y4,
         colors: [interestEarnedColor],
-        width: barWidth,
+        width: swpBarWidht,
       ),
     ]);
   }

@@ -1,8 +1,6 @@
 import 'package:calculator/util/Components/appbar.dart';
 import 'package:calculator/util/Components/base_container.dart';
-import 'package:calculator/util/Components/button.dart';
 import 'package:calculator/util/Constants/constants.dart';
-import 'package:calculator/util/Constants/string_constants.dart';
 import 'package:calculator/util/retirement_data.dart';
 import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +19,8 @@ class RetirementCalulationResult extends StatefulWidget {
 
 class _RetirementCalulationResultState
     extends State<RetirementCalulationResult> {
-  Widget buildDetail(String title, double value, bool? isPeriod) {
+  Widget buildDetail(
+      String title, double value, bool? isPeriod, bool isDevider) {
     return Container(
       child: Column(
         children: [
@@ -49,10 +48,12 @@ class _RetirementCalulationResultState
           SizedBox(
             height: 20,
           ),
-          Container(
-            height: 1,
-            color: Colors.grey,
-          ),
+          isDevider == true
+              ? Container(
+                  height: 1,
+                  color: Colors.grey,
+                )
+              : Container(),
           SizedBox(
             height: 10,
           ),
@@ -115,32 +116,53 @@ class _RetirementCalulationResultState
                     SizedBox(
                       height: 10,
                     ),
-                    buildHeader("AMOUNT NEEDED FOR RETIREMENT",
+                    buildHeader("AMOUNT YOU NEED FOR RETIREMENT",
                         widget.result.finalRetirementAmount),
-                    buildDetail('YOUR CURRENT MONTHLY EXPENSE',
-                        widget.result.currentExpenses, false),
+                    // Container(
+                    //   color: appTheme.accentColor,
+                    //   padding: EdgeInsets.all(8),
+                    //   child: Text(
+                    //     'Break Down',
+                    //     style: appTheme.textTheme.bodyText1,
+                    //   ),
+                    // ),
+                    buildDetail('YOUR CURRENT MONTHLY HOUSEHOLD EXPENSES',
+                        widget.result.currentExpenses, false, true),
                     buildDetail(
-                        'YOUR FUTURE MONTHLY EXPENSES INCLUDING INFLATION',
+                        'YOUR FUTURE MONTHLY HOUSEHOLD EXPENSES (INFLATION ADJUSTED)',
                         widget.result.futureExpenses,
-                        false),
-                    buildDetail('YOUR CURRENT INVESTMENT AMOUNT',
-                        widget.result.currentInvestmentAmount, false),
-                    buildDetail('FUTURE VALUE OF INVESTMENT AMOUNT',
-                        widget.result.futureInvestmentsAmount, false),
+                        false,
+                        true),
                     buildDetail(
-                        'RETIREMENT CORPUS', widget.result.corpusAmount, false),
+                        'AMOUNT YOU REQUIRED TO MEET EXPENSES ON RETIRMENT ${widget.result.currentInvestmentAmount > 0 ? '(A)' : ''}',
+                        widget.result.corpusAmount,
+                        false,
+                        true),
+                    widget.result.currentInvestmentAmount > 0
+                        ? buildDetail('YOUR CURRENT INVESTMENT AMOUNT',
+                            widget.result.currentInvestmentAmount, false, true)
+                        : Container(),
                     widget.result.currentInvestmentAmount > 0
                         ? buildDetail(
-                            'FINAL AMOUNT (RETIREMENT CORPUS - FUTURE INVESTMENT)',
+                            'FUTURE VALUE OF YOUR CURRENT INVESTMENTS AFTER ${widget.result.period.toInt()} YEARS (B)',
+                            widget.result.futureInvestmentsAmount,
+                            false,
+                            true)
+                        : Container(),
+
+                    widget.result.currentInvestmentAmount > 0
+                        ? buildDetail(
+                            'FINAL AMOUNT YOU NEED FOR RETIREMENT \n(A - B)',
                             widget.result.finalRetirementAmount,
-                            false)
+                            false,
+                            true)
                         : Container(),
                     buildDetail('NUMBER OF YEARS YOU NEED TO INVEST',
-                        widget.result.period.toDouble(), true),
+                        widget.result.period.toDouble(), true, true),
                     buildDetail('LUMPSUM AMOUNT YOU NEED TO INVEST',
-                        widget.result.lumpsumAmount, false),
+                        widget.result.lumpsumAmount, false, true),
                     buildDetail('SIP AMOUNT YOU NEED TO INVEST',
-                        widget.result.sipAmount, false),
+                        widget.result.sipAmount, false, false),
                     SizedBox(
                       height: 50,
                     ),

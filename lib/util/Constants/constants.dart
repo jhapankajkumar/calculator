@@ -19,6 +19,8 @@ double bodyText2FontSize = device == DeviceType.Phone ? 14 : 26;
 double calculateButtonFont = device == DeviceType.Phone ? 20 : 28;
 double menuFontSize = device == DeviceType.Phone ? 10 : 20;
 double headerFontSize = device == DeviceType.Phone ? 30 : 40;
+double swpBarWidht = device == DeviceType.Phone ? 5 : 20;
+double loanBarWidht = device == DeviceType.Phone ? 10 : 30;
 
 //ComponentsR
 double menuContainerSize = device == DeviceType.Phone ? 120 : 220;
@@ -173,4 +175,5 @@ enum ErrorType {
   maxReturnRate,
   maxStepUpRate,
   maxInflationRate,
+  invalidWithdrawalAmount,
 }

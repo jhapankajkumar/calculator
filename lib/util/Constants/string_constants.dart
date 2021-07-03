@@ -52,11 +52,11 @@ class StringConstants {
   static String calculate = 'Calculate';
   static String summary = 'Summary';
 
-  static String fixedDepositAmount = 'Fixed Deposit Amount';
-  static String recurringDepositAmount = 'Recurring Deposit Amount';
+  static String fixedDepositAmount = 'I Want To Deposit Amount';
+  static String recurringDepositAmount = 'I Want To Deposit Recurring Amount';
 
-  static String depositPriod = 'Time Period';
-  static String rateOfInterest = 'Rate of Interest (%)';
+  static String depositPriod = 'For Time Period';
+  static String rateOfInterest = 'With Rate of Interest (%)';
 
   static String loanAmount = 'Loan amount';
 
@@ -126,4 +126,16 @@ class StringConstants {
   static String maxLoanPeriod = "Loan period should not be more than 30 years";
   static String maxLoanInterestRate =
       "Loan interest rate should not be more than 30 %";
+  static String maxWithdrawalAmount =
+      "Withdrawal amount should not be more than total investment.";
+
+  static String androidBanner1 = 'ca-app-pub-3940256099942544/2934735716';
+  static String androidBanner2 = 'ca-app-pub-3940256099942544/2934735716';
+
+  // static String iOSBanner1 = 'ca-app-pub-5306311701979651/2365144314';
+  // static String iOSBanner2 = 'ca-app-pub-5306311701979651/2766994211';
+
+//test banner
+  static String iOSBanner2 = 'ca-app-pub-3940256099942544/6300978111';
+  static String iOSBanner1 = 'ca-app-pub-3940256099942544/2934735716';
 }

@@ -216,7 +216,12 @@ class _EMICalculatorState extends State<EMICalculator> {
       periodValue = value;
       if (period != null) {
         if (periodValue == Period.years) {
-          period = ((period ?? 0) ~/ 12).toDouble();
+          var value = ((period ?? 0) ~/ 12).toDouble();
+          if (value == 0) {
+            period = 1;
+          } else {
+            period = value;
+          }
           controller?.text = (period ?? 0).toInt().toString();
         } else {
           period = (period ?? 0) * 12;

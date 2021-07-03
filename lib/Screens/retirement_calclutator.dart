@@ -71,7 +71,6 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
             (1 + ((inflationrate ?? 0) / 100)) -
         1;
 
-    print(interestRate);
     retirementCorpus = helper.pv(
         interestRate, lifePeriod, -(futureMonthlyExpenses! * 12), 0, 1);
     // print('Corpus $retirementCorpus');
@@ -85,7 +84,6 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         inflationrate ?? 0,
         false,
         false);
-    print(sipAmount);
     lumpsumAmount = helper.getLumpsumValueAmount(retirementCorpus ?? 0,
         expectedRORetirement ?? 0, period.toDouble(), 1, null, false);
 
@@ -643,7 +641,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textFieldType: TextFieldType.number,
       placeHolder: "10000000",
       textLimit: currentinvestmentLimit,
-      containerTitle: "How much investments you have now?",
+      containerTitle: "My current investment amount is",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
@@ -657,8 +655,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textFieldType: TextFieldType.decimal,
       placeHolder: "12",
       textLimit: interestRateTextLimit,
-      containerTitle:
-          "Expected rate of return on your investments (% per annum)",
+      containerTitle: "My expected rate of return on investments (% per annum)",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
@@ -673,7 +670,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textFieldType: TextFieldType.decimal,
       placeHolder: "8",
       textLimit: interestRateTextLimit,
-      containerTitle: "Expect on your retirement corpus (% per annum)",
+      containerTitle: "My expected return on retirement corpus (% per annum)",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
@@ -688,7 +685,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textFieldType: TextFieldType.decimal,
       placeHolder: "6",
       textLimit: interestRateTextLimit,
-      containerTitle: "Expected inflation rate over the years (% per annum)",
+      containerTitle: "My expected inflation rate over the years (% per annum)",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
@@ -703,7 +700,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         textFieldType: TextFieldType.number,
         placeHolder: "25",
         textLimit: ageLimit,
-        containerTitle: "What is your current age?",
+        containerTitle: "My Current age is",
         focus: currentFocus,
         onFocusChange: _onFocusChange,
         onTextChange: _onTextChange,
@@ -717,7 +714,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textFieldType: TextFieldType.number,
       placeHolder: "55",
       textLimit: ageLimit,
-      containerTitle: "At what age you want to retire?",
+      containerTitle: "I want to retire at age",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,
@@ -732,7 +729,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
         textFieldType: TextFieldType.number,
         placeHolder: "85",
         textLimit: ageLimit,
-        containerTitle: "How many years you are expecting to live?",
+        containerTitle: "I am expecting to live till age",
         focus: currentFocus,
         onFocusChange: _onFocusChange,
         onTextChange: _onTextChange,
@@ -746,7 +743,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
       textFieldType: TextFieldType.number,
       placeHolder: "25000",
       textLimit: expensLimit,
-      containerTitle: "Your current monthly household expenses?",
+      containerTitle: "My current monthly household expenses is",
       focus: currentFocus,
       onFocusChange: _onFocusChange,
       onTextChange: _onTextChange,

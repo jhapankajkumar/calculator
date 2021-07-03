@@ -65,7 +65,7 @@ class _LoanChartViewState extends State<LoanChartView> {
           BarChartRodStackItem(0, y1 - y2, const Color(0xff2bdb90)),
           BarChartRodStackItem(y1 - y2, y1, const Color(0xffff4d94)),
         ],
-        width: 10,
+        width: loanBarWidht,
       ),
     ]);
   }
@@ -136,7 +136,7 @@ class _LoanChartViewState extends State<LoanChartView> {
                       Indicator(
                         color: finalBalanceColor,
                         size: indicatorSize,
-                        text: "Pricipal",
+                        text: "Principal",
                         isSquare: false,
                         textColor: Colors.white,
                       ),

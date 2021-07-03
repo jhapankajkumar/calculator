@@ -3,7 +3,6 @@ import 'package:calculator/util/utility.dart';
 import 'package:flutter/material.dart';
 
 Widget buildErrorView(ErrorType? errorType) {
-  print(errorType);
   return Row(
     children: [
       Flexible(

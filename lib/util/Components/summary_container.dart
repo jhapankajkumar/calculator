@@ -323,7 +323,9 @@ Widget buildSummaryRow(double? amount, String title) {
                   textAlign: TextAlign.end,
                   style: subTitle1,
                 )
-              : Text('\$INFINITE', style: subTitle1),
+              : (amount?.isNaN == true
+                  ? Text('\$0', style: subTitle1)
+                  : Text('\$INFINITE', style: subTitle1)),
         ),
       ),
     ],
