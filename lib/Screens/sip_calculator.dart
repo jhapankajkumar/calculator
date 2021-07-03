@@ -187,7 +187,6 @@ class _SIPCalculatorState extends State<SIPCalculator> {
   }
 
   _onFocusChange(TextFieldFocus? textField, bool value) {
-    print('object');
     if (value == true) {
       setState(() {
         currentFocus = textField;
@@ -225,7 +224,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
         return SIPProjetionList(
-          category: Screen.detail,
+          category: widget.category,
           data: data!,
         );
       }));

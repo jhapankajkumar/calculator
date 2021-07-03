@@ -26,7 +26,7 @@ class _RetirementCalulationResultState
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 0, 0),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: Text(
               title,
               textAlign: TextAlign.center,
@@ -37,7 +37,7 @@ class _RetirementCalulationResultState
             height: 10,
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 0, 0),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: Text(
               isPeriod == true
                   ? '${formatter.format(value)} Years'
@@ -66,7 +66,7 @@ class _RetirementCalulationResultState
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 0, 0),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: Text(
               title,
               textAlign: TextAlign.center,
@@ -77,7 +77,7 @@ class _RetirementCalulationResultState
             height: 10,
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 0, 0),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: Text(
               '\$ ${formatter.format(value)}',
               textAlign: TextAlign.center,

@@ -510,7 +510,7 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
     return Scaffold(
         appBar: appBar(category: widget.category, context: context),
         body: baseContainer(
-            onTap: removeFocus,
+            onTap: null,
             context: context,
             child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
