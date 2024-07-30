@@ -431,7 +431,7 @@ Widget messageView(String message) {
   return Container(
       margin: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-          border: Border.all(color: appTheme.accentColor, width: 1.0),
+          border: Border.all(color: appTheme.hintColor, width: 1.0),
           borderRadius: BorderRadius.circular(8),
           color: Colors.grey[80]),
       child: Padding(

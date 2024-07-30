@@ -16,7 +16,9 @@ class Chart extends StatelessWidget {
       child: Center(
         child: PieChart(
           PieChartData(
-              pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {}),
+              pieTouchData: PieTouchData(
+                touchCallback: (p0, p1) {},
+              ),
               startDegreeOffset: 270,
               borderData: FlBorderData(
                 show: false,

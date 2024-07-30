@@ -54,8 +54,8 @@ class _LoanChartViewState extends State<LoanChartView> {
   BarChartGroupData makeGroupData(int x, double y1, double y2, double y3) {
     return BarChartGroupData(barsSpace: 2, x: x, barRods: [
       BarChartRodData(
-        y: y1,
-        colors: [Colors.black],
+        toY: y1,
+        color: Colors.black,
         borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(6), topRight: Radius.circular(6)),
         rodStackItems: [
@@ -81,7 +81,7 @@ class _LoanChartViewState extends State<LoanChartView> {
         gradient: LinearGradient(
           colors: [
             Color(0xff2c274c),
-            appTheme.accentColor,
+            appTheme.hintColor,
           ],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
@@ -250,10 +250,14 @@ class _LoanChartViewState extends State<LoanChartView> {
       barTouchData: BarTouchData(enabled: false),
       groupsSpace: 12,
       titlesData: FlTitlesData(
-        bottomTitles:
-            ChartHelper.shared.getBottomTiles(interval, widget.cateogry, 12),
-        leftTitles: ChartHelper.shared.getLeftSideTiles(amountInterval, false),
-        rightTitles: ChartHelper.shared.getRightSideTiles(),
+        bottomTitles: AxisTitles(
+            sideTitles: ChartHelper.shared
+                .getBottomTiles(interval, widget.cateogry, 12)),
+        leftTitles: AxisTitles(
+            sideTitles:
+                ChartHelper.shared.getLeftSideTiles(amountInterval, false)),
+        rightTitles:
+            AxisTitles(sideTitles: ChartHelper.shared.getRightSideTiles()),
       ),
       gridData: FlGridData(
         show: true,

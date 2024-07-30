@@ -221,55 +221,58 @@ class _LandingPageState extends State<LandingPage> {
                       SizedBox(
                         height: 15,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            icon: Image.asset('assets/images/twitter.png'),
-                            iconSize: shareImageSize,
-                            onPressed: () {
-                              SocialShare.shareTwitter(
-                                "I found this cool application. Let me recommend you this.",
-                                hashtags: [
-                                  "finance",
-                                  "calculator",
-                                  "sip",
-                                  "emi",
-                                  "loan",
-                                  "financecalculator",
-                                  "\n"
-                                ],
-                                url: '${getiPhoneAppUrl()}',
-                              );
-                            },
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            icon: Image.asset('assets/images/whatsapp.png'),
-                            iconSize: shareImageSize,
-                            onPressed: () {
-                              SocialShare.shareWhatsapp(
-                                  "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
-                            },
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            icon: Image.asset('assets/images/telegram.png'),
-                            iconSize: shareImageSize,
-                            onPressed: () {
-                              SocialShare.shareTelegram(
-                                  "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
-                            },
-                          )
-                        ],
+                      Container(
+                        height: shareImageSize,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              padding: EdgeInsets.all(0),
+                              icon: Image.asset('assets/images/twitter.png'),
+                              iconSize: shareImageSize,
+                              onPressed: () {
+                                SocialShare.shareTwitter(
+                                  "I found this cool application. Let me recommend you this.",
+                                  hashtags: [
+                                    "finance",
+                                    "calculator",
+                                    "sip",
+                                    "emi",
+                                    "loan",
+                                    "financecalculator",
+                                    "\n"
+                                  ],
+                                  url: '${getiPhoneAppUrl()}',
+                                );
+                              },
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.all(0),
+                              icon: Image.asset('assets/images/whatsapp.png'),
+                              iconSize: 20,
+                              onPressed: () {
+                                SocialShare.shareWhatsapp(
+                                    "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
+                              },
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.all(0),
+                              icon: Image.asset('assets/images/telegram.png'),
+                              iconSize: shareImageSize,
+                              onPressed: () {
+                                SocialShare.shareTelegram(
+                                    "I found this cool application. Let me recommend you this. \n\niPhone ${getiPhoneAppUrl()} \n\nAndroid ${getAndroidAppUrl()}");
+                              },
+                            )
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: 50,
@@ -318,7 +321,7 @@ class _LandingPageState extends State<LandingPage> {
             ),
             Text(
               title,
-              style: appTheme.textTheme.caption,
+              style: appTheme.textTheme.bodySmall,
             )
           ],
         ),

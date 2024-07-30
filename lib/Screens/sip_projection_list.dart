@@ -333,13 +333,11 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
   Future<void> shareItem(String path) async {
     final box = context.findRenderObject() as RenderBox?;
     if (path.isNotEmpty) {
-      Share.shareFiles([path],
-              text: "GrowFund",
-              subject: "Investment Detail",
-              sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size)
-          .onError((error, stackTrace) {
-        _showErrorAlert();
-      });
+      XFile file = XFile(path);
+      Share.shareXFiles([file],
+          text: "GrowFund",
+          subject: "Investment Detail",
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } else {
       Share.share("text",
           subject: "subject",
@@ -418,25 +416,25 @@ class _SIPProjetionListState extends State<SIPProjetionList> {
                         style: TextStyle(
                             color: (this._currentSelection == 0
                                 ? Colors.white
-                                : appTheme.accentColor)),
+                                : appTheme.hintColor)),
                       ),
                       1: Text(
                         '          Chart          ',
                         style: TextStyle(
                             color: (this._currentSelection == 1
                                 ? Colors.white
-                                : appTheme.accentColor)),
+                                : appTheme.hintColor)),
                       ),
                     },
                     selectionIndex: _currentSelection,
                     borderColor: appTheme.primaryColor,
-                    selectedColor: appTheme.accentColor,
+                    selectedColor: appTheme.hintColor,
                     unselectedColor: appTheme.primaryColor,
                     horizontalPadding: EdgeInsets.all(16),
                     verticalOffset: 16,
                     borderRadius: 32.0,
                     disabledColor: appTheme.primaryColor,
-                    onSegmentChosen: (int index) {
+                    onSegmentTapped: (int index) {
                       setState(() {
                         _currentSelection = index;
                       });

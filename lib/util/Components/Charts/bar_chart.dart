@@ -75,7 +75,7 @@ class _BarChartViewState extends State<BarChartView> {
         gradient: LinearGradient(
           colors: [
             Color(0xff2c274c),
-            appTheme.accentColor,
+            appTheme.hintColor,
           ],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
@@ -212,19 +212,22 @@ class _BarChartViewState extends State<BarChartView> {
       minY: 0,
       barTouchData: BarTouchData(
           touchTooltipData: BarTouchTooltipData(
-            tooltipBgColor: Color(0xff2c274c),
+            getTooltipColor: (group) => Color(0xff2c274c),
             getTooltipItem: (_a, _b, _c, _d) {
               return ChartHelper.shared
                   .getBarChartGroupTouchData(_a, widget.data, interval);
             },
           ),
-          touchCallback: (response) {}),
+          touchCallback: (p0, p1) {}),
       titlesData: FlTitlesData(
-          bottomTitles:
-              ChartHelper.shared.getBottomTiles(interval, widget.cateogry, 12),
-          leftTitles:
-              ChartHelper.shared.getLeftSideTiles(amountInterval, false),
-          rightTitles: ChartHelper.shared.getRightSideTiles()),
+          bottomTitles: AxisTitles(
+              sideTitles: ChartHelper.shared
+                  .getBottomTiles(interval, widget.cateogry, 12)),
+          leftTitles: AxisTitles(
+              sideTitles:
+                  ChartHelper.shared.getLeftSideTiles(amountInterval, false)),
+          rightTitles:
+              AxisTitles(sideTitles: ChartHelper.shared.getRightSideTiles())),
       gridData: FlGridData(
         show: true,
       ),

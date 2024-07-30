@@ -18,8 +18,8 @@ class ExcelSheetCreator {
 
   CellStyle cellHeaderStyle = CellStyle(
     bold: true,
-    backgroundColorHex: '#212E51',
-    fontColorHex: '#FFFFFF',
+    backgroundColorHex: ExcelColor.fromHexString('#212E51'),
+    fontColorHex: ExcelColor.fromHexString('#FFFFFF'),
     horizontalAlign: HorizontalAlign.Right,
     textWrapping: TextWrapping.WrapText,
     fontFamily: getFontFamily(FontFamily.Comic_Sans_MS),
@@ -27,8 +27,8 @@ class ExcelSheetCreator {
   );
   CellStyle rowTextStyle = CellStyle(
     bold: true,
-    backgroundColorHex: '#212E51',
-    fontColorHex: '#FFFFFF',
+    backgroundColorHex: ExcelColor.fromHexString('#212E51'),
+    fontColorHex: ExcelColor.fromHexString('#FFFFFF'),
     textWrapping: TextWrapping.WrapText,
     fontFamily: getFontFamily(FontFamily.Comic_Sans_MS),
     rotation: 0,
@@ -64,18 +64,18 @@ class ExcelSheetCreator {
       isSwp = true;
     }
     data.list?.forEach((element) {
-      List<dynamic> row = [];
+      List<CellValue> row = [];
       if (isFutureValue) {
-        row.add('${element.tenor} Year');
+        row.add(TextCellValue('${element.tenor} Year'));
       } else {
-        row.add('${(element.tenor)} Month(s)');
+        row.add(TextCellValue('${(element.tenor)} Month(s)'));
       }
-      row.add(element.amount);
+      row.add(DoubleCellValue(element.amount));
       if (isSwp) {
-        row.add(element.withdrawal);
+        row.add(DoubleCellValue(element.withdrawal ?? 0));
       }
-      row.add(element.profit);
-      row.add(element.balance);
+      row.add(DoubleCellValue(element.profit));
+      row.add(DoubleCellValue(element.balance));
       sheet.appendRow(row);
     });
 
@@ -104,12 +104,12 @@ class ExcelSheetCreator {
 
     // appending rows and checking the time complexity of it
     data.installments.forEach((element) {
-      List<dynamic> row = [];
-      row.add('${(element.tenor)} Month(s)');
-      row.add(element.principalAmount.roundToDouble());
-      row.add(element.interestAmount.roundToDouble());
-      row.add(element.emiAmount.roundToDouble());
-      row.add(element.remainingLoanBalance.roundToDouble());
+      List<CellValue> row = [];
+      row.add(TextCellValue('${(element.tenor)} Month(s)'));
+      row.add(DoubleCellValue(element.principalAmount.roundToDouble()));
+      row.add(DoubleCellValue(element.interestAmount.roundToDouble()));
+      row.add(DoubleCellValue(element.emiAmount.roundToDouble()));
+      row.add(DoubleCellValue(element.remainingLoanBalance.roundToDouble()));
       sheet.appendRow(row);
     });
 
@@ -124,19 +124,19 @@ class ExcelSheetCreator {
 
   Sheet updateNormalHeader(Sheet sheet, Screen category) {
     var cell = sheet.cell(CellIndex.indexByString("A1"));
-    cell.value = "Duration";
+    cell.value = TextCellValue("Duration");
     cell.cellStyle = cellHeaderStyle;
 
     var cell3 = sheet.cell(CellIndex.indexByString("B1"));
-    cell3.value = "Amount";
+    cell3.value = TextCellValue("Amount");
     cell3.cellStyle = cellHeaderStyle;
 
     var cell5 = sheet.cell(CellIndex.indexByString("C1"));
-    cell5.value = "Interest";
+    cell5.value = TextCellValue("Interest");
     cell5.cellStyle = cellHeaderStyle;
 
     var cell7 = sheet.cell(CellIndex.indexByString("D1"));
-    cell7.value = "Balance";
+    cell7.value = TextCellValue("Balance");
     cell7.cellStyle = cellHeaderStyle;
 
     // var cell5 = sheet.cell(CellIndex.indexByString("E1"));
@@ -149,23 +149,23 @@ class ExcelSheetCreator {
 
   Sheet updateSwpHeader(Sheet sheet, Screen category) {
     var cell = sheet.cell(CellIndex.indexByString("A1"));
-    cell.value = "Time";
+    cell.value = TextCellValue("Time");
     cell.cellStyle = cellHeaderStyle;
 
     var cell3 = sheet.cell(CellIndex.indexByString("B1"));
-    cell3.value = "Start Balance";
+    cell3.value = TextCellValue("Start Balance");
     cell3.cellStyle = cellHeaderStyle;
 
     var cell5 = sheet.cell(CellIndex.indexByString("C1"));
-    cell5.value = "Withdrawal";
+    cell5.value = TextCellValue("Withdrawal");
     cell5.cellStyle = cellHeaderStyle;
 
     var cell7 = sheet.cell(CellIndex.indexByString("D1"));
-    cell7.value = "Interest";
+    cell7.value = TextCellValue("Interest");
     cell7.cellStyle = cellHeaderStyle;
 
     var cell9 = sheet.cell(CellIndex.indexByString("E1"));
-    cell9.value = 'End Balance';
+    cell9.value = TextCellValue("End Balance");
     cell9.cellStyle = cellHeaderStyle;
 
     return sheet;
@@ -173,23 +173,23 @@ class ExcelSheetCreator {
 
   Sheet updateLoanHeader(Sheet sheet) {
     var cell = sheet.cell(CellIndex.indexByString("A1"));
-    cell.value = "Time";
+    cell.value = TextCellValue("Time");
     cell.cellStyle = cellHeaderStyle;
 
     var cell3 = sheet.cell(CellIndex.indexByString("B1"));
-    cell3.value = "Principal\n(A)";
+    cell3.value = TextCellValue("Principal\n(A)");
     cell3.cellStyle = cellHeaderStyle;
 
     var cell5 = sheet.cell(CellIndex.indexByString("C1"));
-    cell5.value = "Interest\n(B)";
+    cell5.value = TextCellValue("Interest\n(B)");
     cell5.cellStyle = cellHeaderStyle;
 
     var cell7 = sheet.cell(CellIndex.indexByString("D1"));
-    cell7.value = "Total Payment\n(A + B)";
+    cell7.value = TextCellValue("Total Payment\n(A + B)");
     cell7.cellStyle = cellHeaderStyle;
 
     var cell9 = sheet.cell(CellIndex.indexByString("E1"));
-    cell9.value = 'Balance';
+    cell9.value = TextCellValue("Balance");
     cell9.cellStyle = cellHeaderStyle;
 
     return sheet;

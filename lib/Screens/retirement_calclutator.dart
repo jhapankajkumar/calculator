@@ -523,12 +523,12 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
                         Expanded(
                           child: Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            // color: appTheme.accentColor,
+                            // color: appTheme.hintColor,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 5, 0, 10),
                               child: Text(
                                 "Personal information",
-                                style: appTheme.textTheme.bodyText2,
+                                style: appTheme.textTheme.bodyMedium,
                               ),
                             ),
                           ),
@@ -547,12 +547,12 @@ class _RetirementCalculatorState extends State<RetirementCalculator> {
                         Expanded(
                           child: Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            // color: appTheme.accentColor,
+                            // color: appTheme.hintColor,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 5, 0, 10),
                               child: Text(
                                 "Investment information",
-                                style: appTheme.textTheme.bodyText2,
+                                style: appTheme.textTheme.bodyMedium,
                               ),
                             ),
                           ),

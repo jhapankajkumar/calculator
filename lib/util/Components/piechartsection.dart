@@ -44,7 +44,7 @@ Widget buildGraphContainer({
                   size: indicatorSize,
                   text: wealthGainValue,
                   isSquare: false,
-                  textColor: appTheme.accentColor,
+                  textColor: appTheme.hintColor,
                 ),
                 SizedBox(
                   height: 4,
@@ -54,7 +54,7 @@ Widget buildGraphContainer({
                   size: indicatorSize,
                   text: investedAmountValue,
                   isSquare: false,
-                  textColor: appTheme.accentColor,
+                  textColor: appTheme.hintColor,
                 ),
                 SizedBox(
                   height: 18,

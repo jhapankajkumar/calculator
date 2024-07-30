@@ -17,7 +17,7 @@ AppBar appBar(
         : null,
     title: new Text(
       headerTitle(category),
-      style: appTheme.textTheme.bodyText2,
+      style: appTheme.textTheme.bodyMedium,
     ),
     backgroundColor: appTheme.primaryColor,
     elevation: 0.0,
@@ -41,7 +41,7 @@ Container leading(BuildContext context) {
     ),
     child: Center(
       child: IconButton(
-        icon: Icon(Icons.arrow_back, color: appTheme.accentColor),
+        icon: Icon(Icons.arrow_back, color: appTheme.hintColor),
         onPressed: () => Navigator.of(context).pop(),
       ),
     ),
@@ -65,7 +65,7 @@ Container trailing(BuildContext context, Function? onTapShare) {
     ),
     child: Center(
       child: IconButton(
-          icon: Icon(Icons.share, color: appTheme.accentColor),
+          icon: Icon(Icons.share, color: appTheme.hintColor),
           onPressed: () {
             if (onTapShare != null) {
               onTapShare();

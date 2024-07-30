@@ -339,7 +339,7 @@ class _EMICalculatorState extends State<EMICalculator> {
                   children: [
                     Text(
                       '',
-                      style: appTheme.textTheme.caption,
+                      style: appTheme.textTheme.bodySmall,
                     ),
                     SizedBox(
                       height: 10,

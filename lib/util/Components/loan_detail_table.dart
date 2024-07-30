@@ -80,7 +80,7 @@ class _InstallmentListTableViewState extends State<InstallmentListTableView> {
     return Container(
       decoration: BoxDecoration(
           color: isYear == true
-              ? appTheme.accentColor
+              ? appTheme.hintColor
               : (index % 2 == 0 ? appTheme.primaryColor : Colors.white)),
       child: Column(
         children: [
@@ -180,7 +180,7 @@ class _InstallmentListTableViewState extends State<InstallmentListTableView> {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Container(
-        color: appTheme.accentColor,
+        color: appTheme.hintColor,
         height: 80,
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

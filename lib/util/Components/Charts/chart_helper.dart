@@ -132,8 +132,8 @@ class ChartHelper {
   SideTitles getRightSideTiles() {
     return SideTitles(
         showTitles: true,
-        getTitles: (value) {
-          return '';
+        getTitlesWidget: (value, meta) {
+          return Text("");
         },
         reservedSize: 5);
   }
@@ -141,76 +141,88 @@ class ChartHelper {
   SideTitles getLeftSideTiles(double amountInterval, bool shouldShowZero) {
     return SideTitles(
       showTitles: true,
-      rotateAngle: 25,
-      getTextStyles: (value) => const TextStyle(
-        color: Color(0xff75729e),
-        fontWeight: FontWeight.bold,
-        fontSize: 12,
-      ),
-      getTitles: (value) {
+      getTitlesWidget: (value, meta) {
         if (shouldShowZero) {
           if (value == 0) {
-            return "0    ";
+            return Text(
+              "0    ",
+              style: const TextStyle(
+                color: Color(0xff75729e),
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            );
           }
+
+          return Text(
+            k_m_b_generators(amountInterval * value),
+            style: const TextStyle(
+              color: Color(0xff75729e),
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          );
+        } else {
+          return Text("");
         }
-        return k_m_b_generators(amountInterval * value);
       },
-      margin: 8,
       reservedSize: 40,
     );
   }
 
   SideTitles getBottomTiles(int interval, Screen category, int delta) {
     return SideTitles(
-      showTitles: true,
-      reservedSize: 22,
-      getTextStyles: (value) => TextStyle(
-        color: Color(0xff72719b),
-        fontWeight: FontWeight.bold,
-        fontSize: category != Screen.stepup ? 12 : 16,
-      ),
-      margin: 10,
-      rotateAngle: 0,
-      getTitles: (value) {
-        if (category == Screen.swp) {
-          return (((value + 1) / 12 * interval)).toInt().toString();
-        }
-        if (category == Screen.emi) {
-          return (((value + 1) / 12 * interval)).toInt().toString();
-        } else {
-          if (value == 0) {
-            return "0";
+        showTitles: true,
+        reservedSize: 22,
+        getTitlesWidget: (value, meta) {
+          String result = "";
+          if (category == Screen.swp) {
+            result = (((value + 1) / 12 * interval)).toInt().toString();
           }
-          if (value % space == 0) {
-            return (((value / space) / delta * interval)).toInt().toString();
+          if (category == Screen.emi) {
+            result = (((value + 1) / 12 * interval)).toInt().toString();
+          } else {
+            if (value == 0) {
+              result = "0";
+            } else if (value % space == 0) {
+              result =
+                  (((value / space) / delta * interval)).toInt().toString();
+            } else {
+              result = '';
+            }
           }
-          return '';
-        }
-      },
-    );
+          return Text(
+            result,
+            style: TextStyle(
+              color: Color(0xff72719b),
+              fontWeight: FontWeight.bold,
+              fontSize: category != Screen.stepup ? 12 : 16,
+            ),
+          );
+        });
   }
 
   BarChartGroupData makeGroupData(
       int x, double y1, double y2, double y3, double y4) {
     return BarChartGroupData(barsSpace: 2, x: x, barRods: [
       BarChartRodData(
-        y: y1,
-        colors: [startBalanceColor],
+        toY: y1,
+        color: startBalanceColor,
         width: swpBarWidht,
       ),
       BarChartRodData(
-        y: y2,
-        colors: [finalBalanceColor],
+        toY: y2,
+        color: finalBalanceColor,
         width: swpBarWidht,
       ),
       BarChartRodData(
-        y: y3,
-        colors: [withdrawalColor],
+        toY: y3,
+        color: withdrawalColor,
         width: swpBarWidht,
       ),
       BarChartRodData(
-        y: y4,
-        colors: [interestEarnedColor],
+        toY: y4,
+        color: interestEarnedColor,
         width: swpBarWidht,
       ),
     ]);
@@ -373,12 +385,11 @@ class ChartHelper {
 
   LineChartBarData getLineSpotsData(SpotsType type, int interval,
       double amountInterval, InvestmentResult data, Color color) {
+    List<FlSpot>? spot = getSpotsFor(type, interval, amountInterval, data);
     return LineChartBarData(
-      spots: getSpotsFor(type, interval, amountInterval, data),
+      spots: spot == null ? [] : spot,
       isCurved: true,
-      colors: [
-        color,
-      ],
+      color: color,
       barWidth: 3,
       isStrokeCapRound: true,
       dotData: FlDotData(

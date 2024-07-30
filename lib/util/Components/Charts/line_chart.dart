@@ -56,7 +56,7 @@ class _LineChartViewState extends State<LineChartView> {
         gradient: LinearGradient(
           colors: [
             Color(0xff2c274c),
-            appTheme.accentColor,
+            appTheme.hintColor,
           ],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
@@ -145,7 +145,7 @@ class _LineChartViewState extends State<LineChartView> {
                   padding: const EdgeInsets.only(right: 16.0, left: 6.0),
                   child: LineChart(
                     getLineChartData(),
-                    swapAnimationDuration: const Duration(milliseconds: 250),
+                    duration: const Duration(milliseconds: 250),
                   ),
                 ),
               ),
@@ -195,24 +195,28 @@ class _LineChartViewState extends State<LineChartView> {
       minY: 0,
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+          getTooltipColor: (touchedSpot) => Colors.blueGrey.withOpacity(0.8),
           tooltipPadding: EdgeInsets.all(16),
           getTooltipItems: (barSpots) {
             return ChartHelper.shared
                 .getLineChartTouchData(barSpots, interval, widget.data);
           },
         ),
-        touchCallback: (LineTouchResponse touchResponse) {},
+        touchCallback: (p0, p1) {},
         handleBuiltInTouches: true,
       ),
       gridData: FlGridData(
         show: true,
       ),
       titlesData: FlTitlesData(
-          bottomTitles: ChartHelper.shared
-              .getBottomTiles(interval, widget.cateogry, deltaFactor),
-          leftTitles: ChartHelper.shared.getLeftSideTiles(amountInterval, true),
-          rightTitles: ChartHelper.shared.getRightSideTiles()),
+          bottomTitles: AxisTitles(
+              sideTitles: ChartHelper.shared
+                  .getBottomTiles(interval, widget.cateogry, deltaFactor)),
+          leftTitles: AxisTitles(
+              sideTitles:
+                  ChartHelper.shared.getLeftSideTiles(amountInterval, true)),
+          rightTitles:
+              AxisTitles(sideTitles: ChartHelper.shared.getRightSideTiles())),
       borderData: ChartHelper.shared.getChartBorder(true),
       lineBarsData: linesBarDetails(),
     );

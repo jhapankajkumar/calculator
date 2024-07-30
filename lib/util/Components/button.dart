@@ -12,7 +12,7 @@ Container genericButton({required String title, required Function? onPress}) {
           style: buttonStyle,
         ),
         borderRadius: BorderRadius.all(Radius.circular(8)),
-        color: appTheme.accentColor,
+        color: appTheme.hintColor,
         disabledColor: Colors.grey,
         onPressed: onPress != null
             ? () {

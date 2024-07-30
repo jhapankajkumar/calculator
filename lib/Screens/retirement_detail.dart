@@ -29,7 +29,7 @@ class _RetirementCalulationResultState
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: appTheme.textTheme.subtitle1,
+              style: appTheme.textTheme.titleMedium,
             ),
           ),
           SizedBox(
@@ -119,7 +119,7 @@ class _RetirementCalulationResultState
                     buildHeader("AMOUNT YOU NEED FOR RETIREMENT",
                         widget.result.finalRetirementAmount),
                     // Container(
-                    //   color: appTheme.accentColor,
+                    //   color: appTheme.hintColor,
                     //   padding: EdgeInsets.all(8),
                     //   child: Text(
                     //     'Break Down',

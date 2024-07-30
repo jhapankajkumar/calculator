@@ -354,7 +354,7 @@ class _SIPCalculatorState extends State<SIPCalculator> {
                     children: [
                         Text(
                           '',
-                          style: appTheme.textTheme.caption,
+                          style: appTheme.textTheme.bodySmall,
                         ),
                         SizedBox(
                           height: 10,

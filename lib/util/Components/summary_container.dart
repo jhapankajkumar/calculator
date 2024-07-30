@@ -27,12 +27,12 @@ Widget buildSummeryContainer({required BuildContext context, Widget? child}) {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                color: appTheme.accentColor,
+                color: appTheme.hintColor,
                 padding: EdgeInsets.all(8),
                 width: deviceWidth,
                 child: Text(
                   StringConstants.summary,
-                  style: appTheme.textTheme.bodyText1,
+                  style: appTheme.textTheme.bodyLarge,
                 ),
               ),
               child
@@ -195,8 +195,7 @@ Widget? buildSWPSummaryViews(
                 SizedBox(height: 10),
                 Container(
                   decoration: BoxDecoration(
-                      border:
-                          Border.all(color: appTheme.accentColor, width: 1.0),
+                      border: Border.all(color: appTheme.hintColor, width: 1.0),
                       borderRadius: BorderRadius.circular(8),
                       color: Colors.grey[80]),
                   child: Padding(
@@ -295,7 +294,7 @@ Widget devider() {
     padding: const EdgeInsets.all(8.0),
     child: Container(
       height: 1,
-      color: appTheme.accentColor,
+      color: appTheme.hintColor,
     ),
   );
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../Constants/constants.dart';
 
 enum Compounding { monthly, quaterly, annually }
+
 enum Period { years, months }
 
 List<Period> periodList = [Period.years, Period.months];
@@ -31,7 +32,7 @@ Widget buildCompoundungDropDown(Compounding? currentValue, Function onChanged) {
     iconSize: 24,
     underline: Container(),
     //elevation: 16,
-    style: appTheme.textTheme.caption,
+    style: appTheme.textTheme.bodySmall,
     onChanged: (Compounding? newValue) {
       onChanged(newValue);
     },
@@ -51,7 +52,7 @@ Widget buildPeriodDropDown(Period? currentValue, Function onChanged) {
     iconSize: 24,
     underline: Container(),
     //elevation: 16,
-    style: appTheme.textTheme.caption,
+    style: appTheme.textTheme.bodySmall,
     onChanged: (Period? newValue) {
       onChanged(newValue);
     },

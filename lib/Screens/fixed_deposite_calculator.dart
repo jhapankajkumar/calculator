@@ -318,7 +318,7 @@ class _FixedDepositeCalculatorState extends State<FixedDepositeCalculator> {
                       children: [
                           Text(
                             "Compounding",
-                            style: appTheme.textTheme.caption,
+                            style: appTheme.textTheme.bodySmall,
                           ),
                           SizedBox(height: 10),
                           Container(

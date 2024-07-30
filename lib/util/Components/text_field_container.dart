@@ -115,7 +115,7 @@ class _TextFieldContainerState extends State<TextFieldContainer> {
                             TextFieldType.number)
                         ? TextInputType.numberWithOptions(decimal: false)
                         : TextInputType.numberWithOptions(decimal: true),
-                    style: appTheme.textTheme.subtitle2,
+                    style: appTheme.textTheme.titleSmall,
                     inputFormatters: [
                       LengthLimitingTextInputFormatter(
                           widget.containerData.textLimit),
@@ -217,7 +217,7 @@ Widget buildTextFieldContainerSection(
           padding: const EdgeInsets.fromLTRB(4, 0, 0, 0),
           child: Text(
             containerTitle,
-            style: appTheme.textTheme.caption,
+            style: appTheme.textTheme.bodySmall,
           ),
         ),
         SizedBox(height: 10),

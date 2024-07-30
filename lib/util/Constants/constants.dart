@@ -38,29 +38,29 @@ Color ascentColor = Color(0xff212E51);
 
 ThemeData appTheme = ThemeData(
   primaryColor: Color(0xffEFEFEF),
-  accentColor: ascentColor,
+  hintColor: ascentColor,
   fontFamily: 'Oxygen',
   scaffoldBackgroundColor: Color(0xffEFEFEF),
   brightness: Brightness.light,
   textTheme: TextTheme(
-    bodyText1: TextStyle(
+    bodyLarge: TextStyle(
         fontSize: bodyText1FontSize,
         fontWeight: FontWeight.normal,
         color: Colors.white),
-    bodyText2: TextStyle(
+    bodyMedium: TextStyle(
         fontSize: bodyText2FontSize,
         fontWeight: FontWeight.bold,
         color: ascentColor),
-    caption: TextStyle(
+    bodySmall: TextStyle(
       fontSize: captionFontSize,
       fontWeight: FontWeight.bold,
       color: ascentColor,
     ),
-    subtitle1: TextStyle(
+    titleMedium: TextStyle(
         fontSize: subTtitleFontSize,
         fontWeight: FontWeight.bold,
         color: Color(0xff212E51)),
-    subtitle2: TextStyle(
+    titleSmall: TextStyle(
         fontSize: subTtitleFontSize,
         fontWeight: FontWeight.bold,
         color: Colors.black54),
